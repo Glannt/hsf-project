@@ -1,9 +1,7 @@
 package com.hsf.hsfproject.service.cart;
 
 import com.hsf.hsfproject.dtos.request.CartItemRequest;
-import com.hsf.hsfproject.model.Cart;
-import com.hsf.hsfproject.model.CartItem;
-import com.hsf.hsfproject.model.User;
+import com.hsf.hsfproject.model.*;
 import com.hsf.hsfproject.repository.CartItemRepository;
 import com.hsf.hsfproject.repository.CartRepository;
 import com.hsf.hsfproject.repository.ComputerItemRepository;
@@ -12,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,48 +33,52 @@ public class CartService implements ICartService{
     }
 
     @Override
-    public CartItem addCartItemToCart(CartItemRequest cartItemRequest) {
-        // Retrieve the cart using the cart ID from the request
-        Cart cart = cartRepository.findById(cartItemRequest.getCartId())
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found with ID: " + cartItemRequest.getCartId()));
+    public CartItem addCartItemToCart(CartItemRequest request) {
+        Cart cart = cartRepository.findById(request.getCartId())
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
 
-        CartItem cartItem = new CartItem();
-        // Create a new CartItem from the request
-       if(pcRepository.existsById(cartItemRequest.getProductId())) {
-             cartItem = CartItem.builder()
-                    .cart(cart)
-                    .pc(pcRepository.findById(cartItemRequest.getProductId()).orElse(null))
-                    .quantity(cartItemRequest.getQuantity())
-                    .build();
-
-            // Save the CartItem to the repository
-            cartItemRepository.save(cartItem);
-
-            // Update the cart's total price and item count
-            double itemPrice = cartItem.getPc().getTotalPrice() * cartItem.getQuantity();
-            cart.setTotalPrice(cart.getTotalPrice() + itemPrice);
-            cart.setItemCount(cart.getItemCount() + 1);
-            cartRepository.save(cart);
-
+        Optional<PC> pcOpt = pcRepository.findById(request.getProductId());
+        if (pcOpt.isPresent()) {
+            return addPCToCart(cart, pcOpt.get(), request.getQuantity());
         }
-        if(computerItemRepository.existsById(cartItemRequest.getProductId())) {
-             cartItem = CartItem.builder()
-                    .cart(cart)
-                    .computerItem(computerItemRepository.findById(cartItemRequest.getProductId()).orElse(null))
-                    .quantity(cartItemRequest.getQuantity())
-                    .build();
 
-            // Save the CartItem to the repository
-            cartItemRepository.save(cartItem);
-
-            // Update the cart's total price and item count
-            double itemPrice = cartItem.getComputerItem().getPrice() * cartItem.getQuantity();
-            cart.setTotalPrice(cart.getTotalPrice() + itemPrice);
-            cart.setItemCount(cart.getItemCount() + 1);
-            cartRepository.save(cart);
-
-
+        Optional<ComputerItem> itemOpt = computerItemRepository.findById(request.getProductId());
+        if (itemOpt.isPresent()) {
+            return addComputerItemToCart(cart, itemOpt.get(), request.getQuantity());
         }
+
+        throw new IllegalArgumentException("Product not found");
+    }
+
+    private CartItem addPCToCart(Cart cart, PC pc, int quantity) {
+        CartItem cartItem = CartItem.builder()
+                .cart(cart)
+                .pc(pc)
+                .quantity(quantity)
+                .build();
+
+        cartItemRepository.save(cartItem);
+        double price = pc.getTotalPrice() * quantity;
+        updateCart(cart, price);
         return cartItem;
+    }
+
+    private CartItem addComputerItemToCart(Cart cart, ComputerItem item, int quantity) {
+        CartItem cartItem = CartItem.builder()
+                .cart(cart)
+                .computerItem(item)
+                .quantity(quantity)
+                .build();
+
+        cartItemRepository.save(cartItem);
+        double price = item.getPrice() * quantity;
+        updateCart(cart, price);
+        return cartItem;
+    }
+
+    private void updateCart(Cart cart, double addedPrice) {
+        cart.setTotalPrice(cart.getTotalPrice() + addedPrice);
+        cart.setItemCount(cart.getItemCount() + 1);
+        cartRepository.save(cart);
     }
 }

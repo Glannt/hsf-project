@@ -31,7 +31,7 @@ public class WebSecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(configure -> configure
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/**", "/**").permitAll()
 //                                .requestMatchers("/api/customer/**").hasAuthority("CUSTOMER")
 //                                .requestMatchers("/api/staff/**").hasAnyAuthority("STAFF")
 //                                .requestMatchers("api/manager/**").hasAnyAuthority("MANAGER")

@@ -8,6 +8,6 @@ import com.hsf.hsfproject.model.User;
 public interface ICartService {
     Cart createCart(User user);
     CartItem addCartItemToCart(CartItemRequest cartItemRequest);
-    CartItem updateCartItem(Long cartItemId, int newQuantity);
-    void deleteCartItem(Long cartItemId);
+//    CartItem updateCartItem(Long cartItemId, int newQuantity);
+//    void deleteCartItem(Long cartItemId);
 }

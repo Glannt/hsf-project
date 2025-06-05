@@ -7,35 +7,50 @@ import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final IUserService userService;
 
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody CreateUserDTO registerRequest) {
-        // TODO: Implement registration logic
 
-            if (registerRequest.getUsername() == null || registerRequest.getPassword() == null) {
-                return ResponseEntity.badRequest().body("Username and password are required");
-            }
-            User user = userService.createUser(registerRequest);
-            if (user == null) {
-                return ResponseEntity.badRequest().body("User registration failed");
-            }
-        return ResponseEntity.ok(user);
+
+    @PostMapping("/register")
+    public String register(@ModelAttribute CreateUserDTO registerRequest, Model model) {
+        if (registerRequest.getUsername() == null || registerRequest.getPassword() == null) {
+            model.addAttribute("registerError", "Username and password are required");
+            return "register";
+        }
+        User user = userService.createUser(registerRequest);
+        if (user == null) {
+            model.addAttribute("registerError", "User registration failed");
+            return "register";
+        }
+        model.addAttribute("registerSuccess", "Registration successful! Please log in.");
+        return "login";
+    }
+
+    //Show login form
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login"; // Thymeleaf template: login.html
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public String login(@ModelAttribute LoginRequest loginRequest, Model model) {
         LoginResponse loginResponse = userService.login(loginRequest);
         if (loginResponse == null) {
-            return ResponseEntity.status(404).body("User not found or invalid credentials");
+            model.addAttribute("loginError", "User not found or invalid credentials");
+            return "login";
         }
-        return ResponseEntity.ok(loginResponse);
+        model.addAttribute("loginSuccess", "Login successful!");
+        // You may want to set session attributes here
+        return "redirect:/"; // Redirect to homepage after successful login
     }
 }
