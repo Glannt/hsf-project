@@ -1,5 +1,6 @@
 package com.hsf.hsfproject.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,14 +26,17 @@ public class CartItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
+    @JsonBackReference
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "computer_item_id")
+    @JsonBackReference
     private ComputerItem computerItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pc_id")
+    @JsonBackReference
     private PC pc;
 
 }
