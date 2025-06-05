@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <h1>Register</h1>
+</header>
+<main>
+    <form th:action="@{/api/auth/register}" th:object="${registerRequest}" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+    <div th:if="${registerError}">
+        <p th:text="${registerError}" style="color:red;"></p>
+    </div>
+    <div th:if="${registerSuccess}">
+        <p th:text="${registerSuccess}" style="color:green;"></p>
+    </div>
+</main>
+<footer>
+    <p>&copy; 2024 HSF Project</p>
+</footer>
+</body>
+</html>

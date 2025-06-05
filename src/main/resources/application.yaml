@@ -12,3 +12,7 @@ spring:
     show-sql: true
 # XAMPP default MySQL user is 'root' with no password. Adjust 'username' and 'password' if you have changed them.
 
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML

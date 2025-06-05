@@ -1,6 +1,8 @@
 package com.hsf.hsfproject.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,19 +24,20 @@ public class Order extends BaseEntity {
     private String shippingAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "order_id")
+    @JsonManagedReference
     private Set<OrderDetail> orderItems;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "order_id")
+    @JsonManagedReference
     private List<Transaction> transactions;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "order_id")
+    @JsonBackReference
     private InstallmentPlan installmentPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
 }
