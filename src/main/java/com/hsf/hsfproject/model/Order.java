@@ -22,6 +22,7 @@ public class Order extends BaseEntity {
     private String orderNumber;
     private String status;
     private String shippingAddress;
+    private double totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -35,7 +36,7 @@ public class Order extends BaseEntity {
     @JsonBackReference
     private InstallmentPlan installmentPlan;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;

@@ -1,0 +1,148 @@
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <!-- Tùy bạn giữ lại hoặc rút gọn -->
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
+                    </a>
+                    <nav class="main-nav">
+                        <ul class="menu sf-arrows">
+                            <li><a th:href="@{/}">Home</a></li>
+                            <li><a th:href="@{/products}">Shop</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <a th:href="@{/cart}" class="icon-shopping-cart"><i class="icon-shopping-cart"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+            <div class="container">
+                <h1 class="page-title">Shopping Cart</h1>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <div class="cart">
+                <div class="container">
+                    <div th:if="${#lists.isEmpty(cart.cartItems)}">
+                        <p>Your cart is empty.</p>
+                        <a th:href="@{/products}" class="btn btn-outline-primary-2">Continue Shopping</a>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(cart.cartItems)}">
+                        <form th:action="@{/user/cart/update}" method="post">
+                            <table class="table table-cart table-mobile">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price (VND)</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${cart.cartItems}">
+                                    <td class="product-col">
+                                        <div class="product">
+                                            <h3 class="product-title" th:text="${item.computerItem != null ? item.computerItem.name : item.pc.name}">Product Name</h3>
+                                        </div>
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger((item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
+                                    <td>
+                                        <input class="form-control" type="number" name="quantities"
+                                               th:value="${item.quantity}" min="1" style="width:80px;">
+                                        <input type="hidden" name="itemIds" th:value="${item.id}" />
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(item.quantity * (item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
+                                    <td>
+                                        <form th:action="@{/user/cart/remove}" method="post">
+                                            <input type="hidden" name="cartItemId" th:value="${item.id}" />
+                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row">
+                                <div class="col-lg-4 offset-lg-8">
+                                    <div class="cart-summary">
+                                        <h4>Total:</h4>
+                                        <p th:text="${#numbers.formatInteger(cart.totalPrice, 0, 'POINT')} + ' VND'">0 VND</p>
+                                        <button type="submit" class="btn btn-outline-primary-2 btn-block">Update Cart</button>
+<!--                                        <a th:href="@{/order}" class="btn btn-primary btn-block">Proceed to Checkout</a>-->
+                                        <form th:action="@{/orders}" method="post" style="margin-top: 10px;">
+                                            <input type="hidden" name="cartId" th:value="${cart.id}" />
+                                            <input type="hidden" name="userId" th:value="${user.id}" />
+                                            <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Your Store</p>
+        </div>
+    </footer>
+</div>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const removeForms = document.querySelectorAll(".remove-form");
+        removeForms.forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload(); // Reload lại trang sau khi xóa thành công
+                        } else {
+                            alert("Failed to remove item from cart.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred.");
+                    });
+            });
+        });
+    });
+</script>
+</body>
+</html>

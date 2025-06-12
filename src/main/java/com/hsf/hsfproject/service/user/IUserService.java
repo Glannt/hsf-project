@@ -13,5 +13,6 @@ public interface IUserService {
     void deleteUser(Long userId);
     User getUserByName(String name);
     Page<User> getUsers(Pageable pageable);
-    LoginResponse login(LoginRequest loginRequest);
+    User findByUsername(String username);
+//    LoginResponse login(LoginRequest loginRequest);
 }

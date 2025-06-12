@@ -20,8 +20,12 @@ public class PC extends BaseEntity {
 
     private String description;
 
-    @OneToMany(mappedBy = "pc", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "pc_computer_item",
+        joinColumns = @JoinColumn(name = "pc_id"),
+        inverseJoinColumns = @JoinColumn(name = "computer_item_id")
+    )
     private List<ComputerItem> computerItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "pc", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -32,8 +36,8 @@ public class PC extends BaseEntity {
     @JsonManagedReference
     private List<Image> images = new ArrayList<>();
 
-    @Column(name = "total_price")
-    private Double totalPrice;
+    @Column(name = "price")
+    private Double price;
 
 
 }

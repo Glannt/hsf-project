@@ -16,6 +16,9 @@ import java.util.List;
 @Builder
 public class CartItem extends BaseEntity {
 
+    @Column(name = "product_name")
+    private String productName; // Name of the product in the cart
+
     @Column(name = "unit_price")
     private Double unitPrice;
 

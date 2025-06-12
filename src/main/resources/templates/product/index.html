@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>PC List</title>
+  <link rel="stylesheet" th:href="@{../../static/css/style.css}">
+</head>
+<body>
+<section class="container">
+  <h1>PC List</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pc : ${pcPage.content}">
+      <td th:text="${pc.id}"></td>
+      <td th:text="${pc.name}"></td>
+      <td th:text="${pc.price}"></td>
+      <td th:text="${pc.description}"></td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="pagination">
+    <a th:if="${pcPage.hasPrevious()}" th:href="@{/api/v1/products(page=${pcPage.number - 1}, limit=${pcPage.size})}">Previous</a>
+    <span th:text="${pcPage.number + 1}"></span> / <span th:text="${pcPage.totalPages}"></span>
+    <a th:if="${pcPage.hasNext()}" th:href="@{/api/v1/products(page=${pcPage.number + 1}, limit=${pcPage.size})}">Next</a>
+  </div>
+</section>
+</body>
+</html>
