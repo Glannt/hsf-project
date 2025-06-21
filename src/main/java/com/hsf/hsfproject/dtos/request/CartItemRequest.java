@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CartItemRequest {
-    Long cartId;
-    Long productId;
+    String cartId;
+    String productId;
     Integer quantity;
 }

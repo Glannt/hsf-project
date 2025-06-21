@@ -8,7 +8,6 @@ import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.repository.RoleRepository;
 import com.hsf.hsfproject.repository.UserRepository;
 import com.hsf.hsfproject.service.cart.ICartService;
-import com.hsf.hsfproject.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +28,6 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final ICartService cartService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -82,17 +80,10 @@ public class UserService implements IUserService {
         return null;
     }
 
+
+
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getUsername());
-        if (user == null && !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new NullPointerException("Username hoặc password không đúng");
-        }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        String jwt = jwtService.generateAccessToken(new HashMap<>(), user.getUsername());
-        return LoginResponse.builder()
-                .user(user)
-                .token(jwt)
-                .build();
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

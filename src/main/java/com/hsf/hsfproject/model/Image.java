@@ -28,4 +28,5 @@ public class Image extends BaseEntity {
     @JoinColumn(name = "pc_id")
     private PC pc; // Reference to the PC if applicable
 
+
 }

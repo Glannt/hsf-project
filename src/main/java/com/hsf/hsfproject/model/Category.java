@@ -1,5 +1,7 @@
 package com.hsf.hsfproject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.hsf.hsfproject.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +21,7 @@ public class Category extends BaseEntity {
     private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "category_id")
+    @JsonManagedReference
     private List<ComputerItem> computerItems = new ArrayList<>();
 
 
