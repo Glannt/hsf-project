@@ -1,6 +1,7 @@
 package com.hsf.hsfproject.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -38,6 +39,7 @@ public class ComputerItem extends BaseEntity {
     private Category category;
 
     @ManyToMany(mappedBy = "computerItems", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<PC> pcs = new ArrayList<>();
 
     @OneToMany(mappedBy = "computerItem", cascade = CascadeType.ALL, orphanRemoval = true)

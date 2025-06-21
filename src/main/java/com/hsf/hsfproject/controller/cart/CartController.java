@@ -1,7 +1,6 @@
 package com.hsf.hsfproject.controller.cart;
 
 import com.hsf.hsfproject.dtos.request.CartItemRequest;
-import com.hsf.hsfproject.dtos.response.CartItemResponse;
 import com.hsf.hsfproject.model.Cart;
 import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.service.cart.ICartService;
@@ -9,10 +8,7 @@ import com.hsf.hsfproject.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,6 +20,7 @@ public class CartController {
 
     private final ICartService cartService;
     private final IUserService userService;
+
     @GetMapping("cart")
     public String getCartPage(Model model, Principal principal) {
         if (principal == null) {
@@ -44,11 +41,12 @@ public class CartController {
     }
 
 
-
     @PostMapping("/user/cart/add")
     public String addToCart(@RequestParam("id") String productId,
                             @RequestParam("cartId") String cartId,
-                            @RequestParam("quantity") int quantity) {
+                            @RequestParam("quantity") int quantity,
+                            @RequestHeader(value = "Referer", required = false) String referer
+    ) {
 
         CartItemRequest request = CartItemRequest.builder()
                 .cartId(cartId)
@@ -56,7 +54,7 @@ public class CartController {
                 .quantity(quantity)
                 .build();
         cartService.addCartItemToCart(request);
-        return "redirect:/";
+        return "redirect:" + (referer != null ? referer : "/");
     }
 
     @PostMapping("user/cart/remove")

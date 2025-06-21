@@ -143,9 +143,9 @@
                         <li><a th:href="@{/}">Home</a></li>
                         <li><a th:href="@{/products}">Products</a></li>
                         <li><a th:href="@{/cart}">Cart</a></li>
-                        <li th:if="${username != null}"><a th:href="@{/logout}">Logout</a></li>
-                        <li th:unless="${username != null}"><a th:href="@{/login}">Login</a></li>
-                        <li th:unless="${username != null}"><a th:href="@{/register}">Register</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
                     </ul>
                 </nav>
             </div>
@@ -162,7 +162,7 @@
                             <div class="product product-7 text-center">
                                 <figure class="product-media">
                                     <span class="product-label label-new">New</span>
-                                    <a href="product.html">
+                                    <a th:href="@{/product/{id}(id=${pc.id})}">
                                         <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
                                     </a>
 
@@ -251,7 +251,7 @@
                             <div class="product product-7 text-center">
                                 <figure class="product-media">
                                     <span class="product-label label-new">New</span>
-                                    <a href="product.html">
+                                    <a th:href="@{/product/{id}(id=${item.id})}">
                                         <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
                                     </a>
 
@@ -280,11 +280,6 @@
                                     <p th:if="${item.model}">Model: <span th:text="${item.model}"></span></p>
                                     <p th:if="${item.category}">Category: <span th:text="${item.category.name}"></span></p>
                                 </div>
-
-
-
-
-
                             </div>
                         </div>
                     </div>

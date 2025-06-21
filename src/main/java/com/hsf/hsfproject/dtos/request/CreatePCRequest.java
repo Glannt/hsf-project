@@ -19,7 +19,7 @@ public class CreatePCRequest {
     private Double totalPrice;
 
     @JsonProperty("computer_items")
-     private List<String> computerItem;
+     private List<String> computerItems;
 
     @JsonProperty("images")
      private List<String> images;

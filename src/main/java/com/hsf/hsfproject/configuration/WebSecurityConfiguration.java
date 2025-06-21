@@ -22,7 +22,7 @@ public class WebSecurityConfiguration {
 
                 .authorizeHttpRequests(configure -> configure
                         .requestMatchers("/api/**",
-                                "/",
+                                "/**",
                                 "/products",
                                 "/assets/**",
                                 "/css/**",

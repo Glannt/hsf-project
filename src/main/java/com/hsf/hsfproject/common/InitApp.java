@@ -138,7 +138,7 @@ public class InitApp {
 //            if (pcRepository.count() == 0) {
 //                PC pc1 = PC.builder()
 //                        .name("Gaming PC")
-//                        .totalPrice(1500.0)
+//                        .computerItems(1500.0)
 //                        .build();
 //                PC pc2 = PC.builder()
 //                        .name("Office PC")

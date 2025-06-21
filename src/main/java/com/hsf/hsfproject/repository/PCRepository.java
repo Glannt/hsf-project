@@ -14,4 +14,5 @@ public interface PCRepository extends JpaRepository<PC, UUID> {
     // List<PC> findByBrand(String brand);
 //    List<PC> findTop5ByOrderByTotalPriceDesc();
     PC findByName(String name);
+//    List<PC> findByCategoryName(String category);
 }
