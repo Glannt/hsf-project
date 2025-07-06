@@ -175,24 +175,24 @@
                                     </div><!-- End .product-action-vertical -->
 
                                     <div class="product-action">
-                                        <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="display: flex; justify-content: center;">
+                                        <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="width: 100%">
                                             <input type="hidden" name="id" th:value="${pc.id}" />
                                             <input type="hidden" name="cartId" th:value="${user.cart.id}" />
                                             <input type="hidden" name="quantity" value="1" />
-                                            <button type="submit" class="btn-product btn-cart">
+                                            <button type="submit" class="btn-product btn-cart w-100">
                                                 <span>Add to Cart</span>
                                             </button>
                                         </form>
 
                                         <!-- Khi chưa đăng nhập -->
-                                        <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart">
+                                        <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart w-100">
                                             <span>Login to Add</span>
                                         </a>
                                     </div><!-- End .product-action -->
                                 </figure>
                                 <div class="product-body">
                                     <h3 class="product-title" th:text="${pc.name}">PC Name</h3>
-                                    <div class="product-price">Price: <span th:text="${pc.totalPrice}">0</span></div>
+                                    <div class="product-price">Price: <span th:text="${pc.price}">0</span></div>
                                     <p th:if="${pc.description != null}" th:text="${pc.description}">Description</p>
                                 </div>
                             </div>

@@ -132,21 +132,45 @@ public class InitApp {
             }
         };
     }
-//    @Bean
-//    CommandLineRunner initPCs(PCRepository pcRepository) {
-//        return args -> {
-//            if (pcRepository.count() == 0) {
-//                PC pc1 = PC.builder()
-//                        .name("Gaming PC")
-//                        .computerItems(1500.0)
-//                        .build();
-//                PC pc2 = PC.builder()
-//                        .name("Office PC")
-//                        .totalPrice(800.0)
-//                        .build();
-//                pcRepository.save(pc1);
-//                pcRepository.save(pc2);
-//            }
-//        };
-//    }
+    @Bean
+    CommandLineRunner initPCs(PCRepository pcRepository) {
+        return args -> {
+            if (computerItemRepository.count() != 0 && pcRepository.count() == 0) {
+                // Get computer items for PC builds
+                ComputerItem cpu = computerItemRepository.findByName("CPU Intel i7");
+                ComputerItem gpu = computerItemRepository.findByName("GPU RTX 3060");
+                ComputerItem ram = computerItemRepository.findByName("RAM 16GB");
+                ComputerItem motherboard = computerItemRepository.findByName("Mainboard B660");
+                ComputerItem storage = computerItemRepository.findByName("SSD 512GB");
+                ComputerItem psu = computerItemRepository.findByName("Power Supply 650W");
+                ComputerItem pcCase = computerItemRepository.findByName("Case ATX");
+
+                // Gaming PC Build
+                PC gamingPC = PC.builder()
+                        .name("Gaming PC Pro")
+                        .description("High-performance gaming computer with RTX 3060 and Intel i7")
+                        .price(1500.0)
+                        .computerItems(List.of(cpu, gpu, ram, motherboard, storage, psu, pcCase))
+                        .build();
+
+                // Office PC Build (without high-end GPU)
+                PC officePC = PC.builder()
+                        .name("Office PC Standard")
+                        .description("Reliable office computer for productivity tasks")
+                        .price(800.0)
+                        .computerItems(List.of(cpu, ram, motherboard, storage, psu, pcCase))
+                        .build();
+
+                // Budget Gaming PC
+                PC budgetPC = PC.builder()
+                        .name("Budget Gaming PC")
+                        .description("Affordable gaming setup for casual gaming")
+                        .price(1100.0)
+                        .computerItems(List.of(cpu, gpu, ram, motherboard, storage, psu, pcCase))
+                        .build();
+
+                pcRepository.saveAll(List.of(gamingPC, officePC, budgetPC));
+            }
+        };
+    }
 }

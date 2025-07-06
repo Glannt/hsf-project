@@ -157,8 +157,13 @@
                                                     <tr th:each="item : ${transaction.order.orderItems}">
                                                         <td>
                                                             <div class="d-flex align-items-center">
-                                                                <img th:if="${item.pc != null and item.pc.imageUrl != null}" 
-                                                                     th:src="${item.pc.imageUrl}" 
+                                                                <img th:if="${item.pc != null and !item.pc.images.isEmpty()}" 
+                                                                     th:src="${item.pc.images[0].imageUrl}" 
+                                                                     alt="Product Image" 
+                                                                     class="me-2" 
+                                                                     style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                                                <img th:if="${item.computerItem != null and !item.computerItem.images.isEmpty()}" 
+                                                                     th:src="${item.computerItem.images[0].imageUrl}" 
                                                                      alt="Product Image" 
                                                                      class="me-2" 
                                                                      style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
@@ -166,6 +171,8 @@
                                                                     <div class="fw-bold" th:text="${item.pc != null ? item.pc.name : (item.computerItem != null ? item.computerItem.name : item.productName)}">Product Name</div>
                                                                     <small class="text-muted" th:if="${item.pc != null and item.pc.description != null}" 
                                                                            th:text="${#strings.abbreviate(item.pc.description, 50)}">Description</small>
+                                                                    <small class="text-muted" th:if="${item.computerItem != null and item.computerItem.description != null}" 
+                                                                           th:text="${#strings.abbreviate(item.computerItem.description, 50)}">Description</small>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -217,7 +224,7 @@
                     <nav th:if="${totalPages > 1}" aria-label="Transaction pagination">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/transactions(page=${currentPage - 1})}" aria-label="Previous">
+                                <a class="page-link" th:href="@{/transaction/history(page=${currentPage - 1})}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -225,11 +232,11 @@
                             <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
                                 class="page-item" 
                                 th:classappend="${pageNum == currentPage} ? 'active'">
-                                <a class="page-link" th:href="@{/transactions(page=${pageNum})}" th:text="${pageNum + 1}"></a>
+                                <a class="page-link" th:href="@{/transaction/history(page=${pageNum})}" th:text="${pageNum + 1}"></a>
                             </li>
                             
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/transactions(page=${currentPage + 1})}" aria-label="Next">
+                                <a class="page-link" th:href="@{/transaction/history(page=${currentPage + 1})}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
