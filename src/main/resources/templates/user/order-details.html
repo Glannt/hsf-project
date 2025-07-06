@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Order Details - HSF Project</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .order-details-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .card-header-custom {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px;
+        }
+        .status-badge {
+            font-size: 0.9em;
+            padding: 8px 16px;
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d1ecf1; color: #0c5460; }
+        .status-completed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .payment-method-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .item-row {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 15px 0;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .total-section {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
+                                              height="25"/></a>
+
+                <nav class="main-nav">
+                    <ul class="menu">
+                        <li><a th:href="@{/}">Home</a></li>
+                        <li><a th:href="@{/products}">Products</a></li>
+                        <li><a th:href="@{/cart}">Cart</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-receipt me-2"></i>Order Details</h2>
+                    <div>
+                        <!-- Cancel Order Button (only show for PENDING or CONFIRMED orders) -->
+                        <button th:if="${order != null and (order.status == 'PENDING' or order.status == 'CONFIRMED')}" 
+                                type="button" 
+                                class="btn btn-outline-danger me-2" 
+                                onclick="cancelOrder()">
+                            <i class="fas fa-times me-2"></i>Cancel Order
+                        </button>
+                        <a href="/user/orders" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                        </a>
+                    </div>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div th:if="${order != null}">
+                    <!-- Order Information -->
+                    <div class="order-details-card">
+                        <div class="card-header-custom">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h4 class="mb-1">Order <span th:text="${order.orderNumber}">ORD-123456</span></h4>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Placed on <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</span>
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <span th:class="'badge status-badge status-' + ${order.status.toLowerCase()}" 
+                                          th:text="${order.status}">PENDING</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-user me-2"></i>Customer Information</h6>
+                                    <p class="mb-1"><strong>Name:</strong> <span th:text="${order.user.username}">John Doe</span></p>
+                                    <p class="mb-3"><strong>Email:</strong> <span th:text="${order.user.email}">john@example.com</span></p>
+                                    
+                                    <h6><i class="fas fa-shipping-fast me-2"></i>Shipping Address</h6>
+                                    <p th:text="${order.shippingAddress ?: 'Not specified'}">123 Main St, City, Country</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-credit-card me-2"></i>Payment Information</h6>
+                                    <div th:if="${transaction != null}">
+                                        <div class="payment-method-icon mb-2">
+                                            <i th:class="${transaction.paymentMethod == 'VNPAY' ? 'fas fa-credit-card text-primary' : 'fas fa-money-bill-wave text-success'}"></i>
+                                            <span th:text="${transaction.paymentMethod == 'VNPAY' ? 'VNPay Online Payment' : (transaction.paymentMethod == 'COD' ? 'Cash on Delivery' : transaction.paymentMethod)}">Payment Method</span>
+                                        </div>
+                                        <p class="mb-1"><strong>Status:</strong> 
+                                            <span th:class="'badge status-badge status-' + ${transaction.status.toLowerCase()}" 
+                                                  th:text="${transaction.status}">COMPLETED</span>
+                                        </p>
+                                        <p class="mb-1" th:if="${transaction.transactionRef != null}">
+                                            <strong>Transaction ID:</strong> <span th:text="${transaction.transactionRef}">TXN123456</span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Payment Date:</strong> 
+                                            <span th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</span>
+                                        </p>
+                                    </div>
+                                    <div th:if="${transaction == null}">
+                                        <p class="text-muted">Payment information not available</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items -->
+                    <div class="order-details-card">
+                        <div class="card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-box me-2"></i>Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${order.orderItems != null and !order.orderItems.isEmpty()}">
+                                <div th:each="item : ${order.orderItems}" class="item-row">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <h6 class="mb-1" th:text="${item.productName}">Product Name</h6>
+                                            <small class="text-muted">SKU: <span th:text="${item.id}">SKU123</span></small>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <span class="fw-bold" th:text="${item.quantity}">1</span>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <span th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')}">500,000</span> VND
+                                        </div>
+                                        <div class="col-md-2 text-end">
+                                            <strong th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')}">500,000</strong> VND
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${order.orderItems == null or order.orderItems.isEmpty()}">
+                                <p class="text-muted text-center py-3">No items found in this order</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Total -->
+                    <div class="total-section">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Order Summary</h5>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <span>Subtotal: </span>
+                                    <span th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')}">1,000,000</span> VND
+                                </div>
+                                <div class="mb-2">
+                                    <span>Shipping: </span>
+                                    <span class="text-success">Free</span>
+                                </div>
+                                <hr>
+                                <div class="h5">
+                                    <strong>Total: </strong>
+                                    <strong class="text-primary" th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')}">1,000,000</strong> VND
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${order == null}" class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle fa-4x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">Order Not Found</h4>
+                    <p class="text-muted">The requested order could not be found or you don't have permission to view it.</p>
+                    <a href="/user/orders" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                 height="25">
+                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna
+                                eros eu erat. </p>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                        class="icon-facebook-f"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                        class="icon-twitter"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                        class="icon-instagram"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                        class="icon-youtube"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                        class="icon-pinterest"></i></a>
+                            </div><!-- End .soial-icons -->
+                        </div><!-- End .widget about-widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="about.html">About Molla</a></li>
+                                <li><a href="#">How to shop on Molla</a></li>
+                                <li><a href="#">FAQ</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                                <li><a href="login.html">Log in</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Payment Methods</a></li>
+                                <li><a href="#">Money-back guarantee!</a></li>
+                                <li><a href="#">Returns</a></li>
+                                <li><a href="#">Shipping</a></li>
+                                <li><a href="#">Terms and conditions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Sign In</a></li>
+                                <li><a href="cart.html">View Cart</a></li>
+                                <li><a href="#">My Wishlist</a></li>
+                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="#">Help</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+                </div><!-- End .row -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-middle -->
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                <!-- End .footer-copyright -->
+                <figure class="footer-payments">
+                    <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
+                </figure><!-- End .footer-payments -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-bottom -->
+    </footer><!-- End .footer -->
+</div>
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Cancel Order
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this order?</p>
+                <div class="mb-3">
+                    <label for="cancelReason" class="form-label">Reason for cancellation (optional):</label>
+                    <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide a reason for cancelling this order..."></textarea>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <small>If you paid online, the refund will be processed within 3-5 business days. Items will be restored to your cart.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Order</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancelOrder()">
+                    <i class="fas fa-times me-2"></i>Cancel Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function cancelOrder() {
+        // Show the cancel order modal
+        const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+        modal.show();
+    }
+
+    function confirmCancelOrder() {
+        const orderId = '[[${order.id}]]';
+        const reason = document.getElementById('cancelReason').value;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cancelOrderModal'));
+        
+        // Show loading state
+        const cancelBtn = document.querySelector('#cancelOrderModal .btn-danger');
+        const originalText = cancelBtn.innerHTML;
+        cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cancelling...';
+        cancelBtn.disabled = true;
+        
+        // Make AJAX request to cancel order
+        fetch(`/order/cancel/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: reason ? `reason=${encodeURIComponent(reason)}` : ''
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message and redirect
+                alert('Order cancelled successfully! You will be redirected to your orders page.');
+                window.location.href = '/user/orders';
+            } else {
+                // Show error message
+                alert('Error: ' + data.message);
+                // Reset button state
+                cancelBtn.innerHTML = originalText;
+                cancelBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while cancelling the order. Please try again.');
+            // Reset button state
+            cancelBtn.innerHTML = originalText;
+            cancelBtn.disabled = false;
+        })
+        .finally(() => {
+            modal.hide();
+        });
+    }
+</script>
+</body>
+</html>

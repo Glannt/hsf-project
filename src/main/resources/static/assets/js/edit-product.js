@@ -29,7 +29,6 @@ function updateSelectedDisplayEdit(selectedIds, allItemsMap, initialItemsMap = n
     const priceDisplay = document.getElementById("edit-pc-total-price");
     const selectedList = document.getElementById("edit-pc-selected-list");
     const hiddenInputsContainer = document.getElementById("edit-pc-selected-hidden-inputs");
-    console.log(initialItemsMap)
     let total = 0;
     const selectedHTML = [];
     const hiddenInputs = [];

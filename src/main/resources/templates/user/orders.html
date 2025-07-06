@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>My Orders - HSF Project</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .order-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+        .order-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .order-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 20px;
+        }
+        .order-body {
+            padding: 20px;
+        }
+        .status-badge {
+            font-size: 0.85em;
+            padding: 6px 12px;
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d1ecf1; color: #0c5460; }
+        .status-completed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .payment-method-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .amount-text {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
+                                              height="25"/></a>
+
+                <nav class="main-nav">
+                    <ul class="menu">
+                        <li><a th:href="@{/}">Home</a></li>
+                        <li><a th:href="@{/products}">Products</a></li>
+                        <li><a th:href="@{/cart}">Cart</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-shopping-bag me-2"></i>My Orders</h2>
+                    <a href="/" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>Back to Shop
+                    </a>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <div th:if="${orders != null and orders.totalElements > 0}">
+                    <div th:each="order : ${orders.content}" class="order-card">
+                        <div class="order-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <strong>Order #</strong>
+                                    <span th:text="${order.orderNumber}">ORD-123456</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</span>
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <span th:class="'badge status-badge status-' + ${order.status.toLowerCase()}" 
+                                          th:text="${order.status}">PENDING</span>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <div class="amount-text text-primary">
+                                        <span th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')}">1,000,000</span> VND
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Items:</strong>
+                                    <div th:if="${order.orderItems != null}">
+                                        <div th:each="item, iterStat : ${order.orderItems}" class="mb-1">
+                                            <small>
+                                                <span th:text="${item.productName}">Product Name</span>
+                                                <span class="text-muted">x</span>
+                                                <span th:text="${item.quantity}">1</span>
+                                                <span th:if="${!iterStat.last}">, </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>Shipping Address:</strong><br>
+                                    <small class="text-muted" th:text="${order.shippingAddress ?: 'Not specified'}">123 Main St, City</small>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <a th:href="@{/user/orders/{orderId}(orderId=${order.id})}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${orders.totalElements == 0}" class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-shopping-bag fa-4x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No Orders Found</h4>
+                    <p class="text-muted">You haven't placed any orders yet.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+                    </a>
+                </div>
+            </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${orders.totalPages > 1}" aria-label="Orders pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${orders.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/user/orders(page=${orders.number - 1})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                        
+                        <li th:each="pageNum : ${#numbers.sequence(0, orders.totalPages - 1)}"
+                            class="page-item"
+                            th:classappend="${pageNum == orders.number} ? 'active'">
+                            <a class="page-link" th:href="@{/user/orders(page=${pageNum})}" th:text="${pageNum + 1}"></a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${orders.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/user/orders(page=${orders.number + 1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                 height="25">
+                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna
+                                eros eu erat. </p>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                        class="icon-facebook-f"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                        class="icon-twitter"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                        class="icon-instagram"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                        class="icon-youtube"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                        class="icon-pinterest"></i></a>
+                            </div><!-- End .soial-icons -->
+                        </div><!-- End .widget about-widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="about.html">About Molla</a></li>
+                                <li><a href="#">How to shop on Molla</a></li>
+                                <li><a href="#">FAQ</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                                <li><a href="login.html">Log in</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Payment Methods</a></li>
+                                <li><a href="#">Money-back guarantee!</a></li>
+                                <li><a href="#">Returns</a></li>
+                                <li><a href="#">Shipping</a></li>
+                                <li><a href="#">Terms and conditions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Sign In</a></li>
+                                <li><a href="cart.html">View Cart</a></li>
+                                <li><a href="#">My Wishlist</a></li>
+                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="#">Help</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+                </div><!-- End .row -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-middle -->
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                <!-- End .footer-copyright -->
+                <figure class="footer-payments">
+                    <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
+                </figure><!-- End .footer-payments -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-bottom -->
+    </footer><!-- End .footer -->
+</div>
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html>

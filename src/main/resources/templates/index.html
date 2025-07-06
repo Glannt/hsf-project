@@ -143,6 +143,8 @@
                         <li><a th:href="@{/}">Home</a></li>
                         <li><a th:href="@{/products}">Products</a></li>
                         <li><a th:href="@{/cart}">Cart</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/user/orders}">My Orders</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/transaction/history}">Transaction History</a></li>
                         <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
                         <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
                         <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
@@ -202,15 +204,6 @@
                 <nav aria-label="PC Pagination" th:if="${pcs.totalElements > 0}">
                     <ul class="pagination justify-content-center">
 
-                        <!-- Prev button -->
-                        <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
-                            <a class="page-link page-link-prev"
-                               th:href="@{/(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}"
-                               aria-label="Previous">
-                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-                            </a>
-                        </li>
-
                         <!-- Page numbers -->
                         <li class="page-item"
                             th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
@@ -223,15 +216,6 @@
                         <!-- Total pages display -->
                         <li class="page-item-total ml-2">
                             of <span th:text="${pcs.totalPages}">0</span>
-                        </li>
-
-                        <!-- Next button -->
-                        <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
-                            <a class="page-link page-link-next"
-                               th:href="@{/(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}"
-                               aria-label="Next">
-                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-                            </a>
                         </li>
 
                     </ul>
@@ -288,15 +272,6 @@
                 <nav aria-label="Page navigation" th:if="${computerItems.totalElements > 0}">
                     <ul class="pagination justify-content-center">
 
-                        <!-- Prev button -->
-                        <li class="page-item" th:classappend="${!computerItems.hasPrevious()} ? 'disabled'">
-                            <a class="page-link page-link-prev"
-                               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}"
-                               aria-label="Previous">
-                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-                            </a>
-                        </li>
-
                         <!-- Page numbers -->
                         <li class="page-item"
                             th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
@@ -309,15 +284,6 @@
                         <!-- Total pages display -->
                         <li class="page-item-total ml-2">
                             of <span th:text="${computerItems.totalPages}">0</span>
-                        </li>
-
-                        <!-- Next button -->
-                        <li class="page-item" th:classappend="${!computerItems.hasNext()} ? 'disabled'">
-                            <a class="page-link page-link-next"
-                               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}"
-                               aria-label="Next">
-                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-                            </a>
                         </li>
 
                     </ul>

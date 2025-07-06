@@ -140,7 +140,7 @@ public class ProductService implements IProductService {
         ComputerItem existingItem = computerItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Computer item not found"));
         computerItemRepository.delete(existingItem);
-        return null;
+        return existingItem; // Return the deleted item for confirmation
     }
 
     @Override
@@ -153,25 +153,12 @@ public class ProductService implements IProductService {
         PC existingPc = pcRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("PC not found"));
         pcRepository.delete(existingPc);
-        return null;
+        return existingPc; // Return the deleted item for confirmation
     }
 
-
-//    @Override
-//    public List<Object> getProductsByCategorySuggest(String category) {
-//        List<ComputerItem> computerItems = computerItemRepository.findByCategory(category);
-//        if (!computerItems.isEmpty()) {
-//            return List.copyOf(computerItems);
-//        }
-//        return List.of();
-//    }
-//
-//    public Category getCategoryByName(String categoryName) {
-//        Category existingCategory = categoryRepository.findByName(categoryName);
-//        if( existingCategory == null) {
-//            throw new IllegalArgumentException("Category with name " + categoryName + " does not exist");
-//        }
-//        return existingCategory;
-//
-//    }
+    // TODO: Future implementation for category-based product suggestions
+    // public List<Object> getProductsByCategorySuggest(String category)
+    
+    // TODO: Future implementation for category lookup by name
+    // public Category getCategoryByName(String categoryName)
 }

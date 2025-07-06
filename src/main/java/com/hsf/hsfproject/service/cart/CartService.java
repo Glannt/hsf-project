@@ -6,6 +6,7 @@ import com.hsf.hsfproject.repository.CartItemRepository;
 import com.hsf.hsfproject.repository.CartRepository;
 import com.hsf.hsfproject.repository.ComputerItemRepository;
 import com.hsf.hsfproject.repository.PCRepository;
+import com.hsf.hsfproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class CartService implements ICartService {
     private final CartItemRepository cartItemRepository;
     private final PCRepository pcRepository;
     private final ComputerItemRepository computerItemRepository;
+    private final UserRepository userRepository;
 
     // Implement the methods defined in ICartService
     @Override
@@ -47,7 +49,9 @@ public class CartService implements ICartService {
                 existingPC.setQuantity(existingPC.getQuantity() + request.getQuantity());
                 existingPC.setSubtotal(existingPC.getUnitPrice() * existingPC.getQuantity());
                 cartItemRepository.save(existingPC);
-                updateCart(cart, pcOpt.get().getPrice() * request.getQuantity());
+                // Refresh cart with updated items
+                Cart refreshedCart = cartRepository.findByUserIdWithItems(cart.getUser().getId());
+                updateCart(refreshedCart, 0);
                 return existingPC;
             }
             return addPCToCart(cart, pcOpt.get(), request.getQuantity());
@@ -61,7 +65,9 @@ public class CartService implements ICartService {
                 existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
                 existingItem.setSubtotal(existingItem.getUnitPrice() * existingItem.getQuantity());
                 cartItemRepository.save(existingItem);
-                updateCart(cart, itemOpt.get().getPrice() * request.getQuantity());
+                // Refresh cart with updated items
+                Cart refreshedCart = cartRepository.findByUserIdWithItems(cart.getUser().getId());
+                updateCart(refreshedCart, 0);
                 return existingItem;
             }
             return addComputerItemToCart(cart, itemOpt.get(), request.getQuantity());
@@ -75,26 +81,25 @@ public class CartService implements ICartService {
         CartItem cartItem = cartItemRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
-        double oldPrice = 0.0;
-        oldPrice = cartItem.getUnitPrice() * cartItem.getQuantity();
         cartItem.setQuantity(newQuantity);
-        double newPrice = cartItem.getUnitPrice() * newQuantity;
-        updateCart(cartItem.getCart(), newPrice - oldPrice);
-
-
+        cartItem.setSubtotal(cartItem.getUnitPrice() * newQuantity); // Update subtotal
         cartItemRepository.save(cartItem);
-
+        
+        // Refresh cart with updated items
+        Cart cart = cartRepository.findByUserIdWithItems(cartItem.getCart().getUser().getId());
+        updateCart(cart, 0); // Pass 0 since we're recalculating from scratch
     }
 
     @Override
     public Cart getCartByUserId(String userId) {
         Cart cart = cartRepository.findByUserIdWithItems(UUID.fromString(userId));
         if (cart == null) {
-            throw new IllegalArgumentException("Cart not found for user ID: " + userId);
+            // Create a new cart if one doesn't exist (e.g., after payment completion)
+            User user = userRepository.findById(UUID.fromString(userId))
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+            cart = createCart(user);
         }
         return cart;
-
-
     }
 
     @Override
@@ -102,11 +107,12 @@ public class CartService implements ICartService {
         CartItem cartItem = cartItemRepository.findById(UUID.fromString(cartItemId))
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
-        Cart cart = cartItem.getCart();
-        double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
-
+        UUID userId = cartItem.getCart().getUser().getId();
         cartItemRepository.delete(cartItem);
-        updateCart(cart, -priceToRemove);
+        
+        // Refresh cart with updated items after deletion
+        Cart cart = cartRepository.findByUserIdWithItems(userId);
+        updateCart(cart, 0); // Pass 0 since we're recalculating from scratch
     }
 
     private CartItem addPCToCart(Cart cart, PC pc, int quantity) {
@@ -120,8 +126,9 @@ public class CartService implements ICartService {
                 .build();
 
         cartItemRepository.save(cartItem);
-        double price = pc.getPrice() * quantity;
-        updateCart(cart, price);
+        // Refresh cart with updated items
+        Cart refreshedCart = cartRepository.findByUserIdWithItems(cart.getUser().getId());
+        updateCart(refreshedCart, 0);
         return cartItem;
     }
 
@@ -136,13 +143,23 @@ public class CartService implements ICartService {
                 .build();
 
         cartItemRepository.save(cartItem);
-        double price = item.getPrice() * quantity;
-        updateCart(cart, price);
+        // Refresh cart with updated items
+        Cart refreshedCart = cartRepository.findByUserIdWithItems(cart.getUser().getId());
+        updateCart(refreshedCart, 0);
         return cartItem;
     }
 
     private void updateCart(Cart cart, double addedPrice) {
-        cart.setTotalPrice(cart.getTotalPrice() + addedPrice);
+        // Recalculate total price from all cart items to avoid negative values
+        double totalPrice = 0.0;
+        if (cart.getCartItems() != null && !cart.getCartItems().isEmpty()) {
+            totalPrice = cart.getCartItems()
+                    .stream()
+                    .mapToDouble(CartItem::getSubtotal)
+                    .sum();
+        }
+        
+        cart.setTotalPrice(totalPrice);
         Long count = cartItemRepository.countCartItemsByCartId(cart.getId());
         cart.setItemCount(count.intValue());
         cartRepository.save(cart);

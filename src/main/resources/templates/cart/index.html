@@ -45,7 +45,7 @@
                 <div class="container">
                     <div th:if="${#lists.isEmpty(cart.cartItems)}">
                         <p>Your cart is empty.</p>
-                        <a th:href="@{/products}" class="btn btn-outline-primary-2">Continue Shopping</a>
+                        <a href="/" class="btn btn-outline-primary-2">Continue Shopping</a>
                     </div>
 
                     <div th:unless="${#lists.isEmpty(cart.cartItems)}">
@@ -73,9 +73,9 @@
                                                th:value="${item.quantity}" min="1" style="width:80px;">
                                         <input type="hidden" name="itemIds" th:value="${item.id}" />
                                     </td>
-                                    <td th:text="${#numbers.formatInteger(item.quantity * (item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
+                                    <td th:text="${#numbers.formatInteger(item.subtotal != null ? item.subtotal : (item.quantity * (item.computerItem != null ? item.computerItem.price : item.pc.price)), 0, 'POINT')}">0</td>
                                     <td>
-                                        <form th:action="@{/user/cart/remove}" method="post">
+                                        <form th:action="@{/user/cart/remove}" method="post" class="remove-form">
                                             <input type="hidden" name="cartItemId" th:value="${item.id}" />
                                             <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                                         </form>

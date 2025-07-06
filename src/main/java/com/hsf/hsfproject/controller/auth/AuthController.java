@@ -47,7 +47,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error,
-//                                @RequestParam(value = "logout", required = false) String logout,
                                 Model model) {
         if(error != null) {
             model.addAttribute("loginError", "Invalid username or password");

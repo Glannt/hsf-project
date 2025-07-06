@@ -5,9 +5,12 @@ import com.hsf.hsfproject.mapper.Mapper;
 import com.hsf.hsfproject.model.*;
 import com.hsf.hsfproject.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +29,7 @@ public class OrderService implements IOrderService {
 
     // Implement the methods defined in IOrderService interface
     @Override
+    @Transactional
     public Order createOrder(OrderRequest request) {
         User user = userRepository.findById(UUID.fromString(request.getUserId()))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -42,38 +46,56 @@ public class OrderService implements IOrderService {
                 .orderNumber(ORDER_NUMBER_PREFIX + System.currentTimeMillis())
                 .build();
 
-//        Order savedOrder = orderRepository.save(order);
+        // Save order first to get the ID
+        Order savedOrder = orderRepository.save(order);
 
-        // Optionally save order details if they require a reference to the saved order
-//        orderDetails.forEach(detail -> {
-//            detail.setOrder(savedOrder);
-//            orderDetailRepository.save(detail);
-//        });
+        // Set the order reference for each order detail and save them
+        orderDetails.forEach(detail -> {
+            detail.setOrder(savedOrder);
+            orderDetailRepository.save(detail);
+        });
 
-        return order;
+        return savedOrder;
     }
 
     @Override
     public Order getOrderById(String orderId) {
-//        Order order = orderRepository.fin
-        return null; // Replace with actual implementation
+        return orderRepository.findByIdWithOrderItems(UUID.fromString(orderId))
+                .orElse(null);
     }
 
     @Override
     public List<Order> getOrdersByUserId(String userId) {
-        // Logic to retrieve orders by user ID
-        return null; // Replace with actual implementation
+        try {
+            UUID userUuid = UUID.fromString(userId);
+            return orderRepository.findByUserIdOrderByCreatedAtDesc(userUuid);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve orders for user: " + userId, e);
+        }
+    }
+    
+    @Override
+    public Page<Order> getOrdersByUserId(String userId, Pageable pageable) {
+        try {
+            UUID userUuid = UUID.fromString(userId);
+            return orderRepository.findByUserIdOrderByCreatedAtDesc(userUuid, pageable);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve paginated orders for user: " + userId, e);
+        }
     }
 
     @Override
     public void cancelOrder(String orderId) {
-        // Logic to cancel an order
+        // TODO: Implement order cancellation logic
+        // This should update order status to CANCELLED and handle any necessary cleanup
+        throw new UnsupportedOperationException("Order cancellation not yet implemented");
     }
 
     @Override
     public List<Order> getAllOrders() {
-        // Logic to retrieve all orders
-        return null; // Replace with actual implementation
+        // TODO: Implement admin functionality to retrieve all orders
+        // This should be used by admin interface for order management
+        return orderRepository.findAll();
     }
 
     @Override
@@ -100,10 +122,11 @@ public class OrderService implements IOrderService {
         Transaction transaction = Transaction.builder()
                 .order(order)
                 .totalAmount(order.getTotalPrice())
-                .transactionDate(String.valueOf(System.currentTimeMillis()))
+                .transactionDate(LocalDateTime.now())
                 .status("PAYED")
                 .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
                 .build();
+        transactionRepository.save(transaction);
 
         return order;
     }

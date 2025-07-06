@@ -62,21 +62,23 @@ public class UserService implements IUserService {
 
     @Override
     public void updateUser(Long userId, String username, String password) {
-
+        // TODO: Implement user update functionality
     }
 
     @Override
     public void deleteUser(Long userId) {
-
+        // TODO: Implement user deletion functionality
     }
 
     @Override
     public User getUserByName(String name) {
+        // TODO: Implement get user by name functionality
         return null;
     }
 
     @Override
     public Page<User> getUsers(Pageable pageable) {
+        // TODO: Implement paginated user retrieval
         return null;
     }
 

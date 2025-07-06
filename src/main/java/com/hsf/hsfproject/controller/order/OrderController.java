@@ -42,7 +42,15 @@ public class OrderController {
     @GetMapping("/orders")
     public String getOrders(Model model, Principal principal) {
         addUserInfo(model, principal);
-        // TODO: Add orders to model if needed
+        
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null) {
+                List<Order> userOrders = orderService.getOrdersByUserId(user.getId().toString());
+                model.addAttribute("orders", userOrders);
+            }
+        }
+        
         return "order/index";
     }
 

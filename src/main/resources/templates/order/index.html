@@ -25,6 +25,163 @@
     <title>Order Confirmation</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .payment-methods {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .payment-methods {
+            margin-top: 25px;
+        }
+        .payment-methods h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .payment-method-option {
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .payment-method-option:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.15);
+            transform: translateY(-2px);
+        }
+        .payment-method-option.selected {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #e7f3ff 0%, #cce7ff 100%);
+            box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+        }
+        .payment-method-option > .form-check {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .payment-method-option > .form-check > .custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        .payment-method-icon {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            vertical-align: middle;
+            width: 30px;
+            text-align: center;
+        }
+        .payment-method-details {
+            padding: 10px;
+        }
+        .form-check {
+            background: transparent;
+            padding: 20px;
+            border: none;
+            margin: 0;
+        }
+        .form-check-label {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+            width: 100%;
+        }
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            border: 2px solid #dee2e6;
+            flex-shrink: 0;
+        }
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+        }
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+        }
+        .payment-method-option.selected .form-check-label {
+            color: #007bff;
+            font-weight: 600;
+        }
+        .payment-method-details small {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .payment-method-option.selected .payment-method-details small {
+            color: #0056b3;
+        }
+        .btn-order {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .btn-order:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+        .summary {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 <div class="page-wrapper">
@@ -75,7 +232,7 @@
             <div class="checkout">
                 <div class="container">
                     <div th:if="${order != null}">
-                        <form th:action="@{/order/confirm}" th:object="${order}" method="post" class="container">
+                        <form th:action="@{/payment/process}" method="post" class="container" id="paymentForm">
                             <div class="row">
                                 <div class="col-lg-9">
                                     <h2 class="checkout-title">Billing Details</h2>
@@ -141,201 +298,41 @@
                                         </table>
 
 
-                                        <div
-                                                class="accordion-summary"
-                                                id="accordion-payment"
-                                        >
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-1"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-1"
-                                                                aria-expanded="true"
-                                                                aria-controls="collapse-1"
-                                                        >
-                                                            Direct bank transfer
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-1"
-                                                        class="collapse show"
-                                                        aria-labelledby="heading-1"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Make your payment directly into our bank account.
-                                                        Please use your Order ID as the payment reference.
-                                                        Your order will not be shipped until the funds
-                                                        have cleared in our account.
+                                        <div class="payment-methods">
+                                            <h4 class="mb-3"><i class="fas fa-credit-card me-3"></i>Payment Methods</h4>
+                                            
+                                            <div class="payment-method-option" data-method="COD">
+                                                <div class="form-check">
+                                                    <div class="custom">
+                                                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
                                                     </div>
-                                                    <!-- End .card-body -->
+                                                    <label class="form-check-label" for="cod">
+                                                        <i class="fas fa-money-bill-wave text-success payment-method-icon"></i>
+                                                        <strong>Cash on Delivery (COD)</strong>
+                                                    </label>
                                                 </div>
-                                                <!-- End .collapse -->
+                                                <div class="payment-method-details">
+                                                    <small class="text-muted">Pay with cash when your order is delivered to your doorstep. No advance payment required.</small>
+                                                </div>
                                             </div>
-                                            <!-- End .card -->
 
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-2"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-2"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-2"
-                                                        >
-                                                            Check payments
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-2"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-2"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Ipsum dolor sit amet, consectetuer adipiscing
-                                                        elit. Donec odio. Quisque volutpat mattis eros.
-                                                        Nullam malesuada erat ut turpis.
+                                            <div class="payment-method-option" data-method="VNPAY">
+                                                <div class="form-check">
+                                                    <div class="custom">
+                                                        <input class="form-check-input" type="radio" name="paymentMethod" id="vnpay" value="VNPAY">
                                                     </div>
-                                                    <!-- End .card-body -->
+                                                    <label class="form-check-label" for="vnpay">
+                                                        <i class="fas fa-credit-card text-primary payment-method-icon"></i>
+                                                        <strong>VNPay Online Payment</strong>
+                                                    </label>
                                                 </div>
-                                                <!-- End .collapse -->
+                                                <div class="payment-method-details">
+                                                    <small class="text-muted">Pay securely online using VNPay gateway. Supports credit cards, debit cards, and bank transfers.</small>
+                                                </div>
                                             </div>
-                                            <!-- End .card -->
-
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-3"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-3"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-3"
-                                                        >
-                                                            Cash on delivery
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-3"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-3"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Quisque volutpat mattis eros. Lorem ipsum dolor
-                                                        sit amet, consectetuer adipiscing elit. Donec
-                                                        odio. Quisque volutpat mattis eros.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
-
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-4"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-4"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-4"
-                                                        >
-                                                            PayPal
-                                                            <small class="float-right paypal-link"
-                                                            >What is PayPal?</small
-                                                            >
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-4"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-4"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Nullam malesuada erat ut turpis. Suspendisse urna
-                                                        nibh, viverra non, semper suscipit, posuere a,
-                                                        pede. Donec nec justo eget felis facilisis
-                                                        fermentum.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
-
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-5"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-5"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-5"
-                                                        >
-                                                            Credit Card (Stripe)
-                                                            <img
-                                                                    src="assets/images/payments-summary.png"
-                                                                    alt="payments cards"
-                                                            />
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-5"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-5"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Donec nec justo eget felis facilisis
-                                                        fermentum.Lorem ipsum dolor sit amet, consectetuer
-                                                        adipiscing elit. Donec odio. Quisque volutpat
-                                                        mattis eros. Lorem ipsum dolor sit ame.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
                                         </div>
 
-                                        <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+                                        <button type="submit" class="btn btn-order btn-block" id="submitBtn">
                                             <span class="btn-text">Place Order</span>
                                             <span class="btn-hover-text">Proceed to Checkout</span>
                                         </button>
@@ -504,6 +501,16 @@
     </footer>
 
 </div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <h5>Processing Payment...</h5>
+        <p class="text-muted">Please wait while we redirect you to the payment gateway.</p>
+    </div>
+</div>
+
 <button
         id="scroll-top"
         title="Back to Top"
@@ -520,5 +527,90 @@
 <script th:src="@{/assets/js/owl.carousel.min.js}"></script>
 <!-- Main JS File -->
 <script th:src="@{/assets/js/main.js}"></script>
+
+<script>
+$(document).ready(function() {
+    // Payment method selection handling
+    $('input[name="paymentMethod"]').change(function() {
+        const selectedMethod = $(this).val();
+        const submitBtn = $('#submitBtn');
+        const btnText = submitBtn.find('.btn-text');
+        const btnHoverText = submitBtn.find('.btn-hover-text');
+        
+        // Remove selected class from all options
+        $('.payment-method-option').removeClass('selected');
+        
+        // Add selected class to current option
+        $(this).closest('.payment-method-option').addClass('selected');
+        
+        if (selectedMethod === 'VNPAY') {
+            btnText.text('Pay with VNPay');
+            btnHoverText.text('Redirect to VNPay');
+            submitBtn.removeClass('btn-success').addClass('btn-primary');
+        } else {
+            btnText.text('Place Order');
+            btnHoverText.text('Confirm Order');
+            submitBtn.removeClass('btn-primary').addClass('btn-success');
+        }
+    });
+    
+    // Initialize selected state
+    $('.payment-method-option').click(function() {
+        const radio = $(this).find('input[type="radio"]');
+        radio.prop('checked', true).trigger('change');
+    });
+    
+    // Set initial selected state
+    $('input[name="paymentMethod"]:checked').closest('.payment-method-option').addClass('selected');
+    
+    // Form submission handling
+    $('#paymentForm').submit(function(e) {
+        const selectedMethod = $('input[name="paymentMethod"]:checked').val();
+        const shippingAddress = $('#shippingAddress').val().trim();
+        
+        // Validate shipping address
+        if (!shippingAddress) {
+            e.preventDefault();
+            alert('Please enter your shipping address.');
+            $('#shippingAddress').focus();
+            return false;
+        }
+        
+        // Show loading overlay for VNPay payments
+        if (selectedMethod === 'VNPAY') {
+            $('#loadingOverlay').css('display', 'flex');
+            
+            // Update loading text for VNPay
+            $('.loading-content h5').text('Redirecting to VNPay...');
+            $('.loading-content p').text('Please wait while we redirect you to the VNPay payment gateway.');
+        } else {
+            // Show loading for COD as well
+            $('#loadingOverlay').css('display', 'flex');
+            $('.loading-content h5').text('Processing Order...');
+            $('.loading-content p').text('Please wait while we process your cash on delivery order.');
+        }
+        
+        // Disable submit button to prevent double submission
+        $('#submitBtn').prop('disabled', true);
+        
+        // Allow form to submit normally
+        return true;
+    });
+    
+    // Handle browser back button
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            $('#loadingOverlay').hide();
+            $('#submitBtn').prop('disabled', false);
+        }
+    });
+    
+    // Auto-hide loading overlay after 30 seconds (fallback)
+    setTimeout(function() {
+        $('#loadingOverlay').hide();
+        $('#submitBtn').prop('disabled', false);
+    }, 30000);
+});
+</script>
 </body>
 </html>

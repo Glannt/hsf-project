@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Transaction History - HSF Project</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .transaction-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s ease;
+        }
+        .transaction-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.85em;
+            padding: 0.4em 0.8em;
+        }
+        .status-success { background-color: #d4edda; color: #155724; }
+        .status-failed { background-color: #f8d7da; color: #721c24; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .amount-text {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .payment-method {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
+                                              height="25"/></a>
+
+                <nav class="main-nav">
+                    <ul class="menu">
+                        <li><a th:href="@{/}">Home</a></li>
+                        <li><a th:href="@{/products}">Products</a></li>
+                        <li><a th:href="@{/cart}">Cart</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/user/orders}">My Orders</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/transaction/history}">Transaction History</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-history"></i> Transaction History</h2>
+                    <a href="/" class="btn btn-outline-primary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+
+                <div th:if="${transactions.isEmpty()}" class="text-center py-5">
+                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No transactions found</h4>
+                    <p class="text-muted">You haven't made any purchases yet.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart"></i> Start Shopping
+                    </a>
+                </div>
+
+                <div th:if="${!transactions.isEmpty()}">
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Showing <span th:text="${transactions.numberOfElements}"></span> of 
+                            <span th:text="${totalElements}"></span> transactions
+                        </small>
+                    </div>
+
+                    <div th:each="transaction : ${transactions.content}" class="transaction-card p-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h6 class="mb-1">Order #<span th:text="${transaction.order.orderNumber}"></span></h6>
+                                <small class="text-muted" th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy HH:mm')}"></small>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="payment-method">
+                                    <i th:class="${transaction.paymentMethod == 'VNPAY' ? 'fas fa-credit-card text-primary' : 'fas fa-money-bill-wave text-success'}"></i>
+                                    <span th:text="${transaction.paymentMethod == 'VNPAY' ? 'VNPay' : 'Cash on Delivery'}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <span th:class="'badge status-badge status-' + ${transaction.status.toLowerCase()}" 
+                                      th:text="${transaction.status}"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="amount-text text-end" 
+                                     th:classappend="${transaction.status == 'SUCCESS' ? 'text-success' : (transaction.status == 'FAILED' ? 'text-danger' : 'text-warning')}">
+                                    <span th:text="${#numbers.formatDecimal(transaction.totalAmount, 0, 'COMMA', 0, 'POINT')}"></span> VND
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                                            data-toggle="collapse" 
+                                            th:data-target="'#details-' + ${transaction.id}"
+                                            th:aria-controls="'details-' + ${transaction.id}"
+                                            aria-expanded="false">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div th:id="'details-' + ${transaction.id}" class="collapse mt-3">
+                            <div class="card card-body bg-light">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Transaction ID:</strong><br>
+                                        <small class="text-muted" th:text="${transaction.id}"></small>
+                                    </div>
+                                    <div class="col-md-6" th:if="${transaction.transactionRef}">
+                                        <strong>VNPay Transaction No:</strong><br>
+                                        <small class="text-muted" th:text="${transaction.transactionRef}"></small>
+                                    </div>
+                                </div>
+
+                                
+                                <!-- Order Items Section -->
+                                <div class="row mt-3" th:if="${transaction.order != null and transaction.order.orderItems != null and !transaction.order.orderItems.isEmpty()}">
+                                    <div class="col-12">
+                                        <strong><i class="fas fa-shopping-cart"></i> Order Items:</strong>
+                                        <div class="table-responsive mt-2">
+                                            <table class="table table-sm table-striped">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Product</th>
+                                                        <th class="text-center">Quantity</th>
+                                                        <th class="text-end">Price</th>
+                                                        <th class="text-end">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="item : ${transaction.order.orderItems}">
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img th:if="${item.pc != null and item.pc.imageUrl != null}" 
+                                                                     th:src="${item.pc.imageUrl}" 
+                                                                     alt="Product Image" 
+                                                                     class="me-2" 
+                                                                     style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                                                <div>
+                                                                    <div class="fw-bold" th:text="${item.pc != null ? item.pc.name : (item.computerItem != null ? item.computerItem.name : item.productName)}">Product Name</div>
+                                                                    <small class="text-muted" th:if="${item.pc != null and item.pc.description != null}" 
+                                                                           th:text="${#strings.abbreviate(item.pc.description, 50)}">Description</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-secondary" th:text="${item.quantity}">1</span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')}">0</span> VND
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <strong th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')}">0</strong> VND
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot class="table-light">
+                                                    <tr>
+                                                        <th colspan="3" class="text-end">Total Amount:</th>
+                                                        <th class="text-end">
+                                                            <span class="text-success fw-bold" th:text="${#numbers.formatDecimal(transaction.totalAmount, 0, 'COMMA', 0, 'POINT')}">0</span> VND
+                                                        </th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- View Full Order Details Button -->
+                                        <div class="mt-2">
+                                            <a th:href="@{/user/order-details/{orderId}(orderId=${transaction.order.id})}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-external-link-alt"></i> View Full Order Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- No Order Items Message -->
+                                <div class="row mt-3" th:if="${transaction.order == null or transaction.order.orderItems == null or transaction.order.orderItems.isEmpty()}">
+                                    <div class="col-12">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle"></i> Order items information is not available for this transaction.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${totalPages > 1}" aria-label="Transaction pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link" th:href="@{/transactions(page=${currentPage - 1})}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                                class="page-item" 
+                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/transactions(page=${pageNum})}" th:text="${pageNum + 1}"></a>
+                            </li>
+                            
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/transactions(page=${currentPage + 1})}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                 height="25">
+                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna
+                                eros eu erat. </p>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                        class="icon-facebook-f"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                        class="icon-twitter"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                        class="icon-instagram"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                        class="icon-youtube"></i></a>
+                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                        class="icon-pinterest"></i></a>
+                            </div><!-- End .soial-icons -->
+                        </div><!-- End .widget about-widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="about.html">About Molla</a></li>
+                                <li><a href="#">How to shop on Molla</a></li>
+                                <li><a href="#">FAQ</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                                <li><a href="login.html">Log in</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Payment Methods</a></li>
+                                <li><a href="#">Money-back guarantee!</a></li>
+                                <li><a href="#">Returns</a></li>
+                                <li><a href="#">Shipping</a></li>
+                                <li><a href="#">Terms and conditions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget">
+                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                            <ul class="widget-list">
+                                <li><a href="#">Sign In</a></li>
+                                <li><a href="cart.html">View Cart</a></li>
+                                <li><a href="#">My Wishlist</a></li>
+                                <li><a href="#">Track My Order</a></li>
+                                <li><a href="#">Help</a></li>
+                            </ul><!-- End .widget-list -->
+                        </div><!-- End .widget -->
+                    </div><!-- End .col-sm-6 col-lg-3 -->
+                </div><!-- End .row -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-middle -->
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                <!-- End .footer-copyright -->
+                <figure class="footer-payments">
+                    <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
+                </figure><!-- End .footer-payments -->
+            </div><!-- End .container -->
+        </div><!-- End .footer-bottom -->
+    </footer><!-- End .footer -->
+</div>
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html>

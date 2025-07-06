@@ -52,7 +52,6 @@ public class AdminController {
 //    Computer Item
     @PostMapping("/product/item/save")
     public String addComputerItem(@ModelAttribute ComputerItem item,Model model) {
-        System.out.println("Adding item: " + item.getName());
         ComputerItem newItem = productService.addComputerItem(item);
         model.addAttribute("message", "Item added successfully: " + newItem.getName());
         return "redirect:/admin/product";
@@ -75,11 +74,6 @@ public class AdminController {
 //    PC
     @PostMapping("/product/pc/save")
     public String addNewPC(@ModelAttribute PC item, Model model) {
-        System.out.println("Adding item: " + item.getComputerItems());
-       for (ComputerItem computerItem : item.getComputerItems()) {
-            System.out.println("Computer Item: " + computerItem.getName());
-        }
-        // Assuming productService.addPc() returns the newly created PC
         PC newItem = productService.addPc(item);
         model.addAttribute("message", "Item added successfully: " + newItem.getName());
         return "redirect:/admin/product";

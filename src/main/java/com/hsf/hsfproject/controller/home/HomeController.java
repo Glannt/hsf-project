@@ -41,17 +41,6 @@ public class HomeController {
                         @RequestParam(name = "computerItemPage", defaultValue = "0") int computerItemPage,
                         Model model) {
         addUserToModel(model, principal);
-//        model.addAttribute("isLogin", principal != null);
-//        if (principal != null) {
-//            User user = userService.findByUsername(principal.getName());
-//            if (user != null) {
-//                model.addAttribute("user", user);
-//                model.addAttribute("username", user.getUsername());
-//                session.setAttribute("user", user);
-//            }
-//
-//        }
-        System.out.println("Logged in username: " + (principal != null ? principal.getName() : "Anonymous"));
         Page<PC> pcList = productService.getPcList(pcPage, 2);
         Page<ComputerItem> computerItems = productService.getComputerItemList(computerItemPage, 2);
         model.addAttribute("pcs", pcList);

@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, UUID> {
-    // Additional query methods can be defined here if needed
+    // Additional query methods can be added here as needed
 }
