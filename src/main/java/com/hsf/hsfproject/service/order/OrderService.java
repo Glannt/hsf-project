@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -100,10 +101,11 @@ public class OrderService implements IOrderService {
         Transaction transaction = Transaction.builder()
                 .order(order)
                 .totalAmount(order.getTotalPrice())
-                .transactionDate(String.valueOf(System.currentTimeMillis()))
+                .transactionDate(LocalDateTime.now())
                 .status("PAYED")
                 .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
                 .build();
+        transactionRepository.save(transaction);
 
         return order;
     }
