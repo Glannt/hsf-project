@@ -43,6 +43,11 @@ public class OrderService implements IOrderService {
                 .orderNumber(ORDER_NUMBER_PREFIX + System.currentTimeMillis())
                 .build();
 
+        Order savedOrder = orderRepository.save(order);
+        orderDetails.forEach(detail -> {
+            detail.setOrder(savedOrder);
+            orderDetailRepository.save(detail);
+        });
 //        Order savedOrder = orderRepository.save(order);
 
         // Optionally save order details if they require a reference to the saved order
@@ -51,13 +56,13 @@ public class OrderService implements IOrderService {
 //            orderDetailRepository.save(detail);
 //        });
 
-        return order;
+        return savedOrder;
     }
 
     @Override
     public Order getOrderById(String orderId) {
-//        Order order = orderRepository.fin
-        return null; // Replace with actual implementation
+        return orderRepository.findByIdWithOrderItems(UUID.fromString(orderId))
+                .orElse(null);
     }
 
     @Override

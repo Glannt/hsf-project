@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class OrderController {
+
 
     private final IUserService userService;
     private final IOrderService orderService;
@@ -42,14 +44,30 @@ public class OrderController {
     @GetMapping("/orders")
     public String getOrders(Model model, Principal principal) {
         addUserInfo(model, principal);
-        // TODO: Add orders to model if needed
+
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null) {
+                List<Order> userOrders = orderService.getOrdersByUserId(user.getId().toString());
+                model.addAttribute("orders", userOrders);
+            }
+        }
+
         return "order/index";
     }
 
     // Show order confirmation page
     @GetMapping("/confirmation")
-    public String getConfirmationPage(Model model, Principal principal) {
+    public String getConfirmationPage(Model model, Principal principal, HttpSession session) {
         addUserInfo(model, principal);
+
+        Order order = (Order) session.getAttribute("pendingOrder");
+        if (order == null) {
+            return "redirect:/cart";
+        }
+
+        model.addAttribute("order", order);  // 🟢 FIX: Truyền order vào model
+
         return "order/confirmation";
     }
 
