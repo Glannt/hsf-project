@@ -22,4 +22,7 @@ public interface IProductService {
     ComputerItem deleteComputerItem(UUID id);
     List<Category> getAllCategories();
     PC deletePc(UUID id);
+    long countOrders();
+    Double sumOrderRevenue();
+    long countAllProducts();
 }

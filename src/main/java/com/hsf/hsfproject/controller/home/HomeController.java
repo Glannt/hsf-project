@@ -27,6 +27,7 @@ public class HomeController {
         if (principal != null && !model.containsAttribute("user")) {
             User user = userService.findByUsername(principal.getName());
             model.addAttribute("user", user);
+            model.addAttribute("username", user.getUsername());
             model.addAttribute("isLogin", true);
         } else {
             model.addAttribute("isLogin", false);
@@ -59,5 +60,6 @@ public class HomeController {
 
         return "index";
     }
+
 
 }

@@ -24,7 +24,6 @@ public class Cart extends BaseEntity {
     private Integer itemCount;
 
     @OneToOne(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

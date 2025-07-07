@@ -1,32 +1,34 @@
 package com.hsf.hsfproject.controller.order;
 
-import com.hsf.hsfproject.dtos.request.OrderRequest;
-import com.hsf.hsfproject.dtos.response.CartItemResponse;
+import com.hsf.hsfproject.dtos.request.CreateOrderRequest;
 import com.hsf.hsfproject.model.Cart;
 import com.hsf.hsfproject.model.Order;
 import com.hsf.hsfproject.model.User;
-import com.hsf.hsfproject.service.order.IOrderService;
+import com.hsf.hsfproject.service.cart.CartService;
+import com.hsf.hsfproject.service.order.OrderService;
 import com.hsf.hsfproject.service.user.IUserService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.UUID;
 
 @Controller
+@RequestMapping("/order")
 @RequiredArgsConstructor
 public class OrderController {
 
+    private final OrderService orderService;
+    private final CartService cartService;
     private final IUserService userService;
-    private final IOrderService orderService;
-
-    // Helper method to add user info to the model
+    
+    // Helper method to add user info to model
     private void addUserInfo(Model model, Principal principal) {
         model.addAttribute("isLogin", principal != null);
         if (principal != null) {
@@ -37,55 +39,65 @@ public class OrderController {
             }
         }
     }
-
-    // Display all orders for the user
-    @GetMapping("/orders")
-    public String getOrders(Model model, Principal principal) {
-        addUserInfo(model, principal);
-        // TODO: Add orders to model if needed
-        return "order/index";
-    }
-
-    // Show order confirmation page
-    @GetMapping("/confirmation")
-    public String getConfirmationPage(Model model, Principal principal) {
-        addUserInfo(model, principal);
-        return "order/confirmation";
-    }
-
-    // Create a new order and store it in session
-    @PostMapping("/orders")
-    public String createOrder(@RequestParam("cartId") String cartId,
-                              @RequestParam("userId") String userId,
-                              HttpSession session,
-                              Principal principal,
-                              Model model) {
-        OrderRequest request = OrderRequest.builder()
-                .cartId(cartId)
-                .userId(userId)
-                .build();
-        Order order = orderService.createOrder(request);
-        session.setAttribute("pendingOrder", order);
-        model.addAttribute("order", order);
-        addUserInfo(model, principal);
-        return "order/index";
-    }
-
-    // Confirm the order and redirect to confirmation page
-    @PostMapping("/order/confirm")
-    public String confirmOrder(@RequestParam("shippingAddress") String shippingAddress,
-                               HttpSession session,
-                               Model model) {
-        Order order = (Order) session.getAttribute("pendingOrder");
-        if (order == null) return "redirect:/cart";
-        Order confirmedOrder = orderService.acceptOrder(order, shippingAddress);
-        if (confirmedOrder == null) {
-            model.addAttribute("error", "Failed to confirm order. Please try again.");
-            return "order/index";
+    
+    @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public String createOrderFromCart(@RequestParam("cartId") UUID cartId, 
+                                    @RequestParam("userId") UUID userId,
+                                    Model model, 
+                                    Principal principal) {
+        try {
+            addUserInfo(model, principal);
+            
+            System.out.println("Creating order from cart. CartId: " + cartId + ", UserId: " + userId);
+            
+            // Lấy cart
+            Cart cart = cartService.getCartByUserId(userId.toString());
+            if (cart == null || cart.getCartItems().isEmpty()) {
+                System.out.println("Cart is null or empty");
+                return "redirect:/cart?error=empty_cart";
+            }
+            
+            System.out.println("Cart found with " + cart.getCartItems().size() + " items");
+            
+            // Tạo CreateOrderRequest từ cart
+            CreateOrderRequest request = new CreateOrderRequest();
+            request.setShippingAddress("Default Address"); // Có thể thêm form để nhập địa chỉ
+            request.setOrderItems(new ArrayList<>());
+            
+            cart.getCartItems().forEach(item -> {
+                CreateOrderRequest.OrderItemRequest orderItem = new CreateOrderRequest.OrderItemRequest();
+                orderItem.setQuantity(item.getQuantity());
+                
+                if (item.getComputerItem() != null) {
+                    orderItem.setProductType("COMPUTER_ITEM");
+                    orderItem.setComputerItemId(item.getComputerItem().getId());
+                    System.out.println("Adding computer item: " + item.getComputerItem().getName());
+                } else if (item.getPc() != null) {
+                    orderItem.setProductType("PC");
+                    orderItem.setPcId(item.getPc().getId());
+                    System.out.println("Adding PC: " + item.getPc().getName());
+                }
+                
+                request.getOrderItems().add(orderItem);
+            });
+            
+            System.out.println("Created order request with " + request.getOrderItems().size() + " items");
+            
+            // Tạo order
+            Order order = orderService.createOrder(principal.getName(), request);
+            
+            System.out.println("Order created successfully with ID: " + order.getId());
+            
+            // Xóa cart sau khi tạo order thành công
+            cartService.clearCart(userId);
+            
+            return "redirect:/orders/" + order.getId() + "?success=order_created";
+            
+        } catch (Exception e) {
+            System.err.println("Error creating order: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/cart?error=order_creation_failed";
         }
-        session.removeAttribute("pendingOrder");
-        // No need to add order to model since redirect
-        return "redirect:/confirmation";
     }
-
 }

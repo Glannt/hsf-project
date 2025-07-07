@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -7,6 +5,84 @@
     <title>Your Cart</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <style>
+        .cart-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        .table-cart th, .table-cart td {
+            vertical-align: middle !important;
+            text-align: center;
+            font-size: 1rem;
+        }
+        .product-col {
+            min-width: 220px;
+            text-align: left;
+        }
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        .product-image-container {
+            width: 60px;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .quantity-input:focus {
+            border-color: #c96;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25);
+        }
+        .btn-remove {
+            background: #ff4d4f;
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            margin: 0 auto;
+        }
+        .btn-remove:hover {
+            background: #d32f2f;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255,77,79,0.15);
+        }
+        .cart-summary {
+            background: #f8f9fa;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+        .cart-summary h4 {
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .btn-primary, .btn-outline-primary {
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
+            padding: 10px 24px;
+        }
+    </style>
 </head>
 
 <body>
@@ -44,62 +120,94 @@
             <div class="cart">
                 <div class="container">
                     <div th:if="${#lists.isEmpty(cart.cartItems)}">
-                        <p>Your cart is empty.</p>
-                        <a th:href="@{/products}" class="btn btn-outline-primary-2">Continue Shopping</a>
+                        <div class="text-center py-5">
+                            <h3>Your cart is empty.</h3>
+                            <p class="text-muted">Add some products to your cart to get started.</p>
+                            <a th:href="@{/products}" class="btn btn-primary">Continue Shopping</a>
+                        </div>
                     </div>
 
                     <div th:unless="${#lists.isEmpty(cart.cartItems)}">
-                        <form th:action="@{/user/cart/update}" method="post">
-                            <table class="table table-cart table-mobile">
-                                <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price (VND)</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="item : ${cart.cartItems}">
-                                    <td class="product-col">
-                                        <div class="product">
-                                            <h3 class="product-title" th:text="${item.computerItem != null ? item.computerItem.name : item.pc.name}">Product Name</h3>
-                                        </div>
-                                    </td>
-                                    <td th:text="${#numbers.formatInteger((item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
-                                    <td>
-                                        <input class="form-control" type="number" name="quantities"
-                                               th:value="${item.quantity}" min="1" style="width:80px;">
-                                        <input type="hidden" name="itemIds" th:value="${item.id}" />
-                                    </td>
-                                    <td th:text="${#numbers.formatInteger(item.quantity * (item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
-                                    <td>
-                                        <form th:action="@{/user/cart/remove}" method="post">
-                                            <input type="hidden" name="cartItemId" th:value="${item.id}" />
-                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <!-- Update Cart Form -->
+                        <form th:action="@{/cart/update}" method="post" id="updateCartForm">
+                            <div class="cart-table">
+                                <table class="table table-cart table-mobile">
+                                    <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price (VND)</th>
+                                        <th>Quality</th>
+                                        <th>Total</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="item : ${cart.cartItems}">
+                                        <td class="product-col">
+                                            <figure class="product-image-container">
+                                                <a href="product.html" class="product-image">
+                                                    <img th:src="@{/assets/images/products/product-1.jpg}" alt="product">
+                                                </a>
+                                            </figure>
+                                            <div>
+                                                <h2 class="product-title">
+                                                    <a th:href="@{/product/{id}(id=${item.computerItem != null ? item.computerItem.id : item.pc.id})}" 
+                                                       th:text="${item.computerItem != null ? item.computerItem.name : item.pc.name}">Product Name</a>
+                                                </h2>
+                                            </div>
+                                        </td>
+                                        <td class="price-col">$<span th:text="${#numbers.formatDecimal(item.computerItem != null ? item.computerItem.price : item.pc.price, 1, 'COMMA', 2, 'POINT')}" 
+                                                                   th:data-price="${item.computerItem != null ? item.computerItem.price : item.pc.price}">0.00</span></td>
+                                        <td class="quantity-col">
+                                            <div class="product-details-quantity">
+                                                <input type="number" th:value="${item.quantity}" min="1" max="10" 
+                                                       class="form-control quantity-input" 
+                                                       th:data-item-id="${item.id}"
+                                                       name="quantities"
+                                                       oninput="updateTotalPrice(this)" 
+                                                       onblur="updateCartItemQuantityFromData(this)">
+                                            </div>
+                                        </td>
+                                        <td class="total-col">$<span th:text="${#numbers.formatDecimal((item.computerItem != null ? item.computerItem.price : item.pc.price) * item.quantity, 1, 'COMMA', 2, 'POINT')}">0.00</span></td>
+                                        <td class="remove-col">
+                                            <button type="button" class="btn-remove" 
+                                                    th:data-item-id="${item.id}"
+                                                    onclick="removeCartItemFromData(this)">
+                                                <i class="icon-close"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                            <div class="row">
+                            <div class="row mt-4">
                                 <div class="col-lg-4 offset-lg-8">
                                     <div class="cart-summary">
-                                        <h4>Total:</h4>
-                                        <p th:text="${#numbers.formatInteger(cart.totalPrice, 0, 'POINT')} + ' VND'">0 VND</p>
-                                        <button type="submit" class="btn btn-outline-primary-2 btn-block">Update Cart</button>
-<!--                                        <a th:href="@{/order}" class="btn btn-primary btn-block">Proceed to Checkout</a>-->
-                                        <form th:action="@{/orders}" method="post" style="margin-top: 10px;">
-                                            <input type="hidden" name="cartId" th:value="${cart.id}" />
-                                            <input type="hidden" name="userId" th:value="${user.id}" />
-                                            <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>
-                                        </form>
+                                        <h4>Cart Summary</h4>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Total Items:</span>
+                                            <span th:text="${cart.itemCount}">0</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <strong>Total Amount:</strong>
+                                            <strong th:text="${cart.totalPrice != null ? #numbers.formatInteger(cart.totalPrice, 0, 'POINT') + ' VND' : '0 VND'}">0 VND</strong>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </form>
+                        
+                        <!-- Checkout Form - Separate from update form -->
+                        <div class="row mt-3">
+                            <div class="col-lg-4 offset-lg-8">
+                                <form th:action="@{/order}" method="post">
+                                    <input type="hidden" name="cartId" th:value="${cart.id}" />
+                                    <input type="hidden" name="userId" th:value="${user.id}" />
+                                    <button type="submit" class="btn btn-primary btn-block">Payment</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -117,29 +225,96 @@
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/js/main.js}"></script>
 <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        const removeForms = document.querySelectorAll(".remove-form");
-        removeForms.forEach(form => {
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload(); // Reload lại trang sau khi xóa thành công
-                        } else {
-                            alert("Failed to remove item from cart.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("An error occurred.");
+    // Function to update cart item quantity from data attribute
+    function updateCartItemQuantityFromData(input) {
+        const itemId = input.getAttribute('data-item-id');
+        const quantity = input.value;
+        
+        const formData = new FormData();
+        formData.append('itemId', itemId);
+        formData.append('quantity', quantity);
+        
+        fetch('/cart/update-quantity', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload(); // Reload to update totals
+            } else {
+                alert('Failed to update quantity');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating quantity');
+        });
+    }
+    
+    // Function to remove cart item from data attribute
+    function removeCartItemFromData(button) {
+        const itemId = button.getAttribute('data-item-id');
+        
+        if (confirm('Are you sure you want to remove this item from cart?')) {
+            const formData = new FormData();
+            formData.append('itemId', itemId);
+            
+            fetch('/cart/remove', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove the row from the table
+                    const row = button.closest('tr');
+                    row.remove();
+                    
+                    // Reload page to update totals
+                    window.location.reload();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Failed to remove item');
                     });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while removing item: ' + error.message);
+            });
+        }
+    }
+    
+    // Function to update total price when quantity changes
+    function updateTotalPrice(input) {
+        const row = input.closest('tr');
+        const priceElement = row.querySelector('.price-col span');
+        const totalElement = row.querySelector('.total-col span');
+        const quantity = parseInt(input.value) || 0;
+        
+        // Get price from data attribute first, fallback to text content
+        const price = parseFloat(priceElement.getAttribute('data-price')) || 
+                     parseFloat(priceElement.textContent.replace('$', '').replace(/,/g, '')) || 0;
+        
+        const total = quantity * price;
+        
+        // Format total with commas and 2 decimal places
+        totalElement.textContent = '$' + total.toLocaleString('en-US', {
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2
+        });
+        
+        console.log('Updated price:', {quantity, price, total, formatted: totalElement.textContent});
+    }
+    
+    // Add event listeners for quantity inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                updateTotalPrice(this);
             });
         });
     });

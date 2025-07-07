@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Slf4j(topic = "UserService")
@@ -33,19 +34,22 @@ public class UserService implements IUserService {
     @Override
     public User createUser(CreateUserDTO userDTO) {
 
-        User user = userRepository.findByUsername(userDTO.getUsername());
+        User user = userRepository.findByUsername(userDTO.getUsername()).orElse(null);
         if (user != null) {
             log.info("User with username {} already exists" + userDTO.getUsername());
             throw new IllegalArgumentException("User with username " + userDTO.getUsername() + " already exists");
         }
         //build a new user from the DTO
 
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Role USER not found"));
+
         User newUser = User.builder()
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
                 .phoneNumber(userDTO.getPhoneNumber())
-                .role(roleRepository.findByName("ROLE_USER"))
+                .role(userRole)
                 .build();
 
         // Set the cart for the new user
@@ -55,8 +59,7 @@ public class UserService implements IUserService {
         userRepository.save(newUser);
 
         // Assign the default role to the user
-        Role role = roleRepository.findByName("ROLE_USER");
-        role.setUsers(Set.of(newUser));
+        // Note: Role relationship is already set via the User entity
         return newUser;
     }
 
@@ -66,8 +69,10 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(Long userId) {
-
+    public void deleteUser(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.delete(user);
     }
 
     @Override
@@ -77,13 +82,18 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> getUsers(Pageable pageable) {
-        return null;
+        return userRepository.findAll(pageable);
     }
 
 
 
     @Override
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameWithCart(username).orElse(null);
+    }
+
+    @Override
+    public long count() {
+        return userRepository.count();
     }
 }

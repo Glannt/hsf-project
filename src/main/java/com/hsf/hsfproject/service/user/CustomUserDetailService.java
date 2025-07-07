@@ -2,6 +2,7 @@ package com.hsf.hsfproject.service.user;
 
 import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class CustomUserDetailService implements UserDetailsService {
 
     @Autowired
@@ -16,19 +18,17 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities(user.getRole().getName()) // Assuming Role has a getName() method
-                .roles(user.getRole().getName().replace("ROLE_", "")) // Remove "ROLE_" prefix for roles
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
+        log.info("Loading user by username: {}", username);
+        
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new UsernameNotFoundException("User not found: " + username);
+                });
+        
+        log.info("Found user: {} with role: {}", user.getUsername(), user.getRole().getName());
+        
+        // Return the User entity directly since it implements UserDetails
+        return user;
     }
 }

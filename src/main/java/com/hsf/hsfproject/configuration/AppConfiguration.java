@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AppConfiguration {
-    static Dotenv dotenv = Dotenv.load();
+//    static Dotenv dotenv = Dotenv.load();
 
     @Autowired
     UserRepository userRepository;
@@ -25,11 +25,10 @@ public class AppConfiguration {
 
     @Bean
     public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-//        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
-        return  provider;
-
+        return provider;
     }
 
     @Bean

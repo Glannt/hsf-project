@@ -1,36 +1,399 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>PC List</title>
-  <link rel="stylesheet" th:href="@{../../static/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Products - HSF Store</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .product-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.3;
+        }
+        .product-title a {
+            color: #333;
+            text-decoration: none;
+        }
+        .product-title a:hover {
+            color: #c96;
+        }
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #c96;
+            margin-bottom: 15px;
+        }
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .quantity-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 60px;
+        }
+        .quantity-input {
+            width: 80px !important;
+            text-align: center;
+            font-size: 16px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .quantity-input:focus {
+            border-color: #c96;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25);
+        }
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #c96 0%, #b85 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #b85 0%, #a74 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(204, 153, 102, 0.4);
+        }
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 5px solid #c96;
+        }
+        .section-title {
+            color: #333;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .cart-count {
+            background: linear-gradient(135deg, #c96 0%, #b85 100%);
+            color: white;
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 12px;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+        .header-cart {
+            position: relative;
+            display: inline-block;
+        }
+        .login-btn {
+            background: #c96;
+            border-color: #c96;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .login-btn:hover {
+            background: #b85;
+            border-color: #b85;
+            transform: translateY(-1px);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #c96;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-<section class="container">
-  <h1>PC List</h1>
-  <table>
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Price</th>
-      <th>Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="pc : ${pcPage.content}">
-      <td th:text="${pc.id}"></td>
-      <td th:text="${pc.name}"></td>
-      <td th:text="${pc.price}"></td>
-      <td th:text="${pc.description}"></td>
-    </tr>
-    </tbody>
-  </table>
-  <div class="pagination">
-    <a th:if="${pcPage.hasPrevious()}" th:href="@{/api/v1/products(page=${pcPage.number - 1}, limit=${pcPage.size})}">Previous</a>
-    <span th:text="${pcPage.number + 1}"></span> / <span th:text="${pcPage.totalPages}"></span>
-    <a th:if="${pcPage.hasNext()}" th:href="@{/api/v1/products(page=${pcPage.number + 1}, limit=${pcPage.size})}">Next</a>
-  </div>
-</section>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
+                    </a>
+                    <nav class="main-nav">
+                        <ul class="menu sf-arrows">
+                            <li><a th:href="@{/}">Home</a></li>
+                            <li><a th:href="@{/products}">Shop</a></li>
+                            <li th:if="${isLogin}"><a th:href="@{/orders}">My Orders</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <div class="header-cart">
+                        <a th:href="@{/cart}" class="icon-shopping-cart">
+                            <i class="icon-shopping-cart"></i>
+                            <span th:if="${user != null and user.cart != null and user.cart.getItemCount() > 0}" 
+                                  class="cart-count" th:text="${user.cart.getItemCount()}">0</span>
+                        </a>
+                    </div>
+                    
+                    <div th:if="${isLogin}" class="user-menu">
+                        <div class="user-avatar" th:text="${#strings.substring(username, 0, 1).toUpperCase()}">U</div>
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <span th:text="${username}">User</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a th:href="@{/user/dashboard}" class="dropdown-item">Dashboard</a>
+                                <a th:href="@{/cart}" class="dropdown-item">View Cart</a>
+                                <a th:href="@{/orders}" class="dropdown-item">My Orders</a>
+                                <div class="dropdown-divider"></div>
+                                <a th:href="@{/logout}" class="dropdown-item">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:unless="${isLogin}">
+                        <a th:href="@{/login}" class="btn login-btn">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+            <div class="container">
+                <h1 class="page-title">Our Products</h1>
+                <p class="page-subtitle">Discover our amazing collection of computers and accessories</p>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <div class="container">
+                <!-- PC Products Section -->
+                <div class="section-header">
+                    <h2 class="section-title">🖥️ PC Products</h2>
+                    <p class="text-muted mb-0">High-performance computers for every need</p>
+                </div>
+                
+                <div class="product-grid" th:if="${pcs.content.size() > 0}">
+                    <div class="product-card" th:each="pc : ${pcs.content}">
+                        <figure class="product-media">
+                            <a th:href="@{/product/{id}(id=${pc.id})}">
+                                <img th:src="@{/assets/images/products/product-1.jpg}" alt="Product image" class="product-image">
+                            </a>
+                        </figure>
+                        <div class="product-body">
+                            <h3 class="product-title">
+                                <a th:href="@{/product/{id}(id=${pc.id})}" th:text="${pc.name}">Product Name</a>
+                            </h3>
+                            <div class="product-price" th:text="${#numbers.formatDecimal(pc.price, 1, 'COMMA', 2, 'POINT')} + ' VND'">0 VND</div>
+                            
+                            <div class="product-action" th:if="${isLogin}">
+                                <form th:action="@{/cart/add}" method="post" class="add-to-cart-form">
+                                    <input type="hidden" name="productId" th:value="${pc.id}">
+                                    <input type="hidden" name="productType" value="PC">
+                                    <input type="hidden" name="cartId" th:value="${user != null ? user.cart.getId() : ''}">
+                                    
+                                    <div class="quantity-section">
+                                        <label class="quantity-label">Quality:</label>
+                                        <input type="number" name="quantity" value="1" min="1" max="10" 
+                                               class="form-control quantity-input" 
+                                               th:onchange="'updatePrice(this, ' + ${pc.price} + ')'">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn add-to-cart-btn">
+                                        <i class="icon-shopping-cart"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="product-action" th:unless="${isLogin}">
+                                <a th:href="@{/login}" class="btn add-to-cart-btn">
+                                    <i class="icon-user"></i> Login to Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Computer Items Section -->
+                <div class="section-header">
+                    <h2 class="section-title">🔧 Computer Items</h2>
+                    <p class="text-muted mb-0">Quality components and accessories</p>
+                </div>
+                
+                <div class="product-grid" th:if="${computerItems.content.size() > 0}">
+                    <div class="product-card" th:each="item : ${computerItems.content}">
+                        <figure class="product-media">
+                            <a th:href="@{/product/{id}(id=${item.id})}">
+                                <img th:src="@{/assets/images/products/product-2.jpg}" alt="Product image" class="product-image">
+                            </a>
+                        </figure>
+                        <div class="product-body">
+                            <h3 class="product-title">
+                                <a th:href="@{/product/{id}(id=${item.id})}" th:text="${item.name}">Product Name</a>
+                            </h3>
+                            <div class="product-price" th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')} + ' VND'">0 VND</div>
+                            
+                            <div class="product-action" th:if="${isLogin}">
+                                <form th:action="@{/cart/add}" method="post" class="add-to-cart-form">
+                                    <input type="hidden" name="productId" th:value="${item.id}">
+                                    <input type="hidden" name="productType" value="COMPUTER_ITEM">
+                                    <input type="hidden" name="cartId" th:value="${user != null ? user.cart.getId() : ''}">
+                                    
+                                    <div class="quantity-section">
+                                        <label class="quantity-label">Quality:</label>
+                                        <input type="number" name="quantity" value="1" min="1" max="10" 
+                                               class="form-control quantity-input"
+                                               th:onchange="'updatePrice(this, ' + ${item.price} + ')'">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn add-to-cart-btn">
+                                        <i class="icon-shopping-cart"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="product-action" th:unless="${isLogin}">
+                                <a th:href="@{/login}" class="btn add-to-cart-btn">
+                                    <i class="icon-user"></i> Login to Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Products Pagination" th:if="${pcs.totalElements > 0 or computerItems.totalElements > 0}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
+                            <a class="page-link" th:href="@{/products(page=${pcs.number - 1})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
+                            th:classappend="${i == pcs.number} ? 'active'">
+                            <a class="page-link" th:href="@{/products(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
+                            <a class="page-link" th:href="@{/products(page=${pcs.number + 1})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
+                            <p>Your trusted computer store for quality products and excellent service.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">&copy; 2025 HSF Store. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+<script th:inline="javascript">
+    // Function to update price when quantity changes
+    function updatePrice(input, basePrice) {
+        const quantity = parseInt(input.value);
+        const priceElement = input.closest('.product-card').querySelector('.product-price');
+        const totalPrice = quantity * basePrice;
+        priceElement.textContent = totalPrice.toLocaleString('en-US') + ' VND';
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const addToCartForms = document.querySelectorAll(".add-to-cart-form");
+        addToCartForms.forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Product added to cart successfully!");
+                        window.location.reload(); // Reload để cập nhật cart count
+                    } else {
+                        alert("Failed to add product to cart.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while adding to cart.");
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>

@@ -6,13 +6,15 @@ import com.hsf.hsfproject.dtos.response.LoginResponse;
 import com.hsf.hsfproject.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.UUID;
 
 public interface IUserService {
     User createUser(CreateUserDTO user);
     void updateUser(Long userId, String username, String password);
-    void deleteUser(Long userId);
+    void deleteUser(UUID id);
     User getUserByName(String name);
     Page<User> getUsers(Pageable pageable);
     User findByUsername(String username);
 //    LoginResponse login(LoginRequest loginRequest);
+    long count();
 }

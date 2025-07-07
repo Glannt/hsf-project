@@ -7,6 +7,7 @@ import com.hsf.hsfproject.model.PC;
 import com.hsf.hsfproject.repository.CategoryRepository;
 import com.hsf.hsfproject.repository.ComputerItemRepository;
 import com.hsf.hsfproject.repository.ImageRepository;
+import com.hsf.hsfproject.repository.OrderRepository;
 import com.hsf.hsfproject.repository.PCRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +28,10 @@ public class ProductService implements IProductService {
     private final ComputerItemRepository computerItemRepository;
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderRepository orderRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     // This method should be implemented to return a paginated list of PCs
     @Override
@@ -156,6 +163,31 @@ public class ProductService implements IProductService {
         return null;
     }
 
+    // Dashboard methods
+    @Override
+    public long countOrders() {
+        // Đếm tổng số đơn hàng
+        return orderRepository.count();
+    }
+
+    @Override
+    public Double sumOrderRevenue() {
+        // Tổng doanh thu
+        try {
+            Double sum = orderRepository.sumTotalRevenue();
+            return sum != null ? sum : 0.0;
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
+
+    @Override
+    public long countAllProducts() {
+        // Tổng số sản phẩm = tổng PC + tổng linh kiện
+        long pcCount = pcRepository.count();
+        long itemCount = computerItemRepository.count();
+        return pcCount + itemCount;
+    }
 
 //    @Override
 //    public List<Object> getProductsByCategorySuggest(String category) {

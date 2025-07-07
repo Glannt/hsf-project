@@ -1,115 +1,110 @@
 package com.hsf.hsfproject.service.order;
 
-import com.hsf.hsfproject.dtos.request.OrderRequest;
-import com.hsf.hsfproject.mapper.Mapper;
+import com.hsf.hsfproject.constants.enums.OrderStatus;
+import com.hsf.hsfproject.dtos.request.CreateOrderRequest;
 import com.hsf.hsfproject.model.*;
 import com.hsf.hsfproject.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService implements IOrderService {
-    private static final String ORDER_NUMBER_PREFIX = "ORD-";
+@Transactional
+public class OrderService {
 
-    private final OrderRepository orderRepository; // Assuming you have an OrderRepository for database operations
+    private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final UserRepository userRepository;
-    private final CartRepository cartRepository;
-    private final Mapper mapper; // Assuming you have a Mapper class for converting between entities
-    private final TransactionRepository transactionRepository;
+    private final PCRepository pcRepository;
+    private final ComputerItemRepository computerItemRepository;
+    
+    public Order createOrder(String username, CreateOrderRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    // Implement the methods defined in IOrderService interface
-    @Override
-    public Order createOrder(OrderRequest request) {
-        User user = userRepository.findById(UUID.fromString(request.getUserId()))
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Cart cart = cartRepository.findById(UUID.fromString(request.getCartId()))
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
-
-        Set<OrderDetail> orderDetails = mapper.maptoOrderDetail(cart.getCartItems());
-
+        // Tạo order mới
         Order order = Order.builder()
+                .orderNumber(generateOrderNumber())
+                .status(OrderStatus.PENDING)
+                .shippingAddress(request.getShippingAddress())
+                .totalPrice(0.0)
+                .orderDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
                 .user(user)
-                .orderItems(orderDetails)
-                .status("PENDING")
-                .totalPrice(cart.getTotalPrice())
-                .orderNumber(ORDER_NUMBER_PREFIX + System.currentTimeMillis())
                 .build();
 
-//        Order savedOrder = orderRepository.save(order);
+        order = orderRepository.save(order);
 
-        // Optionally save order details if they require a reference to the saved order
-//        orderDetails.forEach(detail -> {
-//            detail.setOrder(savedOrder);
-//            orderDetailRepository.save(detail);
-//        });
-
-        return order;
-    }
-
-    @Override
-    public Order getOrderById(String orderId) {
-//        Order order = orderRepository.fin
-        return null; // Replace with actual implementation
-    }
-
-    @Override
-    public List<Order> getOrdersByUserId(String userId) {
-        // Logic to retrieve orders by user ID
-        return null; // Replace with actual implementation
-    }
-
-    @Override
-    public void cancelOrder(String orderId) {
-        // Logic to cancel an order
-    }
-
-    @Override
-    public List<Order> getAllOrders() {
-        // Logic to retrieve all orders
-        return null; // Replace with actual implementation
-    }
-
-    @Override
-    public Order acceptOrder(Order order, String shippingAddress) {
-        if (order == null) {
-            throw new IllegalArgumentException("Order cannot be null");
+        double totalPrice = 0.0;
+        
+        // Tạo order details và tính tổng tiền
+        for (CreateOrderRequest.OrderItemRequest item : request.getOrderItems()) {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(order);
+            orderDetail.setQuantity(item.getQuantity());
+            
+            if ("PC".equals(item.getProductType()) && item.getPcId() != null) {
+                PC pc = pcRepository.findById(item.getPcId())
+                        .orElseThrow(() -> new RuntimeException("PC not found"));
+                
+                orderDetail.setPc(pc);
+                orderDetail.setProductName(pc.getName());
+                orderDetail.setUnitPrice(pc.getPrice());
+                orderDetail.setSubtotal(pc.getPrice() * item.getQuantity());
+                
+            } else if ("COMPUTER_ITEM".equals(item.getProductType()) && item.getComputerItemId() != null) {
+                ComputerItem computerItem = computerItemRepository.findById(item.getComputerItemId())
+                        .orElseThrow(() -> new RuntimeException("Computer item not found"));
+                
+                orderDetail.setComputerItem(computerItem);
+                orderDetail.setProductName(computerItem.getName());
+                orderDetail.setUnitPrice(computerItem.getPrice());
+                orderDetail.setSubtotal(computerItem.getPrice() * item.getQuantity());
+            } else {
+                throw new RuntimeException("Invalid product type or product ID");
+            }
+            
+            totalPrice += orderDetail.getSubtotal();
+            orderDetailRepository.save(orderDetail);
         }
-
-
-        order.setStatus("ACCEPTED");
-        order.setShippingAddress(shippingAddress);
-        orderRepository.save(order);
-        order.getOrderItems().forEach(detail -> {
-            detail.setOrder(order);
-            orderDetailRepository.save(detail);
-        });
-        Cart cart = order.getUser().getCart();
-        if (cart != null) {
-            cart.getCartItems().clear();
-            cart.setTotalPrice(0d); // Optionally reset total price
-            cart.setItemCount(0);
-            cartRepository.save(cart);
-        }
-        Transaction transaction = Transaction.builder()
-                .order(order)
-                .totalAmount(order.getTotalPrice())
-                .transactionDate(String.valueOf(System.currentTimeMillis()))
-                .status("PAYED")
-                .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
-                .build();
-
-        return order;
-    }
-
-    @Override
-    public Order saveOrder(Order order) {
+        
+        // Cập nhật tổng tiền
+        order.setTotalPrice(totalPrice);
         return orderRepository.save(order);
+    }
+    
+    public Order updateOrderStatus(UUID orderId, OrderStatus status, String updatedBy) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        order.setStatus(status);
+        order.setUpdatedDate(LocalDateTime.now());
+        
+        return orderRepository.save(order);
+    }
+    
+    public Page<Order> getUserOrders(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return orderRepository.findByUserOrderByOrderDateDesc(user, pageable);
+    }
+    
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return orderRepository.findAllByOrderByOrderDateDesc(pageable);
+        }
+    
+    public Order getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+    }
+
+    private String generateOrderNumber() {
+        return "ORD-" + System.currentTimeMillis();
     }
 }

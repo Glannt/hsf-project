@@ -108,6 +108,52 @@ public class CartService implements ICartService {
         cartItemRepository.delete(cartItem);
         updateCart(cart, -priceToRemove);
     }
+    
+    @Override
+    public void removeFromCart(String username, UUID itemId) {
+        CartItem cartItem = cartItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
+        
+        // Verify the cart item belongs to the user
+        if (!cartItem.getCart().getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("Cart item does not belong to user");
+        }
+
+        Cart cart = cartItem.getCart();
+        double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
+
+        cartItemRepository.delete(cartItem);
+        updateCart(cart, -priceToRemove);
+    }
+    
+    @Override
+    public void updateQuantity(String username, UUID itemId, int quantity) {
+        CartItem cartItem = cartItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
+        
+        // Verify the cart item belongs to the user
+        if (!cartItem.getCart().getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("Cart item does not belong to user");
+        }
+
+        double oldPrice = cartItem.getUnitPrice() * cartItem.getQuantity();
+        cartItem.setQuantity(quantity);
+        cartItem.setSubtotal(cartItem.getUnitPrice() * quantity);
+        double newPrice = cartItem.getUnitPrice() * quantity;
+        
+        cartItemRepository.save(cartItem);
+        updateCart(cartItem.getCart(), newPrice - oldPrice);
+    }
+
+    public void clearCart(UUID userId) {
+        Cart cart = cartRepository.findByUserIdWithItems(userId);
+        if (cart != null) {
+            cartItemRepository.deleteByCartId(cart.getId());
+            cart.setTotalPrice(0.0);
+            cart.setItemCount(0);
+            cartRepository.save(cart);
+        }
+    }
 
     private CartItem addPCToCart(Cart cart, PC pc, int quantity) {
         CartItem cartItem = CartItem.builder()

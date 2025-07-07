@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>All Products - HSF Computer Store</title>
+    <link rel="stylesheet" th:href="@{assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{assets/css/style.css}">
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="header-left">
+                    <div class="header-dropdown">
+                        <a href="#">USD</a>
+                        <div class="header-menu">
+                            <ul>
+                                <li><a href="#">EUR</a></li>
+                                <li><a href="#">USD</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-dropdown">
+                        <a href="#">Links</a>
+                        <div class="header-menu">
+                            <ul>
+                                <li><a th:href="@{/}">Home</a></li>
+                                <li th:if="${isLogin}"><a th:href="@{/user/dashboard}">Dashboard</a></li>
+                                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                                <li th:if="${isLogin}"><a th:href="@{/logout}">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <button class="mobile-menu-toggler">
+                        <span class="sr-only">Toggle mobile menu</span>
+                        <i class="icon-bars"></i>
+                    </button>
+                    <a th:href="@{/}" class="logo">
+                        <img src="assets/images/logo.png" alt="Molla Logo" width="105" height="25">
+                    </a>
+                </div>
+                <div class="header-center">
+                    <nav class="main-nav">
+                        <ul class="menu sf-arrows">
+                            <li><a th:href="@{/}">Home</a></li>
+                            <li class="active"><a th:href="@{/products}">Products</a></li>
+                            <li th:if="${isLogin}"><a th:href="@{/orders}">My Orders</a></li>
+                            <li th:if="${isLogin}"><a th:href="@{/cart}">Cart</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <div class="header-search">
+                        <a href="#" class="search-toggle" role="button" title="Search">
+                            <i class="icon-search"></i>
+                        </a>
+                        <form action="#" method="get">
+                            <div class="header-search-wrapper">
+                                <input type="search" class="form-control" name="q" id="q" placeholder="Search..." required>
+                                <button class="btn icon-search p-0" type="submit"></button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="header-dropdown-link">
+                        <div class="account">
+                            <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon-user"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-custom-header">
+                                    <span th:if="${isLogin}" th:text="${user.username}">User</span>
+                                    <span th:unless="${isLogin}">Guest</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a th:if="${isLogin}" th:href="@{/user/dashboard}" class="dropdown-item">Dashboard</a>
+                                <a th:if="${isLogin}" th:href="@{/orders}" class="dropdown-item">My Orders</a>
+                                <a th:if="${isLogin}" th:href="@{/cart}" class="dropdown-item">Cart</a>
+                                <a th:if="${!isLogin}" th:href="@{/login}" class="dropdown-item">Login</a>
+                                <a th:if="${isLogin}" th:href="@{/logout}" class="dropdown-item">Logout</a>
+                            </div>
+                        </div>
+                        <a th:if="${isLogin}" th:href="@{/cart}" class="wishlist-link">
+                            <i class="icon-heart-o"></i>
+                            <span class="wishlist-count">0</span>
+                        </a>
+                        <a th:if="${isLogin}" th:href="@{/cart}" class="cart-link">
+                            <i class="icon-shopping-cart"></i>
+                            <span class="cart-count" th:text="${cart != null ? cart.cartItems.size() : 0}">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+            <div class="container">
+                <h1 class="page-title">All Products<span>Browse our collection</span></h1>
+            </div>
+        </div>
+        <nav aria-label="breadcrumb" class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Products
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="page-content">
+            <div class="container">
+                <!-- PC Products Section -->
+                <div class="mb-5">
+                    <h2 class="text-center mb-4">PC Collections</h2>
+                    <div th:if="${pcs != null and pcs.content.size() > 0}">
+                        <div class="products mb-3">
+                            <div class="row justify-content-center">
+                                <div class="col-6 col-md-4 col-lg-3" th:each="pc : ${pcs.content}">
+                                    <div class="product product-7 text-center">
+                                        <figure class="product-media">
+                                            <span class="product-label label-new">New</span>
+                                            <a th:href="@{/product/{id}(id=${pc.id})}">
+                                                <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
+                                            </a>
+
+                                            <div class="product-action-vertical">
+                                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                                <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                            </div>
+
+                                            <div class="product-action">
+                                                <form th:if="${isLogin}" th:action="@{/cart/add}" method="post" style="width: 100%">
+                                                    <input type="hidden" name="productId" th:value="${pc.id}"/>
+                                                    <input type="hidden" name="cartId" th:value="${user.cart.id}"/>
+                                                    <input type="hidden" name="quantity" value="1"/>
+                                                    <button type="submit" class="btn-product btn-cart w-100"><span>Add to Cart</span></button>
+                                                </form>
+                                                <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart"><span>Login to Add</span></a>
+                                            </div>
+                                        </figure>
+                                        <div class="product-body">
+                                            <h3 class="product-title" th:text="${pc.name}">PC Name</h3>
+                                            <div class="product-price">Price: <span th:text="${#numbers.formatInteger(pc.price, 0, 'COMMA')}">0</span> VND</div>
+                                            <p th:if="${pc.description}" th:text="${pc.description}">Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- PC Pagination -->
+                        <nav aria-label="PC Pagination" th:if="${pcs.totalPages > 1}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/products(pcPage=${pcs.number - 1})}">Previous</a>
+                                </li>
+                                <li th:each="page : ${#numbers.sequence(0, pcs.totalPages - 1)}"
+                                    class="page-item"
+                                    th:classappend="${page == pcs.number} ? 'active'">
+                                    <a class="page-link" th:href="@{/products(pcPage=${page})}" th:text="${page + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/products(pcPage=${pcs.number + 1})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div th:if="${pcs == null or pcs.content.size() == 0}" class="text-center">
+                        <div class="alert alert-info">
+                            <h4><i class="icon-info-circle"></i> No PCs Available</h4>
+                            <p>There are no PCs in our collection at the moment.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Computer Items Section -->
+                <div class="mb-5">
+                    <h2 class="text-center mb-4">Computer Components</h2>
+                    <div th:if="${computerItems != null and computerItems.content.size() > 0}">
+                        <div class="products mb-3">
+                            <div class="row justify-content-center">
+                                <div class="col-6 col-md-4 col-lg-3" th:each="item : ${computerItems.content}">
+                                    <div class="product product-7 text-center">
+                                        <figure class="product-media">
+                                            <span class="product-label label-new">New</span>
+                                            <a th:href="@{/product/{id}(id=${item.id})}">
+                                                <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
+                                            </a>
+
+                                            <div class="product-action-vertical">
+                                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                                <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                            </div>
+
+                                            <div class="product-action">
+                                                <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="width: 100%">
+                                                    <input type="hidden" name="id" th:value="${item.id}"/>
+                                                    <input type="hidden" name="cartId" th:value="${user.cart.id}"/>
+                                                    <input type="hidden" name="quantity" value="1"/>
+                                                    <button type="submit" class="btn-product btn-cart w-100"><span>Add to Cart</span></button>
+                                                </form>
+                                                <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart"><span>Login to Add</span></a>
+                                            </div>
+                                        </figure>
+                                        <div class="product-body">
+                                            <h3 class="product-title" th:text="${item.name}">Item Name</h3>
+                                            <div class="product-price">Price: <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}">0</span> VND</div>
+                                            <p th:if="${item.description}" th:text="${item.description}">Description</p>
+                                            <p th:if="${item.brand}">Brand: <span th:text="${item.brand}"></span></p>
+                                            <p th:if="${item.model}">Model: <span th:text="${item.model}"></span></p>
+                                            <p th:if="${item.category}">Category: <span th:text="${item.category.name}"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Computer Items Pagination -->
+                        <nav aria-label="Computer Items Pagination" th:if="${computerItems.totalPages > 1}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${!computerItems.hasPrevious()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/products(computerItemPage=${computerItems.number - 1})}">Previous</a>
+                                </li>
+                                <li th:each="page : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
+                                    class="page-item"
+                                    th:classappend="${page == computerItems.number} ? 'active'">
+                                    <a class="page-link" th:href="@{/products(computerItemPage=${page})}" th:text="${page + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${!computerItems.hasNext()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/products(computerItemPage=${computerItems.number + 1})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div th:if="${computerItems == null or computerItems.content.size() == 0}" class="text-center">
+                        <div class="alert alert-info">
+                            <h4><i class="icon-info-circle"></i> No Computer Items Available</h4>
+                            <p>There are no computer components in our collection at the moment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="widget widget-about">
+                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
+                            <p>HSF Computer Store - Your trusted source for quality computer products.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="footer-copyright">Copyright © 2024 HSF Computer Store. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
+<script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>
+<script th:src="@{/assets/js/superfish.min.js}"></script>
+<script th:src="@{/assets/js/owl.carousel.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html> 

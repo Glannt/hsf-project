@@ -19,4 +19,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, UUID> {
 
     @Query("SELECT ci FROM CartItem ci WHERE ci.cart.id = :cartId AND ci.computerItem.id = :productId")
     Optional<CartItem> findByCartIdAndComputerItemId(UUID cartId, UUID productId);
+    
+    void deleteByCartId(UUID cartId);
 }

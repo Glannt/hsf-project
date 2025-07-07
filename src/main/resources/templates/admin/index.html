@@ -8,6 +8,60 @@
 </head>
 <body class="bg-light">
 <div class="container mt-4">
+    <h2 class="text-primary mb-4">Admin Dashboard</h2>
+    
+    <!-- Navigation Menu -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+                <div class="container-fluid">
+                    <span class="navbar-brand">Admin Panel</span>
+                    <div class="navbar-nav">
+                        <a class="nav-link active" th:href="@{/admin}">Dashboard</a>
+                        <a class="nav-link" th:href="@{/admin/orders}">Orders</a>
+                        <a class="nav-link" th:href="@{/admin/product}">Products</a>
+                        <a class="nav-link" th:href="@{/admin/users}">Users</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Dashboard Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Users</h5>
+                    <h3 th:text="${totalUsers != null ? totalUsers : 0}">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Orders</h5>
+                    <h3 th:text="${totalOrders != null ? totalOrders : 0}">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <h3 th:text="${totalRevenue != null ? #numbers.formatInteger(totalRevenue, 0, 'POINT') + ' VND' : '0 VND'}">0 VND</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Products</h5>
+                    <h3 th:text="${totalProducts != null ? totalProducts : 0}">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
     <h2 class="text-primary mb-4">Quản lý Sản phẩm</h2>
 
     <!-- Table PC -->
@@ -23,24 +77,31 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="pc : ${pcs.content}">
+            <tr th:if="${pcs != null and pcs.content != null}" th:each="pc : ${pcs.content}">
                 <td th:text="${pc.id}"></td>
                 <td th:text="${pc.name}"></td>
-                <td th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"></td>
+                <td th:text="${pc.price != null ? #numbers.formatInteger(pc.price, 0, 'POINT') : '0'}"></td>
                 <td>
                     <a th:href="@{'/admin/product/pc/' + ${pc.id}}" class="btn btn-sm btn-info">Xem</a>
+                    <button type="button" class="btn btn-sm btn-danger" 
+                            th:onclick="'deletePC(\'' + ${pc.id} + '\', \'' + ${pc.name} + '\')'">
+                        Xóa
+                    </button>
                 </td>
+            </tr>
+            <tr th:if="${pcs == null or pcs.content == null or pcs.content.isEmpty()}">
+                <td colspan="4" class="text-center">Không có dữ liệu PC</td>
             </tr>
             </tbody>
         </table>
         <!-- PC pagination -->
-        <nav th:if="${pcs.totalPages > 1}">
+        <nav th:if="${pcs != null and pcs.totalPages > 1}">
             <ul class="pagination">
                 <li th:each="page : ${#numbers.sequence(0, pcs.totalPages - 1)}"
                     class="page-item"
                     th:classappend="${page == pcs.number} ? 'active'">
                     <a class="page-link"
-                       th:href="@{'/product?(pcPage=' + ${page} + '&computerItemPage=' + ${computerItems.number} + ')'}"
+                       th:href="@{'/admin?pcPage=' + ${page} + '&computerItemPage=' + ${computerItems != null ? computerItems.number : 0}}"
                        th:text="${page + 1}">1</a>
                 </li>
             </ul>
@@ -60,29 +121,154 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${computerItems.content}">
+            <tr th:if="${computerItems != null and computerItems.content != null}" th:each="item : ${computerItems.content}">
                 <td th:text="${item.id}"></td>
                 <td th:text="${item.name}"></td>
-                <td th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"></td>
+                <td th:text="${item.price != null ? #numbers.formatInteger(item.price, 0, 'POINT') : '0'}"></td>
                 <td>
                     <a th:href="@{'/admin/product/item/' + ${item.id}}" class="btn btn-sm btn-info">Xem</a>
+                    <button type="button" class="btn btn-sm btn-danger" 
+                            th:onclick="'deleteComputerItem(\'' + ${item.id} + '\', \'' + ${item.name} + '\')'">
+                        Xóa
+                    </button>
                 </td>
+            </tr>
+            <tr th:if="${computerItems == null or computerItems.content == null or computerItems.content.isEmpty()}">
+                <td colspan="4" class="text-center">Không có dữ liệu linh kiện</td>
             </tr>
             </tbody>
         </table>
         <!-- ComputerItem pagination -->
-        <nav th:if="${computerItems.totalPages > 1}">
+        <nav th:if="${computerItems != null and computerItems.totalPages > 1}">
             <ul class="pagination">
                 <li th:each="page : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
                     class="page-item"
                     th:classappend="${page == computerItems.number} ? 'active'">
                     <a class="page-link"
-                       th:href="@{'/product?(pcPage=' + ${pcs.number} + '&computerItemPage=' + ${page} + ')'}"
+                       th:href="@{'/admin?pcPage=' + ${pcs != null ? pcs.number : 0} + '&computerItemPage=' + ${page}}"
+                       th:text="${page + 1}">1</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Quản lý Users -->
+    <h2 class="text-primary mb-4 mt-5">Quản lý Users</h2>
+    <div class="table-container">
+        <h4 class="text-info">Danh sách Users</h4>
+        <table class="table table-bordered table-hover table-light">
+            <thead class="table-info">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${users != null and users.content != null}" th:each="user : ${users.content}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.phoneNumber}"></td>
+                <td>
+                    <span th:class="|badge ${user.role != null and user.role.name == 'ROLE_ADMIN' ? 'badge-danger' : 
+                                          user.role != null and user.role.name == 'ROLE_MANAGER' ? 'badge-warning' : 'badge-info'}|"
+                          th:text="${user.role != null ? user.role.name : 'N/A'}">Role</span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" 
+                            th:onclick="'deleteUser(\'' + ${user.id} + '\', \'' + ${user.username} + '\')'">
+                        Xóa
+                    </button>
+                </td>
+            </tr>
+            <tr th:if="${users == null or users.content == null or users.content.isEmpty()}">
+                <td colspan="6" class="text-center">Không có dữ liệu users</td>
+            </tr>
+            </tbody>
+        </table>
+        <!-- Users pagination -->
+        <nav th:if="${users != null and users.totalPages > 1}">
+            <ul class="pagination">
+                <li th:each="page : ${#numbers.sequence(0, users.totalPages - 1)}"
+                    class="page-item"
+                    th:classappend="${page == users.number} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{'/admin?userPage=' + ${page}}"
                        th:text="${page + 1}">1</a>
                 </li>
             </ul>
         </nav>
     </div>
 </div>
+
+<!-- JavaScript for delete functions -->
+<script>
+function deletePC(pcId, pcName) {
+    if (confirm('Bạn có chắc muốn xóa PC "' + pcName + '"?')) {
+        fetch('/admin/product/pc/delete/' + pcId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Xóa PC thành công!');
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa PC!');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xóa PC!');
+        });
+    }
+}
+
+function deleteComputerItem(itemId, itemName) {
+    if (confirm('Bạn có chắc muốn xóa linh kiện "' + itemName + '"?')) {
+        fetch('/admin/product/item/delete/' + itemId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Xóa linh kiện thành công!');
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa linh kiện!');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xóa linh kiện!');
+        });
+    }
+}
+
+function deleteUser(userId, username) {
+    if (confirm('Bạn có chắc muốn xóa user "' + username + '"?')) {
+        fetch('/admin/users/delete/' + userId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Xóa user thành công!');
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa user!');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xóa user!');
+        });
+    }
+}
+</script>
 </body>
 </html>

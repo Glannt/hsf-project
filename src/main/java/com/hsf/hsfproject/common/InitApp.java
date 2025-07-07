@@ -25,9 +25,9 @@ public class InitApp {
     @Bean
     CommandLineRunner initRoles(RoleRepository roleRepository) {
         return args -> {
-            String[] roles = {"ROLE_USER", "ROLE_ADMIN"};
+            String[] roles = {"ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN"};
             for (String roleName : roles) {
-                if (roleRepository.findByName(roleName) == null) {
+                if (roleRepository.findByName(roleName).isEmpty()) {
                     Role role = new Role();
                     role.setName(roleName);
                     roleRepository.save(role);

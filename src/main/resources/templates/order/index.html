@@ -22,7 +22,7 @@
             name="theme-color"
             content="#ffffff"
     />
-    <title>Order Confirmation</title>
+    <title>My Orders</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
 </head>
@@ -52,7 +52,7 @@
                 style="background-image: url('/assets/images/page-header-bg.jpg')"
         >
             <div class="container">
-                <h1 class="page-title">Checkout<span>Shop</span></h1>
+                <h1 class="page-title">My Orders<span>History</span></h1>
             </div>
             <!-- End .container -->
         </div>
@@ -62,302 +62,97 @@
                     <li class="breadcrumb-item">
                         <a th:href="@{/}">Home</a>
                     </li>
-                    <li class="breadcrumb-item">
-                        <a th:href="@{/cart}">Cart</a>
-                    </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Order Confirmation
+                        My Orders
                     </li>
                 </ol>
             </div>
         </nav>
         <div class="page-content">
-            <div class="checkout">
                 <div class="container">
-                    <div th:if="${order != null}">
-                        <form th:action="@{/order/confirm}" th:object="${order}" method="post" class="container">
+                <!-- Orders List -->
+                <div th:if="${orders != null and orders.content.size() > 0}">
                             <div class="row">
-                                <div class="col-lg-9">
-                                    <h2 class="checkout-title">Billing Details</h2>
-                                    <h4>Customer Info</h4>
-
-                                    <label>Username</label>
-                                    <input type="text" class="form-control" th:value="${order.user.username}" readonly
-                                           disabled/>
-
-                                    <label>Order Number</label>
-                                    <input type="text" class="form-control" th:value="${order.orderNumber}" readonly
-                                           disabled/>
-
-                                    <label>Status</label>
-                                    <input type="text" class="form-control" th:value="${order.status}" readonly
-                                           disabled/>
-
-                                    <label>Shipping Address *</label>
-                                    <input
-                                            type="text"
-                                            id="shippingAddress"
-                                            name="shippingAddress"
-                                            class="form-control"
-                                            placeholder="House number and Street name"
-                                            required
-                                    />
-                                </div>
-                                <aside class="col-lg-3">
-                                    <div class="summary">
-                                        <h3 class="summary-title">Your Order</h3>
-
-                                        <table class="table table-summary">
-                                            <thead>
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Total</th>
+                        <div class="col-lg-12">
+                            <h2 class="text-center mb-4">Your Order History</h2>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Order Number</th>
+                                            <th>Order Date</th>
+                                            <th>Status</th>
+                                            <th>Total Amount</th>
+                                            <th>Actions</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr th:each="item : ${order.orderItems}">
-                                                <td th:text="${item.productName}">Product Name</td>
-                                                <td th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">
-                                                    $0.00
+                                        <tr th:each="order : ${orders.content}">
+                                            <td th:text="${order.orderNumber}">ORD-123456</td>
+                                            <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                                            <td>
+                                                <span th:class="|badge ${order.status.name() == 'PENDING' ? 'badge-warning' : 
+                                                                      order.status.name() == 'CONFIRMED' ? 'badge-info' :
+                                                                      order.status.name() == 'SHIPPED' ? 'badge-primary' :
+                                                                      order.status.name() == 'DELIVERED' ? 'badge-success' : 'badge-danger'}|"
+                                                      th:text="${order.status.displayName}">Pending</span>
                                                 </td>
-                                            </tr>
-                                            <tr class="summary-subtotal">
-                                                <td>Subtotal:</td>
-                                                <td th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')}">
-                                                    $0.00
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Shipping:</td>
-                                                <td>Free shipping</td>
-                                            </tr>
-                                            <tr class="summary-total">
-                                                <td>Total:</td>
-                                                <td th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')}">
-                                                    $0.00
+                                            <td th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')} + ' VND'">1,000,000 VND</td>
+                                            <td>
+                                                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="icon-eye"></i> View Details
+                                                </a>
                                                 </td>
                                             </tr>
                                             </tbody>
                                         </table>
-
-
-                                        <div
-                                                class="accordion-summary"
-                                                id="accordion-payment"
-                                        >
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-1"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-1"
-                                                                aria-expanded="true"
-                                                                aria-controls="collapse-1"
-                                                        >
-                                                            Direct bank transfer
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-1"
-                                                        class="collapse show"
-                                                        aria-labelledby="heading-1"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Make your payment directly into our bank account.
-                                                        Please use your Order ID as the payment reference.
-                                                        Your order will not be shipped until the funds
-                                                        have cleared in our account.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
                                             </div>
-                                            <!-- End .card -->
 
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-2"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-2"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-2"
-                                                        >
-                                                            Check payments
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-2"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-2"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Ipsum dolor sit amet, consectetuer adipiscing
-                                                        elit. Donec odio. Quisque volutpat mattis eros.
-                                                        Nullam malesuada erat ut turpis.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
+                            <!-- Pagination -->
+                            <nav aria-label="Orders Pagination" th:if="${orders.totalElements > 0}">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous button -->
+                                    <li class="page-item" th:classappend="${!orders.hasPrevious()} ? 'disabled'">
+                                        <a class="page-link page-link-prev"
+                                           th:href="@{/orders(page=${orders.number - 1})}"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                        </a>
+                                    </li>
 
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-3"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-3"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-3"
-                                                        >
-                                                            Cash on delivery
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-3"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-3"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Quisque volutpat mattis eros. Lorem ipsum dolor
-                                                        sit amet, consectetuer adipiscing elit. Donec
-                                                        odio. Quisque volutpat mattis eros.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
+                                    <!-- Page numbers -->
+                                    <li class="page-item"
+                                        th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}"
+                                        th:classappend="${i == orders.number} ? 'active'">
+                                        <a class="page-link" th:href="@{/orders(page=${i})}" th:text="${i + 1}">1</a>
+                                    </li>
 
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-4"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-4"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-4"
-                                                        >
-                                                            PayPal
-                                                            <small class="float-right paypal-link"
-                                                            >What is PayPal?</small
-                                                            >
-                                                        </a>
-                                                    </h2>
+                                    <!-- Next button -->
+                                    <li class="page-item" th:classappend="${!orders.hasNext()} ? 'disabled'">
+                                        <a class="page-link page-link-next"
+                                           th:href="@{/orders(page=${orders.number + 1})}"
+                                           aria-label="Next">
+                                            Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
                                                 </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-4"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-4"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Nullam malesuada erat ut turpis. Suspendisse urna
-                                                        nibh, viverra non, semper suscipit, posuere a,
-                                                        pede. Donec nec justo eget felis facilisis
-                                                        fermentum.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
                                             </div>
-                                            <!-- End .card -->
-
-                                            <div class="card">
-                                                <div
-                                                        class="card-header"
-                                                        id="heading-5"
-                                                >
-                                                    <h2 class="card-title">
-                                                        <a
-                                                                class="collapsed"
-                                                                role="button"
-                                                                data-toggle="collapse"
-                                                                href="#collapse-5"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapse-5"
-                                                        >
-                                                            Credit Card (Stripe)
-                                                            <img
-                                                                    src="assets/images/payments-summary.png"
-                                                                    alt="payments cards"
-                                                            />
-                                                        </a>
-                                                    </h2>
-                                                </div>
-                                                <!-- End .card-header -->
-                                                <div
-                                                        id="collapse-5"
-                                                        class="collapse"
-                                                        aria-labelledby="heading-5"
-                                                        data-parent="#accordion-payment"
-                                                >
-                                                    <div class="card-body">
-                                                        Donec nec justo eget felis facilisis
-                                                        fermentum.Lorem ipsum dolor sit amet, consectetuer
-                                                        adipiscing elit. Donec odio. Quisque volutpat
-                                                        mattis eros. Lorem ipsum dolor sit ame.
-                                                    </div>
-                                                    <!-- End .card-body -->
-                                                </div>
-                                                <!-- End .collapse -->
-                                            </div>
-                                            <!-- End .card -->
                                         </div>
 
-                                        <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
-                                            <span class="btn-text">Place Order</span>
-                                            <span class="btn-hover-text">Proceed to Checkout</span>
-                                        </button>
-                                    </div>
-                                </aside>
-                            </div>
-
-
-                        </form>
-
-
+                <!-- No Orders Message -->
+                <div th:if="${orders == null or orders.content.size() == 0}" class="text-center mt-5">
+                    <div class="alert alert-info">
+                        <h4><i class="icon-info-circle"></i> No Orders Found</h4>
+                        <p>You haven't placed any orders yet. Start shopping to see your order history here.</p>
                     </div>
+                    <a th:href="@{/products}" class="btn btn-outline-primary-2">
+                        <span>Continue Shopping</span>
+                    </a>
                 </div>
             </div>
-        </div>
-
-
-        <div th:if="${order == null}" class="text-center mt-5">
-            <div class="alert alert-danger">
-                <strong>No order information available.</strong>
-            </div>
-            <a th:href="@{/cart}" class="btn btn-outline-primary">Return to Cart</a>
         </div>
     </main>
     <footer class="footer">
