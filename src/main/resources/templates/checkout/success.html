@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Success</title>
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body>
+<div class="container mt-15">
+    <div class="mr-auto ml-auto">
+        <h1>Thank You!</h1>
+        <p>Your order has been placed successfully.</p>
+        <div th:if="${message}">
+            <div class="alert alert-success" th:text="${message}"></div>
+        </div>
+        <a th:href="@{/}" class="btn btn-primary mt-3">Return to Home</a>
+    </div>
+
+</div>
+</body>
+</html>

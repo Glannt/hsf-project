@@ -1,7 +1,7 @@
 spring:
   application:
     name: HSF-Project
-#  datasource:
+  datasource:
     url: jdbc:mysql://localhost:3306/hsf_project?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
@@ -37,4 +37,12 @@ vnp:
   tmn-code: PRUGAA47
   hash-secret: J593OQSIWKX1D2BFO2BQ7UJIA1GTWNWQ
   return-url: http://localhost:3000/vn-pay/callback
+
+stripe:
+  secret:
+    key:
+  public:
+    key:
+  webhook:
+    key:
 

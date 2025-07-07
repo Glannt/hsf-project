@@ -1,5 +1,6 @@
 package com.hsf.hsfproject.service.order;
 
+import com.hsf.hsfproject.dtos.request.OrderDto;
 import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.mapper.Mapper;
 import com.hsf.hsfproject.model.*;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class OrderService implements IOrderService {
 //            detail.setOrder(savedOrder);
 //            orderDetailRepository.save(detail);
 //        });
+        orderRepository.save(order);
 
         return order;
     }
@@ -78,9 +81,22 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order acceptOrder(Order order, String shippingAddress) {
-        if (order == null) {
-            throw new IllegalArgumentException("Order cannot be null");
-        }
+//        Order existingOrder = orderRepository.findOrderByOrderNumber(order.getOrderNumber())
+//                .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + order.getOrderNumber()));
+//        Order newOrder = Order.builder()
+//                .shippingAddress(order.getShippingAddress())
+//                .user(order.getUser())
+//                .status(order.getStatus())
+//                .totalPrice(order.getTotalPrice())
+//                .orderNumber(order.getOrderNumber())
+//                .orderItems(order.getOrderItems().stream()
+//                        .map(item -> OrderDetail.builder()
+//                                .productName(item.getProductName())
+//                                .quantity(item.getQuantity())
+//                                .subtotal(item.getSubtotal())
+//                                .build())
+//                        .collect(Collectors.toSet()))
+//                .build();
 
 
         order.setStatus("ACCEPTED");
@@ -105,11 +121,19 @@ public class OrderService implements IOrderService {
                 .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
                 .build();
 
+        transactionRepository.save(transaction);
+
         return order;
     }
 
     @Override
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Order findOrderByOrderNumber(String orderNumber) {
+        return orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + orderNumber));
     }
 }
