@@ -54,7 +54,8 @@ public class ProductController {
             return "product/detail";
         }
 //        model.addAttribute("product", result);
-        return "error/404";
+model.addAttribute("message", "Không tìm thấy sản phẩm!");
+        return "error";
     }
 
 

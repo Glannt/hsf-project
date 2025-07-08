@@ -122,6 +122,7 @@ public class PaymentService {
                         .map(item -> OrderDetail.builder()
                                 .productName(item.getProductName())
                                 .quantity(item.getQuantity())
+                                .unitPrice(item.getUnitPrice())
                                 .subtotal(item.getSubtotal())
                                 .build())
                         .collect(Collectors.toSet()))
@@ -131,8 +132,8 @@ public class PaymentService {
                         .setQuantity((long) item.getQuantity())
                         .setPriceData(
                                 SessionCreateParams.LineItem.PriceData.builder()
-                                        .setCurrency("usd")
-                                        .setUnitAmount((long) (item.getSubtotal() * 100)) // Convert to cents
+                                        .setCurrency("vnd")
+                                        .setUnitAmount(((Double) (item.getUnitPrice() * 100)).longValue()) // Multiply by 100 for Stripe minor units
                                         .setProductData(
                                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                         .setName(item.getProductName())

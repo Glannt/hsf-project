@@ -1,423 +1,619 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>HSF Project - Home</title>-->
-<!--    <link rel="stylesheet" th:href="@{/assests/css/style.css}">-->
-<!--    <style>-->
-<!--        -->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<header>-->
-<!--    <h1>Welcome to HSF Project</h1>-->
-<!--    <span th:if="${username != null}">-->
-<!--        <p>Hello <span th:text="${username}">User</span></p>-->
-<!--        <a th:href="@{/logout}">Logout</a>-->
-<!--    </span>-->
-<!--    <nav>-->
-<!--        <a th:href="@{/}">Home</a>-->
-<!--        <a th:href="@{/products}">Products</a>-->
-<!--        <a th:href="@{/cart}">Cart</a>-->
-<!--        <span th:unless="${username != null}">-->
-<!--        <a th:href="@{/login}">Login</a>-->
-<!--        <a th:href="@{/register}">Register</a>-->
-<!--    </span>-->
-<!--    </nav>-->
-<!--</header>-->
-<!--<main>-->
-<!--    <h2>PC List</h2>-->
-<!--    <div th:if="${pcs != null}">-->
-<!--        <ul class="card-list" th:if="${pcs.content.size() > 0}">-->
-<!--            <li class="card" th:each="pc : ${pcs.content}">-->
-<!--                <div class="card-title" th:text="${pc.name}">PC Name</div>-->
-<!--                <div class="card-price">Price: <span th:text="${pc.totalPrice}">0</span></div>-->
-<!--                <div class="card-desc" th:if="${pc.description != null}" th:text="${pc.description}">Description</div>-->
-<!--                <div th:if="${isLogin}">-->
-<!--                    <form th:if="${user != null}" th:action="@{/user/cart/add}" method="post" style="margin-top:10px;">-->
-<!--                        <input type="hidden" name="id" th:value="${pc.id}"/>-->
-<!--                        <input type="hidden" name="cartId" th:value="${user.cart.id}"/>-->
-<!--                        <input type="hidden" name="quantity" value="1"/>-->
-<!--                        <button type="submit">Add to Cart</button>-->
-<!--                    </form>-->
-<!--                </div>-->
-
-<!--                <div th:unless="${isLogin}">-->
-<!--                    <a href="/login" class="btn btn-primary">Add to Cart</a>-->
-<!--                </div>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--        <p th:if="${pcs.content.size() == 0}">No PCs to display.</p>-->
-
-<!--        <div class="pagination">-->
-<!--            <a th:if="${pcs.hasPrevious()}"-->
-<!--               th:href="@{/(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}">Previous</a>-->
-
-<!--            <span th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}">-->
-<!--                <a th:if="${i != pcs.number}"-->
-<!--                   th:href="@{/(pcPage=${i}, computerItemPage=${computerItems.number})}"-->
-<!--                   th:text="${i + 1}"></a>-->
-<!--                <span th:if="${i == pcs.number}"-->
-<!--                      class="current-page"-->
-<!--                      th:text="${i + 1}"></span>-->
-<!--            </span>-->
-
-<!--            <a th:if="${pcs.hasNext()}"-->
-<!--               th:href="@{/(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}">Next</a>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <h2>Computer Item List</h2>-->
-<!--    <div th:if="${computerItems != null}">-->
-<!--        <ul class="card-list" th:if="${computerItems.content.size() > 0}">-->
-<!--            <li class="card" th:each="item : ${computerItems.content}">-->
-<!--                <div class="card-title" th:text="${item.name}">Item Name</div>-->
-<!--                <div class="card-price">Price: <span th:text="${item.price}">0</span></div>-->
-<!--                <div class="card-desc" th:if="${item.description != null}" th:text="${item.description}">Description</div>-->
-<!--                <div th:if="${item.brand != null}">Brand: <span th:text="${item.brand}">Brand</span></div>-->
-<!--                <div th:if="${item.model != null}">Model: <span th:text="${item.model}">Model</span></div>-->
-<!--                <div th:if="${item.category != null}">Category: <span th:text="${item.category.name}">Category</span></div>-->
-<!--                <div th:if="${isLogin}">-->
-<!--                    <form th:if="${user != null}" th:action="@{/user/cart/add}" method="post" style="margin-top:10px;">-->
-<!--                        <input type="hidden" name="id" th:value="${item.id}"/>-->
-<!--                        <input type="hidden" name="cartId" th:value="${user.cart.id}"/>-->
-<!--                        <input type="hidden" name="quantity" value="1"/>-->
-<!--                        <button type="submit">Add to Cart</button>-->
-<!--                    </form>-->
-<!--                </div>-->
-
-<!--                <div th:unless="${isLogin}">-->
-<!--                    <a href="/login" class="btn btn-primary">Add to Cart</a>-->
-<!--                </div>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--        <p th:if="${computerItems.content.size() == 0}">No Computer Items to display.</p>-->
-
-<!--        <div class="pagination">-->
-<!--            <a th:if="${computerItems.hasPrevious()}"-->
-<!--               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}">Previous</a>-->
-
-<!--            <span th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}">-->
-<!--                <a th:if="${i != computerItems.number}"-->
-<!--                   th:href="@{/(pcPage=${pcs.number}, computerItemPage=${i})}"-->
-<!--                   th:text="${i + 1}"></a>-->
-<!--                <span th:if="${i == computerItems.number}"-->
-<!--                      class="current-page"-->
-<!--                      th:text="${i + 1}"></span>-->
-<!--            </span>-->
-
-<!--            <a th:if="${computerItems.hasNext()}"-->
-<!--               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}">Next</a>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</main>-->
-
-<!--<footer>-->
-<!--    <p>&copy; 2024 HSF Project</p>-->
-<!--</footer>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>HSF Project - Home</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
-</head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}"
+    />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}"
+    />
+    <style>
+      /* Card sản phẩm */
+      .product.product-7 {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+          0 1.5px 4px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        margin-bottom: 32px;
+        padding: 18px 12px 20px 12px;
+        background: #fff;
+        transition: box-shadow 0.2s, transform 0.2s;
+      }
+      .product.product-7:hover {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18),
+          0 3px 8px rgba(0, 0, 0, 0.12);
+        transform: translateY(-4px) scale(1.02);
+      }
+      .product-body {
+        margin-top: 12px;
+        padding: 8px 0 0 0;
+      }
+      .product-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .product-price {
+        color: #e67e22;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .products .row {
+        margin-left: -10px;
+        margin-right: -10px;
+      }
+      .products .col-6,
+      .products .col-md-4,
+      .products .col-lg-4 {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 24px;
+      }
+      .product-action {
+        margin-top: 10px;
+      }
+      .product-label.label-new {
+        background: #28a745;
+        color: #fff;
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        border-radius: 8px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+      }
+      .main .container {
+        padding-top: 32px;
+        padding-bottom: 32px;
+      }
+      .pagination {
+        margin-top: 24px;
+        margin-bottom: 24px;
+      }
+      .product-image {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+      }
+      .product-action-vertical {
+        margin-top: 8px;
+      }
+      .btn-product {
+        border-radius: 8px;
+        font-weight: 500;
+      }
+      .product-body p {
+        margin-bottom: 6px;
+      }
+      .text-center,
+      .text-md-center {
+        margin-top: 24px;
+        margin-bottom: 24px;
+      }
+    </style>
+  </head>
 
-<body>
-<div class="page-wrapper">
-    <header class="header">
+  <body>
+    <div class="page-wrapper">
+      <header class="header">
         <div class="header-middle sticky-header">
-            <div class="container">
-                <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
-                                              height="25"/></a>
+          <div class="container">
+            <a href="#" class="logo"
+              ><img
+                th:src="@{/assets/images/logo.png}"
+                alt="Logo"
+                width="105"
+                height="25"
+            /></a>
 
-                <nav class="main-nav">
-                    <ul class="menu">
-                        <li><a th:href="@{/}">Home</a></li>
-                        <li><a th:href="@{/products}">Products</a></li>
-                        <li><a th:href="@{/cart}">Cart</a></li>
-                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
-                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
-                    </ul>
-                </nav>
-            </div>
+            <nav class="main-nav">
+              <ul class="menu">
+                <li><a th:href="@{/}">Home</a></li>
+                <!--                <li><a th:href="@{/products}">Products</a></li>-->
+                <li th:if="${user != null}">
+                  <a th:href="@{/cart}">Cart</a>
+                </li>
+                <li th:if="${user != null}">
+                  <a th:href="@{/transaction}">Transaction History</a>
+                </li>
+                <li th:if="${user != null}">
+                  <a th:href="@{/logout}">Logout</a>
+                </li>
+                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                <li th:if="${!isLogin}">
+                  <a th:href="@{/register}">Register</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
-    </header>
+      </header>
 
-    <main class="main">
+      <main class="main">
         <div class="container mt-4">
-            <h2>PC List</h2>
-            <div th:if="${pcs != null}">
-                <div class="products mb-3">
-                    <div class="row justify-content-center">
-                        <div class="col-6 col-md-4 col-lg-4" th:each="pc : ${pcs.content}">
-                            <div class="product product-7 text-center">
-                                <figure class="product-media">
-                                    <span class="product-label label-new">New</span>
-                                    <a th:href="@{/product/{id}(id=${pc.id})}">
-                                        <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
-                                    </a>
+          <h2 class="text-center">PC List</h2>
+          <div th:if="${pcs != null}">
+            <div class="products mb-3">
+              <div class="row justify-content-center">
+                <div
+                  class="col-6 col-md-4 col-lg-4"
+                  th:each="pc : ${pcs.content}"
+                >
+                  <div class="product product-7 text-center">
+                    <figure class="product-media">
+                      <span class="product-label label-new">New</span>
+                      <a th:href="@{/product/{id}(id=${pc.id})}">
+                        <img
+                          src="assets/images/products/product.jpg"
+                          alt="Product image"
+                          class="product-image"
+                        />
+                      </a>
 
-                                    <div class="product-action-vertical">
-                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                        <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                        <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                                    </div><!-- End .product-action-vertical -->
+                      <div class="product-action-vertical">
+                        <a
+                          href="#"
+                          class="btn-product-icon btn-wishlist btn-expandable"
+                          ><span>add to wishlist</span></a
+                        >
+                        <a
+                          href="popup/quickView.html"
+                          class="btn-product-icon btn-quickview"
+                          title="Quick view"
+                          ><span>Quick view</span></a
+                        >
+                        <a
+                          href="#"
+                          class="btn-product-icon btn-compare"
+                          title="Compare"
+                          ><span>Compare</span></a
+                        >
+                      </div>
+                      <!-- End .product-action-vertical -->
 
-                                    <div class="product-action">
-                                        <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="display: flex; justify-content: center;">
-                                            <input type="hidden" name="id" th:value="${pc.id}" />
-                                            <input type="hidden" name="cartId" th:value="${user.cart.id}" />
-                                            <input type="hidden" name="quantity" value="1" />
-                                            <button type="submit" class="btn-product btn-cart">
-                                                <span>Add to Cart</span>
-                                            </button>
-                                        </form>
+                      <div class="product-action">
+                        <form
+                          th:if="${isLogin}"
+                          th:action="@{/user/cart/add}"
+                          method="post"
+                          style="width: 100%"
+                        >
+                          <input type="hidden" name="id" th:value="${pc.id}" />
+                          <input
+                            type="hidden"
+                            name="cartId"
+                            th:value="${user.cart.id}"
+                          />
+                          <input type="hidden" name="quantity" value="1" />
+                          <button
+                            type="submit"
+                            class="btn-product btn-cart w-100"
+                          >
+                            <span>Add to Cart</span>
+                          </button>
+                        </form>
 
-                                        <!-- Khi chưa đăng nhập -->
-                                        <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart">
-                                            <span>Login to Add</span>
-                                        </a>
-                                    </div><!-- End .product-action -->
-                                </figure>
-                                <div class="product-body">
-                                    <h3 class="product-title" th:text="${pc.name}">PC Name</h3>
-                                    <div class="product-price">Price: <span th:text="${pc.price}">0</span></div>
-                                    <p th:if="${pc.description != null}" th:text="${pc.description}">Description</p>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Khi chưa đăng nhập -->
+                        <a
+                          th:unless="${isLogin}"
+                          th:href="@{/login}"
+                          class="btn-product btn-cart w-100"
+                        >
+                          <span>Login to Add</span>
+                        </a>
+                      </div>
+                      <!-- End .product-action -->
+                    </figure>
+                    <div class="product-body">
+                      <h3 class="product-title" th:text="${pc.name}">
+                        PC Name
+                      </h3>
+                      <div class="product-price">
+                        Price: <span th:text="${pc.price}">0</span>
+                      </div>
+                      <p
+                        th:if="${pc.description != null}"
+                        th:text="${pc.description}"
+                      >
+                        Description
+                      </p>
                     </div>
+                  </div>
                 </div>
-
-                <!-- PC Pagination -->
-                <nav aria-label="PC Pagination" th:if="${pcs.totalElements > 0}">
-                    <ul class="pagination justify-content-center">
-
-                        <!-- Prev button -->
-                        <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
-                            <a class="page-link page-link-prev"
-                               th:href="@{/(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}"
-                               aria-label="Previous">
-                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-                            </a>
-                        </li>
-
-                        <!-- Page numbers -->
-                        <li class="page-item"
-                            th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
-                            th:classappend="${i == pcs.number} ? 'active'">
-                            <a class="page-link"
-                               th:href="@{/(pcPage=${i}, computerItemPage=${computerItems.number})}"
-                               th:text="${i + 1}">1</a>
-                        </li>
-
-                        <!-- Total pages display -->
-                        <li class="page-item-total ml-2">
-                            of <span th:text="${pcs.totalPages}">0</span>
-                        </li>
-
-                        <!-- Next button -->
-                        <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
-                            <a class="page-link page-link-next"
-                               th:href="@{/(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}"
-                               aria-label="Next">
-                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-                            </a>
-                        </li>
-
-                    </ul>
-                </nav>
-
+              </div>
             </div>
-            <div th:if="${pcs == null}">
-                <div class="text-center">
-                    No PCs to display.
-                </div>
-            </div>
-            <h2 class="mt-5">Computer Items</h2>
-            <div th:if="${computerItems != null}">
-                <div class="products mb-3">
-                    <div class="row justify-content-center">
-                        <div class="col-6 col-md-4 col-lg-4" th:each="item : ${computerItems.content}">
-                            <div class="product product-7 text-center">
-                                <figure class="product-media">
-                                    <span class="product-label label-new">New</span>
-                                    <a th:href="@{/product/{id}(id=${item.id})}">
-                                        <img src="assets/images/products/product.jpg" alt="Product image" class="product-image">
-                                    </a>
 
-                                    <div class="product-action-vertical">
-                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                        <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                        <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                                    </div><!-- End .product-action-vertical -->
+            <!-- PC Pagination -->
+            <nav aria-label="PC Pagination" th:if="${pcs.totalElements > 0}">
+              <ul class="pagination justify-content-center">
+                <!-- Prev button -->
+                <li
+                  class="page-item"
+                  th:classappend="${!pcs.hasPrevious()} ? 'disabled'"
+                >
+                  <a
+                    class="page-link page-link-prev"
+                    th:href="@{/(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}"
+                    aria-label="Previous"
+                  >
+                    <span aria-hidden="true"
+                      ><i class="icon-long-arrow-left"></i></span
+                    >Prev
+                  </a>
+                </li>
 
-                                    <div class="product-action">
-                                        <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="width: 100%">
-                                            <input type="hidden" name="id" th:value="${item.id}"/>
-                                            <input type="hidden" name="cartId" th:value="${user.cart.id}"/>
-                                            <input type="hidden" name="quantity" value="1"/>
-                                            <button type="submit" class="btn-product btn-cart w-100"><span>Add to Cart</span></button>
-                                        </form>
-                                        <a th:unless="${isLogin}" th:href="@{/login}" class="btn-product btn-cart"><span>Login to
-                                            Add</span></a>
-                                    </div><!-- End .product-action -->
-                                </figure><!-- End .product-media -->
-                                <div class="product-body">
-                                    <h3 class="product-title" th:text="${item.name}">Item Name</h3>
-                                    <div class="product-price">Price: <span th:text="${item.price}">0</span></div>
-                                    <p th:if="${item.description}" th:text="${item.description}">Description</p>
-                                    <p th:if="${item.brand}">Brand: <span th:text="${item.brand}"></span></p>
-                                    <p th:if="${item.model}">Model: <span th:text="${item.model}"></span></p>
-                                    <p th:if="${item.category}">Category: <span th:text="${item.category.name}"></span></p>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Page numbers -->
+                <li
+                  class="page-item"
+                  th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
+                  th:classappend="${i == pcs.number} ? 'active'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/(pcPage=${i}, computerItemPage=${computerItems.number})}"
+                    th:text="${i + 1}"
+                    >1</a
+                  >
+                </li>
+
+                <!-- Total pages display -->
+                <li class="page-item-total ml-2">
+                  of <span th:text="${pcs.totalPages}">0</span>
+                </li>
+
+                <!-- Next button -->
+                <li
+                  class="page-item"
+                  th:classappend="${!pcs.hasNext()} ? 'disabled'"
+                >
+                  <a
+                    class="page-link page-link-next"
+                    th:href="@{/(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}"
+                    aria-label="Next"
+                  >
+                    Next
+                    <span aria-hidden="true"
+                      ><i class="icon-long-arrow-right"></i
+                    ></span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <div th:if="${pcs == null}">
+            <div class="text-center">No PCs to display.</div>
+          </div>
+          <h2 class="mt-5 text-center">Computer Items</h2>
+          <div th:if="${computerItems != null}">
+            <div class="products mb-3">
+              <div class="row justify-content-center">
+                <div
+                  class="col-6 col-md-4 col-lg-4"
+                  th:each="item : ${computerItems.content}"
+                >
+                  <div class="product product-7 text-center">
+                    <figure class="product-media">
+                      <span class="product-label label-new">New</span>
+                      <a th:href="@{/product/{id}(id=${item.id})}">
+                        <img
+                          src="assets/images/products/product.jpg"
+                          alt="Product image"
+                          class="product-image"
+                        />
+                      </a>
+
+                      <div class="product-action-vertical">
+                        <a
+                          href="#"
+                          class="btn-product-icon btn-wishlist btn-expandable"
+                          ><span>add to wishlist</span></a
+                        >
+                        <a
+                          href="popup/quickView.html"
+                          class="btn-product-icon btn-quickview"
+                          title="Quick view"
+                          ><span>Quick view</span></a
+                        >
+                        <a
+                          href="#"
+                          class="btn-product-icon btn-compare"
+                          title="Compare"
+                          ><span>Compare</span></a
+                        >
+                      </div>
+                      <!-- End .product-action-vertical -->
+
+                      <div class="product-action">
+                        <form
+                          th:if="${isLogin}"
+                          th:action="@{/user/cart/add}"
+                          method="post"
+                          style="width: 100%"
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            th:value="${item.id}"
+                          />
+                          <input
+                            type="hidden"
+                            name="cartId"
+                            th:value="${user.cart.id}"
+                          />
+                          <input type="hidden" name="quantity" value="1" />
+                          <button
+                            type="submit"
+                            class="btn-product btn-cart w-100"
+                          >
+                            <span>Add to Cart</span>
+                          </button>
+                        </form>
+                        <a
+                          th:unless="${isLogin}"
+                          th:href="@{/login}"
+                          class="btn-product btn-cart"
+                          ><span>Login to Add</span></a
+                        >
+                      </div>
+                      <!-- End .product-action -->
+                    </figure>
+                    <!-- End .product-media -->
+                    <div class="product-body">
+                      <h3 class="product-title" th:text="${item.name}">
+                        Item Name
+                      </h3>
+                      <div class="product-price">
+                        Price: <span th:text="${item.price}">0</span>
+                      </div>
+                      <p
+                        th:if="${item.description}"
+                        th:text="${item.description}"
+                      >
+                        Description
+                      </p>
+                      <p th:if="${item.brand}">
+                        Brand: <span th:text="${item.brand}"></span>
+                      </p>
+                      <p th:if="${item.model}">
+                        Model: <span th:text="${item.model}"></span>
+                      </p>
+                      <p th:if="${item.category}">
+                        Category: <span th:text="${item.category.name}"></span>
+                      </p>
                     </div>
+                  </div>
                 </div>
-
-                <nav aria-label="Page navigation" th:if="${computerItems.totalElements > 0}">
-                    <ul class="pagination justify-content-center">
-
-                        <!-- Prev button -->
-                        <li class="page-item" th:classappend="${!computerItems.hasPrevious()} ? 'disabled'">
-                            <a class="page-link page-link-prev"
-                               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}"
-                               aria-label="Previous">
-                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-                            </a>
-                        </li>
-
-                        <!-- Page numbers -->
-                        <li class="page-item"
-                            th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
-                            th:classappend="${i == computerItems.number} ? 'active'">
-                            <a class="page-link"
-                               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${i})}"
-                               th:text="${i + 1}">1</a>
-                        </li>
-
-                        <!-- Total pages display -->
-                        <li class="page-item-total ml-2">
-                            of <span th:text="${computerItems.totalPages}">0</span>
-                        </li>
-
-                        <!-- Next button -->
-                        <li class="page-item" th:classappend="${!computerItems.hasNext()} ? 'disabled'">
-                            <a class="page-link page-link-next"
-                               th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}"
-                               aria-label="Next">
-                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-                            </a>
-                        </li>
-
-                    </ul>
-                </nav>
+              </div>
             </div>
-            <div th:if="${computerItems == null}">
-                <div class="text-center text-md-center">
-                    No Computer Items to display.
-                </div>
+
+            <nav
+              aria-label="Page navigation"
+              th:if="${computerItems.totalElements > 0}"
+            >
+              <ul class="pagination justify-content-center">
+                <!-- Prev button -->
+                <li
+                  class="page-item"
+                  th:classappend="${!computerItems.hasPrevious()} ? 'disabled'"
+                >
+                  <a
+                    class="page-link page-link-prev"
+                    th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}"
+                    aria-label="Previous"
+                  >
+                    <span aria-hidden="true"
+                      ><i class="icon-long-arrow-left"></i></span
+                    >Prev
+                  </a>
+                </li>
+
+                <!-- Page numbers -->
+                <li
+                  class="page-item"
+                  th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
+                  th:classappend="${i == computerItems.number} ? 'active'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/(pcPage=${pcs.number}, computerItemPage=${i})}"
+                    th:text="${i + 1}"
+                    >1</a
+                  >
+                </li>
+
+                <!-- Total pages display -->
+                <li class="page-item-total ml-2">
+                  of <span th:text="${computerItems.totalPages}">0</span>
+                </li>
+
+                <!-- Next button -->
+                <li
+                  class="page-item"
+                  th:classappend="${!computerItems.hasNext()} ? 'disabled'"
+                >
+                  <a
+                    class="page-link page-link-next"
+                    th:href="@{/(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}"
+                    aria-label="Next"
+                  >
+                    Next
+                    <span aria-hidden="true"
+                      ><i class="icon-long-arrow-right"></i
+                    ></span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <div th:if="${computerItems == null}">
+            <div class="text-center text-md-center">
+              No Computer Items to display.
             </div>
+          </div>
         </div>
-    </main>
+      </main>
 
-    <footer class="footer">
+      <footer class="footer">
         <div class="footer-middle">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget widget-about">
-                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
-                                 height="25">
-                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna
-                                eros eu erat. </p>
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-6 col-lg-3">
+                <div class="widget widget-about">
+                  <img
+                    src="assets/images/logo.png"
+                    class="footer-logo"
+                    alt="Footer Logo"
+                    width="105"
+                    height="25"
+                  />
+                  <p>
+                    Praesent dapibus, neque id cursus ucibus, tortor neque
+                    egestas augue, eu vulputate magna eros eu erat.
+                  </p>
 
-                            <div class="social-icons">
-                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
-                                        class="icon-facebook-f"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
-                                        class="icon-twitter"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
-                                        class="icon-instagram"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
-                                        class="icon-youtube"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
-                                        class="icon-pinterest"></i></a>
-                            </div><!-- End .soial-icons -->
-                        </div><!-- End .widget about-widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
+                  <div class="social-icons">
+                    <a
+                      href="#"
+                      class="social-icon"
+                      target="_blank"
+                      title="Facebook"
+                      ><i class="icon-facebook-f"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="social-icon"
+                      target="_blank"
+                      title="Twitter"
+                      ><i class="icon-twitter"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="social-icon"
+                      target="_blank"
+                      title="Instagram"
+                      ><i class="icon-instagram"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="social-icon"
+                      target="_blank"
+                      title="Youtube"
+                      ><i class="icon-youtube"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="social-icon"
+                      target="_blank"
+                      title="Pinterest"
+                      ><i class="icon-pinterest"></i
+                    ></a>
+                  </div>
+                  <!-- End .soial-icons -->
+                </div>
+                <!-- End .widget about-widget -->
+              </div>
+              <!-- End .col-sm-6 col-lg-3 -->
 
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+              <div class="col-sm-6 col-lg-3">
+                <div class="widget">
+                  <h4 class="widget-title">Useful Links</h4>
+                  <!-- End .widget-title -->
 
-                            <ul class="widget-list">
-                                <li><a href="about.html">About Molla</a></li>
-                                <li><a href="#">How to shop on Molla</a></li>
-                                <li><a href="#">FAQ</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                                <li><a href="login.html">Log in</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
+                  <ul class="widget-list">
+                    <li><a href="about.html">About Molla</a></li>
+                    <li><a href="#">How to shop on Molla</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="contact.html">Contact us</a></li>
+                    <li><a href="login.html">Log in</a></li>
+                  </ul>
+                  <!-- End .widget-list -->
+                </div>
+                <!-- End .widget -->
+              </div>
+              <!-- End .col-sm-6 col-lg-3 -->
 
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+              <div class="col-sm-6 col-lg-3">
+                <div class="widget">
+                  <h4 class="widget-title">Customer Service</h4>
+                  <!-- End .widget-title -->
 
-                            <ul class="widget-list">
-                                <li><a href="#">Payment Methods</a></li>
-                                <li><a href="#">Money-back guarantee!</a></li>
-                                <li><a href="#">Returns</a></li>
-                                <li><a href="#">Shipping</a></li>
-                                <li><a href="#">Terms and conditions</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
+                  <ul class="widget-list">
+                    <li><a href="#">Payment Methods</a></li>
+                    <li><a href="#">Money-back guarantee!</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Terms and conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                  </ul>
+                  <!-- End .widget-list -->
+                </div>
+                <!-- End .widget -->
+              </div>
+              <!-- End .col-sm-6 col-lg-3 -->
 
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+              <div class="col-sm-6 col-lg-3">
+                <div class="widget">
+                  <h4 class="widget-title">My Account</h4>
+                  <!-- End .widget-title -->
 
-                            <ul class="widget-list">
-                                <li><a href="#">Sign In</a></li>
-                                <li><a href="cart.html">View Cart</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
-                                <li><a href="#">Help</a></li>
-                            </ul><!-- End .widget-list -->
-                        </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
-                </div><!-- End .row -->
-            </div><!-- End .container -->
-        </div><!-- End .footer-middle -->
+                  <ul class="widget-list">
+                    <li><a href="#">Sign In</a></li>
+                    <li><a href="cart.html">View Cart</a></li>
+                    <li><a href="#">My Wishlist</a></li>
+                    <li><a href="#">Track My Order</a></li>
+                    <li><a href="#">Help</a></li>
+                  </ul>
+                  <!-- End .widget-list -->
+                </div>
+                <!-- End .widget -->
+              </div>
+              <!-- End .col-sm-6 col-lg-3 -->
+            </div>
+            <!-- End .row -->
+          </div>
+          <!-- End .container -->
+        </div>
+        <!-- End .footer-middle -->
 
         <div class="footer-bottom">
-            <div class="container">
-                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
-                <!-- End .footer-copyright -->
-                <figure class="footer-payments">
-                    <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
-                </figure><!-- End .footer-payments -->
-            </div><!-- End .container -->
-        </div><!-- End .footer-bottom -->
-    </footer><!-- End .footer -->
-</div>
-<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+          <div class="container">
+            <p class="footer-copyright">
+              Copyright © 2019 Molla Store. All Rights Reserved.
+            </p>
+            <!-- End .footer-copyright -->
+            <figure class="footer-payments">
+              <img
+                th:src="@{/assets/images/payments.png}"
+                alt="Payment methods"
+                width="272"
+                height="20"
+              />
+            </figure>
+            <!-- End .footer-payments -->
+          </div>
+          <!-- End .container -->
+        </div>
+        <!-- End .footer-bottom -->
+      </footer>
+      <!-- End .footer -->
+    </div>
+    <button id="scroll-top" title="Back to Top">
+      <i class="icon-arrow-up"></i>
+    </button>
 
-<script th:src="@{/assets/js/jquery.min.js}"></script>
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/assets/js/main.js}"></script>
-</body>
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+  </body>
 </html>

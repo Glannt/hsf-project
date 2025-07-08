@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,11 +48,13 @@ public class OrderService implements IOrderService {
 //        Order savedOrder = orderRepository.save(order);
 
         // Optionally save order details if they require a reference to the saved order
-//        orderDetails.forEach(detail -> {
-//            detail.setOrder(savedOrder);
-//            orderDetailRepository.save(detail);
-//        });
+        
         orderRepository.save(order);
+
+        orderDetails.forEach(detail -> {
+            detail.setOrder(order);
+            orderDetailRepository.save(detail);
+        });
 
         return order;
     }
@@ -80,7 +83,8 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order acceptOrder(Order order, String shippingAddress) {
+    @Transactional
+    public Order acceptOrder(Order order, String shippingAddress, String stripeTransactionId) {
 //        Order existingOrder = orderRepository.findOrderByOrderNumber(order.getOrderNumber())
 //                .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + order.getOrderNumber()));
 //        Order newOrder = Order.builder()
@@ -116,9 +120,10 @@ public class OrderService implements IOrderService {
         Transaction transaction = Transaction.builder()
                 .order(order)
                 .totalAmount(order.getTotalPrice())
-                .transactionDate(String.valueOf(System.currentTimeMillis()))
+                .transactionDate(LocalDateTime.now())
                 .status("PAYED")
-                .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
+                .paymentMethod("STRIPE") // Assuming a default payment method
+                .transactionRef(stripeTransactionId)
                 .build();
 
         transactionRepository.save(transaction);

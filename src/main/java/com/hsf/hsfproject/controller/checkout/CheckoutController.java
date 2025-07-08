@@ -37,6 +37,7 @@ public class CheckoutController {
     private static final Logger log = LoggerFactory.getLogger(CheckoutController.class);
     private final PaymentService stripeService;
     private final OrderService orderService;
+    private final IUserService userService;
 
     @Value("${stripe.public.key}")
     private String publicKey;
@@ -44,7 +45,7 @@ public class CheckoutController {
     @Value("${stripe.webhook.key}")
     private String stripeWebhookKey;
 
-    private final IUserService userService;
+    
 
 //    public CheckoutController(PaymentService stripeService) {
 //        this.stripeService = stripeService;
@@ -54,6 +55,7 @@ public class CheckoutController {
     public String handleCheckout(@ModelAttribute("order") OrderDto order,
                                  @RequestParam("paymentMethod") String paymentMethod,
                                  Principal principal,
+                                 HttpSession httpSession,
                                  RedirectAttributes redirectAttributes) throws StripeException {
         // Kiểm tra thông tin đơn hàngc
         User user = userService.findByUsername(principal.getName());
@@ -62,6 +64,7 @@ public class CheckoutController {
         switch (paymentMethod.toLowerCase()) {
             case "stripe":
                 Session session = stripeService.createCheckoutSession(order);
+                httpSession.setAttribute("orderDto", order);
                 return "redirect:" + session.getUrl();
             case "cod":
             case "bank":
@@ -70,16 +73,39 @@ public class CheckoutController {
 //                orderService.save(order); // xử lý đơn hàng nội bộ
 //                orderService.acceptOrder(order, paymentMethod);
                 redirectAttributes.addFlashAttribute("message", "Đơn hàng đã được đặt thành công!");
+                
                 return "redirect:/checkout/success";
             default:
                 redirectAttributes.addFlashAttribute("error", "Phương thức thanh toán không hợp lệ!");
-                return "redirect:/checkout";
+                return "redirect:/checkout/error";
+        }
+    }
+
+    private void addUserInfo(Model model, Principal principal) {
+        model.addAttribute("isLogin", principal != null);
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null) {
+                model.addAttribute("user", user);
+                model.addAttribute("username", user.getUsername());
+            }
         }
     }
 
     @GetMapping("/success")
-    public String checkoutSuccess() {
-        return "checkout/success"; // HTML: thông báo thanh toán thành công
+    public String checkoutSuccess(HttpSession session, Model model, Principal principal) {
+        addUserInfo(model, principal);
+        OrderDto orderDto = (OrderDto) session.getAttribute("orderDto");
+        if (orderDto == null) {
+            model.addAttribute("message", "Không tìm thấy thông tin đơn hàng trong phiên làm việc. Vui lòng thử lại!");
+            return "error";
+        }
+        Order order = orderService.findOrderByOrderNumber(orderDto.getOrderNumber());
+        if (order != null) {
+            model.addAttribute("order", order);
+            session.removeAttribute("orderDto"); // Xóa sau khi dùng để tránh lặp lại
+        }
+        return "checkout/success";
     }
 
     @GetMapping("/cancel")
@@ -115,18 +141,17 @@ public class CheckoutController {
             if (session != null) {
                 String orderNumber = session.getMetadata().get("orderNumber");
                 String username = session.getMetadata().get("username");
-                System.out.println("Order Number: " + orderNumber);
-                System.out.println("Username: " + username);
+                String stripeTransactionId = session.getPaymentIntent();
                 // Lấy đơn hàng theo orderNumber
                 Order order = orderService.findOrderByOrderNumber(orderNumber);
 
                 if (order != null) {
                     log.info("Order found: {}", order);
-                    orderService.acceptOrder(order, "STRIPE");
+                    orderService.acceptOrder(order, order.getShippingAddress(), stripeTransactionId);
                 }
             }
         }
 
         return ResponseEntity.ok("Webhook received");
-}
+    }
 }

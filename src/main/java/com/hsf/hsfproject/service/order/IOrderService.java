@@ -20,7 +20,7 @@ public interface IOrderService {
 
     List<Order> getAllOrders();
 
-    Order acceptOrder(Order order, String shippingAddress);
+    Order acceptOrder(Order order, String shippingAddress, String stripeTransactionId);
 
     Order saveOrder(Order order);
 

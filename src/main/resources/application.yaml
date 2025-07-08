@@ -6,11 +6,11 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-#  datasource:
-#    url: jdbc:sqlserver://localhost:1433;databaseName=SMK22;encrypt=false;trustServerCertificate=true
-#    username: sa
-#    password: 12345
-#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  #  datasource:
+  #    url: jdbc:sqlserver://localhost:1433;databaseName=SMK22;encrypt=false;trustServerCertificate=true
+  #    username: sa
+  #    password: 12345
+  #    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,13 +18,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-#  hibernate:
-#    dialect: org.hibernate.dialect.SQLServerDialect
+  #  hibernate:
+  #    dialect: org.hibernate.dialect.SQLServerDialect
 
   # XAMPP default MySQL user is 'root' with no password. Adjust 'username' and 'password' if you have changed them.
   web:
-    resources:
-      static-locations=classpath:/static/
+    resources: static-locations=classpath:/static/
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -45,4 +44,3 @@ stripe:
     key:
   webhook:
     key:
-
