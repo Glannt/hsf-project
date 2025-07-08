@@ -1,5 +1,6 @@
 package com.hsf.hsfproject.service.order;
 
+import com.hsf.hsfproject.dtos.request.OrderDto;
 import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.mapper.Mapper;
 import com.hsf.hsfproject.model.*;
@@ -8,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,10 +48,13 @@ public class OrderService implements IOrderService {
 //        Order savedOrder = orderRepository.save(order);
 
         // Optionally save order details if they require a reference to the saved order
-//        orderDetails.forEach(detail -> {
-//            detail.setOrder(savedOrder);
-//            orderDetailRepository.save(detail);
-//        });
+        
+        orderRepository.save(order);
+
+        orderDetails.forEach(detail -> {
+            detail.setOrder(order);
+            orderDetailRepository.save(detail);
+        });
 
         return order;
     }
@@ -77,10 +83,24 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order acceptOrder(Order order, String shippingAddress) {
-        if (order == null) {
-            throw new IllegalArgumentException("Order cannot be null");
-        }
+    @Transactional
+    public Order acceptOrder(Order order, String shippingAddress, String stripeTransactionId) {
+//        Order existingOrder = orderRepository.findOrderByOrderNumber(order.getOrderNumber())
+//                .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + order.getOrderNumber()));
+//        Order newOrder = Order.builder()
+//                .shippingAddress(order.getShippingAddress())
+//                .user(order.getUser())
+//                .status(order.getStatus())
+//                .totalPrice(order.getTotalPrice())
+//                .orderNumber(order.getOrderNumber())
+//                .orderItems(order.getOrderItems().stream()
+//                        .map(item -> OrderDetail.builder()
+//                                .productName(item.getProductName())
+//                                .quantity(item.getQuantity())
+//                                .subtotal(item.getSubtotal())
+//                                .build())
+//                        .collect(Collectors.toSet()))
+//                .build();
 
 
         order.setStatus("ACCEPTED");
@@ -100,10 +120,13 @@ public class OrderService implements IOrderService {
         Transaction transaction = Transaction.builder()
                 .order(order)
                 .totalAmount(order.getTotalPrice())
-                .transactionDate(String.valueOf(System.currentTimeMillis()))
+                .transactionDate(LocalDateTime.now())
                 .status("PAYED")
-                .paymentMethod("CASH_ON_DELIVERY") // Assuming a default payment method
+                .paymentMethod("STRIPE") // Assuming a default payment method
+                .transactionRef(stripeTransactionId)
                 .build();
+
+        transactionRepository.save(transaction);
 
         return order;
     }
@@ -111,5 +134,11 @@ public class OrderService implements IOrderService {
     @Override
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Order findOrderByOrderNumber(String orderNumber) {
+        return orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + orderNumber));
     }
 }

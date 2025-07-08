@@ -65,6 +65,10 @@ public class OrderController {
                 .userId(userId)
                 .build();
         Order order = orderService.createOrder(request);
+        if (order == null) {
+            model.addAttribute("message", "Tạo đơn hàng thất bại. Vui lòng thử lại sau!");
+            return "error";
+        }
         session.setAttribute("pendingOrder", order);
         model.addAttribute("order", order);
         addUserInfo(model, principal);
@@ -72,20 +76,20 @@ public class OrderController {
     }
 
     // Confirm the order and redirect to confirmation page
-    @PostMapping("/order/confirm")
-    public String confirmOrder(@RequestParam("shippingAddress") String shippingAddress,
-                               HttpSession session,
-                               Model model) {
-        Order order = (Order) session.getAttribute("pendingOrder");
-        if (order == null) return "redirect:/cart";
-        Order confirmedOrder = orderService.acceptOrder(order, shippingAddress);
-        if (confirmedOrder == null) {
-            model.addAttribute("error", "Failed to confirm order. Please try again.");
-            return "order/index";
-        }
-        session.removeAttribute("pendingOrder");
-        // No need to add order to model since redirect
-        return "redirect:/confirmation";
-    }
+//    @PostMapping("/order/confirm")
+//    public String confirmOrder(@RequestParam("shippingAddress") String shippingAddress,
+//                               HttpSession session,
+//                               Model model) {
+//        Order order = (Order) session.getAttribute("pendingOrder");
+//        if (order == null) return "redirect:/cart";
+//        Order confirmedOrder = orderService.acceptOrder(order, shippingAddress);
+//        if (confirmedOrder == null) {
+//            model.addAttribute("error", "Failed to confirm order. Please try again.");
+//            return "order/index";
+//        }
+//        session.removeAttribute("pendingOrder");
+//        // No need to add order to model since redirect
+//        return "redirect:/order/confirmation";
+//    }
 
 }

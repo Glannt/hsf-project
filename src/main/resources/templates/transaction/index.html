@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Transactions - Admin Panel</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .status-badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.8em;
+      }
+      .status-success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .status-failed {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .table-responsive {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .payment-method-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid mt-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-chart-line"></i> All Transactions</h2>
+            <div>
+              <a href="/admin" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Admin
+              </a>
+              <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Report
+              </button>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card text-center">
+                <div class="card-body">
+                  <h5 class="card-title text-primary">Total Transactions</h5>
+                  <h3 th:text="${totalElements}">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center">
+                <div class="card-body">
+                  <h5 class="card-title text-success">Successful</h5>
+                  <h3
+                    th:text="${transactions.content.?[status == 'SUCCESS'].size()}"
+                  >
+                    0
+                  </h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center">
+                <div class="card-body">
+                  <h5 class="card-title text-danger">Failed</h5>
+                  <h3
+                    th:text="${transactions.content.?[status == 'FAILED'].size()}"
+                  >
+                    0
+                  </h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card text-center">
+                <div class="card-body">
+                  <h5 class="card-title text-warning">Pending</h5>
+                  <h3
+                    th:text="${transactions.content.?[status == 'PENDING'].size()}"
+                  >
+                    0
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div th:if="${transactions.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No transactions found</h4>
+            <p class="text-muted">
+              No payment transactions have been recorded yet.
+            </p>
+          </div>
+
+          <div th:if="${!transactions.isEmpty()}" class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Order ID</th>
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Stripe Ref</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="transaction : ${transactions.content}">
+                  <td>
+                    <small
+                      class="text-muted"
+                      th:text="${#strings.substring(transaction.id.toString(), 0, 8) + '...'}"
+                    ></small>
+                  </td>
+                  <td>
+                    <small
+                      class="text-muted"
+                      th:text="${#strings.substring(transaction.order.id.toString(), 0, 8) + '...'}"
+                    ></small>
+                  </td>
+                  <td>
+                    <span th:text="${transaction.order.user.username}"></span>
+                    <br />
+                    <small
+                      class="text-muted"
+                      th:text="${transaction.order.user.email}"
+                    ></small>
+                  </td>
+                  <td>
+                    <strong
+                      th:classappend="${transaction.status == 'SUCCESS' ? 'text-success' : (transaction.status == 'FAILED' ? 'text-danger' : 'text-warning')}"
+                    >
+                      <span
+                        th:text="${#numbers.formatDecimal(transaction.totalAmount, 0, 'COMMA', 0, 'POINT')}"
+                      ></span>
+                      VND
+                    </strong>
+                  </td>
+                  <td>
+                    <div class="payment-method-icon">
+                      <i
+                        th:class="${transaction.paymentMethod == 'STRIPE' ? 'fas fa-credit-card text-primary' : 'fas fa-money-bill-wave text-success'}"
+                      ></i>
+                      <span
+                        th:text="${transaction.paymentMethod == 'STRIPE' ? 'STRIPE' : 'COD'}"
+                      ></span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      th:class="'badge status-badge status-' + ${transaction.status.toLowerCase()}"
+                      th:text="${transaction.status}"
+                    ></span>
+                  </td>
+                  <td>
+                    <span
+                      th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"
+                    ></span>
+                    <br />
+                    <small
+                      class="text-muted"
+                      th:text="${#temporals.format(transaction.transactionDate, 'HH:mm:ss')}"
+                    ></small>
+                  </td>
+                  <td>
+                    <small
+                      class="text-muted"
+                      th:text="${transaction.transactionRef ?: 'N/A'}"
+                    ></small>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-info"
+                      data-bs-toggle="modal"
+                      th:data-bs-target="'#modal-' + ${transaction.id}"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav th:if="${totalPages > 1}" aria-label="Transaction pagination">
+            <ul class="pagination justify-content-center">
+              <li
+                class="page-item"
+                th:classappend="${currentPage == 0} ? 'disabled'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/admin/transactions(page=${currentPage - 1})}"
+                  aria-label="Previous"
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+
+              <li
+                th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                class="page-item"
+                th:classappend="${pageNum == currentPage} ? 'active'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/admin/transactions(page=${pageNum})}"
+                  th:text="${pageNum + 1}"
+                ></a>
+              </li>
+
+              <li
+                class="page-item"
+                th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/admin/transactions(page=${currentPage + 1})}"
+                  aria-label="Next"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Detail Modals -->
+    <div
+      th:each="transaction : ${transactions.content}"
+      class="modal fade"
+      th:id="'modal-' + ${transaction.id}"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Transaction Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Transaction ID:</strong><br />
+                <small class="text-muted" th:text="${transaction.id}"></small>
+              </div>
+              <div class="col-md-6">
+                <strong>Order ID:</strong><br />
+                <small
+                  class="text-muted"
+                  th:text="${transaction.order.id}"
+                ></small>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <strong>Customer:</strong><br />
+                <span th:text="${transaction.order.user.username}"></span><br />
+                <small
+                  class="text-muted"
+                  th:text="${transaction.order.user.email}"
+                ></small>
+              </div>
+              <div class="col-md-6">
+                <strong>Amount:</strong><br />
+                <span
+                  class="h5"
+                  th:text="${#numbers.formatDecimal(transaction.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+                ></span>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <strong>Payment Method:</strong><br />
+                <span
+                  th:text="${transaction.paymentMethod == 'VNPAY' ? 'VNPay Online Payment' : 'Cash on Delivery'}"
+                ></span>
+              </div>
+              <div class="col-md-6">
+                <strong>Status:</strong><br />
+                <span
+                  th:class="'badge status-badge status-' + ${transaction.status.toLowerCase()}"
+                  th:text="${transaction.status}"
+                ></span>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <strong>Transaction Date:</strong><br />
+                <span
+                  th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy HH:mm:ss')}"
+                ></span>
+              </div>
+              <div class="col-md-6" th:if="${transaction.transactionRef}">
+                <strong>VNPay Transaction No:</strong><br />
+                <span th:text="${transaction.transactionRef}"></span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

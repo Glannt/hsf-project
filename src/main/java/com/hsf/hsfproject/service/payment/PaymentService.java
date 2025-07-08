@@ -1,6 +1,14 @@
 package com.hsf.hsfproject.service.payment;
 
+import com.hsf.hsfproject.dtos.request.OrderDto;
+import com.hsf.hsfproject.model.Order;
+import com.hsf.hsfproject.model.OrderDetail;
+import com.hsf.hsfproject.service.order.IOrderService;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.hsf.hsfproject.configuration.VnPayConfig;
@@ -13,10 +21,15 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
     private @Autowired VnPayConfig vnPayConfig;
+
+    private final IOrderService orderService;
+
 
     public String createPaymentUrl(HttpServletRequest req, VnPayRequest order) throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
@@ -79,6 +92,66 @@ public class PaymentService {
         String vnp_SecureHash = VnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
         query.append("&vnp_SecureHash=").append(vnp_SecureHash);
         return vnPayConfig.getVnpPayUrl() + "?" + query.toString();
+    }
+
+    public Session createCheckoutSession(OrderDto order) throws StripeException {
+//        Order newOrder = new Order();
+//        newOrder.setOrderNumber(order.getOrderNumber());
+//        newOrder.setStatus(order.getStatus());
+//        newOrder.setShippingAddress(order.getShippingAddress());
+//        newOrder.setTotalPrice(order.getTotalPrice());
+//        newOrder.setUser(order.getUser());
+//        // Map by product name
+//        Set<OrderDetail> orderItems = order.getOrderItemList().stream()
+//                .map(item -> {
+//                    OrderDetail orderDetail = new OrderDetail();
+//                    orderDetail.setProductName(item.getProductName());
+//                    orderDetail.setQuantity(item.getQuantity());
+//                    orderDetail.setSubtotal(item.getSubtotal());
+//                    return orderDetail;
+//                })
+//                .collect(Collectors.toSet());
+//        newOrder.setOrderItems(orderItems);
+        Order newOrder = Order.builder()
+                .shippingAddress(order.getShippingAddress())
+                .user(order.getUser())
+                .status(order.getStatus())
+                .totalPrice(order.getTotalPrice())
+                .orderNumber(order.getOrderNumber())
+                .orderItems(order.getOrderItems().stream()
+                        .map(item -> OrderDetail.builder()
+                                .productName(item.getProductName())
+                                .quantity(item.getQuantity())
+                                .unitPrice(item.getUnitPrice())
+                                .subtotal(item.getSubtotal())
+                                .build())
+                        .collect(Collectors.toSet()))
+                .build();
+        List<SessionCreateParams.LineItem> lineItems = newOrder.getOrderItems().stream()
+                .map(item -> SessionCreateParams.LineItem.builder()
+                        .setQuantity((long) item.getQuantity())
+                        .setPriceData(
+                                SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency("vnd")
+                                        .setUnitAmount(((Double) (item.getUnitPrice() * 100)).longValue()) // Multiply by 100 for Stripe minor units
+                                        .setProductData(
+                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                        .setName(item.getProductName())
+                                                        .build())
+                                        .build())
+                        .build())
+                .toList();
+
+        SessionCreateParams params = SessionCreateParams.builder()
+                .addAllLineItem(lineItems)
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("http://localhost:8080/checkout/success")
+                .setCancelUrl("http://localhost:8080/checkout/cancel")
+                .putMetadata("orderNumber", newOrder.getOrderNumber())
+                .putMetadata("username", newOrder.getUser().getUsername())
+                .build();
+
+        return Session.create(params);
     }
 }
 

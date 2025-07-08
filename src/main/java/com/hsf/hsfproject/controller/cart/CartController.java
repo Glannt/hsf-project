@@ -4,6 +4,7 @@ import com.hsf.hsfproject.dtos.request.CartItemRequest;
 import com.hsf.hsfproject.model.Cart;
 import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.service.cart.ICartService;
+import com.hsf.hsfproject.service.order.IOrderService;
 import com.hsf.hsfproject.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -21,11 +22,25 @@ public class CartController {
     private final ICartService cartService;
     private final IUserService userService;
 
+
+    // Helper method to add user info to the model
+    private void addUserInfo(Model model, Principal principal) {
+        model.addAttribute("isLogin", principal != null);
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null) {
+                model.addAttribute("user", user);
+                model.addAttribute("username", user.getUsername());
+            }
+        }
+    }
+
     @GetMapping("cart")
     public String getCartPage(Model model, Principal principal) {
         if (principal == null) {
             return "redirect:/login"; // Nếu chưa đăng nhập thì chuyển về login
         }
+        addUserInfo(model, principal);
         System.out.println("Logged in username: " + principal.getName());
         User user = userService.findByUsername(principal.getName());
         Cart cart = cartService.getCartByUserId(user.getId().toString());
