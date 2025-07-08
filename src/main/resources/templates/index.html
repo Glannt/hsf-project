@@ -130,7 +130,9 @@
                   <a th:href="@{/logout}">Logout</a>
                 </li>
                 <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                <li th:if="${user != null and user.role == 'ADMIN'}">
+                  <a th:href="@{/admin/product}">Quản trị</a>
+                </li>
                 <li th:if="${!isLogin}">
                   <a th:href="@{/register}">Register</a>
                 </li>

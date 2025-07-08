@@ -38,25 +38,20 @@ public class HomeController {
             Principal principal,
             HttpSession session,
             @RequestParam(name = "pcPage", defaultValue = "0") int pcPage,
-                        @RequestParam(name = "computerItemPage", defaultValue = "0") int computerItemPage,
-                        Model model) {
+            @RequestParam(name = "computerItemPage", defaultValue = "0") int computerItemPage,
+            Model model) {
         addUserToModel(model, principal);
-//        model.addAttribute("isLogin", principal != null);
-//        if (principal != null) {
-//            User user = userService.findByUsername(principal.getName());
-//            if (user != null) {
-//                model.addAttribute("user", user);
-//                model.addAttribute("username", user.getUsername());
-//                session.setAttribute("user", user);
-//            }
-//
-//        }
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null && user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getName())) {
+                return "redirect:/admin/product";
+            }
+        }
         System.out.println("Logged in username: " + (principal != null ? principal.getName() : "Anonymous"));
         Page<PC> pcList = productService.getPcList(pcPage, 2);
         Page<ComputerItem> computerItems = productService.getComputerItemList(computerItemPage, 2);
         model.addAttribute("pcs", pcList);
         model.addAttribute("computerItems", computerItems);
-
         return "index";
     }
 
