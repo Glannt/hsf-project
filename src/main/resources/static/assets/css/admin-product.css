@@ -1,0 +1,163 @@
+/* Card bo tròn và shadow đậm hơn */
+.card.rounded {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+  margin-bottom: 2.5rem;
+  padding: 0.5rem 0.5rem 1.5rem 0.5rem;
+}
+
+/* Card-header: center title, button right, padding lớn */
+.card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 1.25rem 2rem 1.25rem 2rem;
+}
+.card-header .header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.card-header .header-action {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Table lớn hơn, padding lớn hơn */
+.table {
+  /* border-radius: 14px; */
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(23, 162, 184, 0.08);
+  font-size: 1.08rem;
+  margin-bottom: 0;
+}
+.table thead th,
+.table-info th {
+  background: linear-gradient(90deg, #17a2b8 60%, #138496 100%) !important;
+  color: #fff !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  /* border-top-left-radius: 12px; */
+  /* border-top-right-radius: 12px; */
+  font-size: 1.13rem;
+  padding: 1.1rem 0.7rem;
+}
+.table td,
+.table th {
+  vertical-align: middle !important;
+  text-align: center;
+  padding: 1.05rem 0.7rem;
+  font-size: 1.75rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e0f7fa !important;
+  transition: background 0.2s;
+}
+
+/* Hiển thị trạng thái rỗng */
+.table-empty-row {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  background: #f8f9fa;
+}
+.table-empty-row i {
+  color: #b0bec5;
+  margin-bottom: 4px;
+}
+
+/* Nút hành động bo tròn, hiệu ứng scale */
+.btn-sm {
+  border-radius: 50px;
+  transition: transform 0.1s;
+  padding: 0.25rem 0.5rem !important;
+  margin: 0 0.15rem !important;
+  font-size: 1.75rem !important;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-sm i {
+  font-size: 1.75rem !important;
+}
+.btn-sm:hover {
+  transform: scale(1.12);
+}
+
+/* Responsive: ẩn text trên nút khi màn hình nhỏ, chỉ hiện icon */
+@media (max-width: 600px) {
+  .card-header h4 {
+    font-size: 1.1rem;
+  }
+  .btn-sm span,
+  .btn-sm .btn-text {
+    display: none;
+  }
+  .card-header {
+    padding: 0.7rem 0.5rem;
+  }
+  .table thead th,
+  .table-info th,
+  .table td,
+  .table th {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.98rem;
+  }
+}
+
+/* Modal đẹp hơn */
+.modal-content {
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.15);
+}
+
+.pagination-lg .page-link {
+  font-size: 2rem;
+  padding: 0.9rem 2.2rem;
+}
+
+@media (min-width: 992px) {
+  #sidebarMenu {
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    z-index: 1040;
+    display: block !important;
+    font-size: 2rem;
+  }
+  #sidebarMenu .list-group-item {
+    font-size: 2rem;
+  }
+  .main-content {
+    margin-left: 260px;
+    font-size: 1.15rem;
+  }
+}
+@media (max-width: 991.98px) {
+  #sidebarMenu {
+    width: 80vw;
+    min-width: 200px;
+    max-width: 320px;
+  }
+}
+
+.sidebar-link-text {
+  font-size: 1.75rem;
+  font-weight: 600;
+  padding-left: 2px;
+}
+.sidebar-link-icon {
+  font-size: 2rem;
+}
