@@ -17,7 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class UserManagementController {
     
     private final IUserService userService;
@@ -49,6 +49,16 @@ public class UserManagementController {
             return ResponseEntity.ok("User deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deleting user: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetUserPassword(@RequestParam String username, @RequestParam String newPassword) {
+        try {
+            userService.updateUserPassword(username, newPassword);
+            return ResponseEntity.ok("Password reset successfully for user: " + username);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error resetting password: " + e.getMessage());
         }
     }
 } 

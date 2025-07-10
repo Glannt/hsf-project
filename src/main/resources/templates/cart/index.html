@@ -5,6 +5,8 @@
     <title>Your Cart</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
         .cart-table {
             background: white;
@@ -156,8 +158,7 @@
                                                 </h2>
                                             </div>
                                         </td>
-                                        <td class="price-col">$<span th:text="${#numbers.formatDecimal(item.computerItem != null ? item.computerItem.price : item.pc.price, 1, 'COMMA', 2, 'POINT')}" 
-                                                                   th:data-price="${item.computerItem != null ? item.computerItem.price : item.pc.price}">0.00</span></td>
+                                        <td class="price-col"><span th:text="${#numbers.formatDecimal(item.computerItem != null ? item.computerItem.price : item.pc.price, 1, 'COMMA', 2, 'POINT')}"></span> VND</td>
                                         <td class="quantity-col">
                                             <div class="product-details-quantity">
                                                 <input type="number" th:value="${item.quantity}" min="1" max="10" 
@@ -168,7 +169,7 @@
                                                        onblur="updateCartItemQuantityFromData(this)">
                                             </div>
                                         </td>
-                                        <td class="total-col">$<span th:text="${#numbers.formatDecimal((item.computerItem != null ? item.computerItem.price : item.pc.price) * item.quantity, 1, 'COMMA', 2, 'POINT')}">0.00</span></td>
+                                        <td class="total-col"><span th:text="${#numbers.formatDecimal((item.computerItem != null ? item.computerItem.price : item.pc.price) * item.quantity, 1, 'COMMA', 2, 'POINT')}"></span> VND</td>
                                         <td class="remove-col">
                                             <button type="button" class="btn-remove" 
                                                     th:data-item-id="${item.id}"
@@ -202,10 +203,14 @@
                         <div class="row mt-3">
                             <div class="col-lg-4 offset-lg-8">
                                 <form th:action="@{/order}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                     <input type="hidden" name="cartId" th:value="${cart.id}" />
                                     <input type="hidden" name="userId" th:value="${user.id}" />
-                                    <button type="submit" class="btn btn-primary btn-block">Payment</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Place Order</button>
                                 </form>
+                                <div class="mt-2">
+                                    <a th:href="@{/orders}" class="btn btn-outline-secondary btn-block">View My Orders</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -225,8 +230,11 @@
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/js/main.js}"></script>
 <script th:inline="javascript">
+    let isUpdatingQuantity = false;
     // Function to update cart item quantity from data attribute
     function updateCartItemQuantityFromData(input) {
+        if (isUpdatingQuantity) return;
+        isUpdatingQuantity = true;
         const itemId = input.getAttribute('data-item-id');
         const quantity = input.value;
         
@@ -234,11 +242,19 @@
         formData.append('itemId', itemId);
         formData.append('quantity', quantity);
         
+        // Lấy CSRF token và header name từ meta tag
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
         fetch('/cart/update-quantity', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                [csrfHeader]: csrfToken
+            }
         })
         .then(response => {
+            isUpdatingQuantity = false;
             if (response.ok) {
                 window.location.reload(); // Reload to update totals
             } else {
@@ -246,6 +262,7 @@
             }
         })
         .catch(error => {
+            isUpdatingQuantity = false;
             console.error('Error:', error);
             alert('An error occurred while updating quantity');
         });
@@ -253,26 +270,31 @@
     
     // Function to remove cart item from data attribute
     function removeCartItemFromData(button) {
+        if (isUpdatingQuantity) {
+            alert('Please wait for quantity update to finish before removing item.');
+            return;
+        }
         const itemId = button.getAttribute('data-item-id');
-        
         if (confirm('Are you sure you want to remove this item from cart?')) {
             const formData = new FormData();
             formData.append('itemId', itemId);
-            
+
+            // Lấy CSRF token và header name từ meta tag
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
             fetch('/cart/remove', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    [csrfHeader]: csrfToken
                 }
             })
             .then(response => {
                 if (response.ok) {
-                    // Remove the row from the table
                     const row = button.closest('tr');
                     row.remove();
-                    
-                    // Reload page to update totals
                     window.location.reload();
                 } else {
                     return response.text().then(text => {
@@ -293,20 +315,13 @@
         const priceElement = row.querySelector('.price-col span');
         const totalElement = row.querySelector('.total-col span');
         const quantity = parseInt(input.value) || 0;
-        
-        // Get price from data attribute first, fallback to text content
-        const price = parseFloat(priceElement.getAttribute('data-price')) || 
-                     parseFloat(priceElement.textContent.replace('$', '').replace(/,/g, '')) || 0;
-        
+        const price = parseFloat(priceElement.textContent.replace(/[^\d.]/g, '')) || 0;
         const total = quantity * price;
-        
         // Format total with commas and 2 decimal places
-        totalElement.textContent = '$' + total.toLocaleString('en-US', {
-            minimumFractionDigits: 2, 
+        totalElement.textContent = total.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
-        
-        console.log('Updated price:', {quantity, price, total, formatted: totalElement.textContent});
     }
     
     // Add event listeners for quantity inputs

@@ -22,19 +22,20 @@ public class InitApp {
     private final PCRepository pcRepository;
     private final RoleRepository roleRepository;
     private final ComputerItemRepository computerItemRepository;
-    @Bean
-    CommandLineRunner initRoles(RoleRepository roleRepository) {
-        return args -> {
-            String[] roles = {"ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN"};
-            for (String roleName : roles) {
-                if (roleRepository.findByName(roleName).isEmpty()) {
-                    Role role = new Role();
-                    role.setName(roleName);
-                    roleRepository.save(role);
-                }
-            }
-        };
-    }
+    // Temporarily disabled to avoid duplicate roles with DataSeeder
+    // @Bean
+    // CommandLineRunner initRoles(RoleRepository roleRepository) {
+    //     return args -> {
+    //         String[] roles = {"ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN"};
+    //         for (String roleName : roles) {
+    //             if (roleRepository.findByName(roleName).isEmpty()) {
+    //                 Role role = new Role();
+    //                 role.setName(roleName);
+    //                 roleRepository.save(role);
+    //             }
+    //         }
+    //     };
+    // }
     @Bean
     CommandLineRunner initComputerItems(ComputerItemRepository computerItemRepository) {
         return args -> {
@@ -111,27 +112,28 @@ public class InitApp {
         };
     }
 
-    @Bean
-    CommandLineRunner initCategories(CategoryRepository categoryRepository) {
-        return args -> {
-            if (categoryRepository.count() == 0) {
-                Category cpu = Category.builder().name("CPU").build();
-                Category gpu = Category.builder().name("GPU").build();
-                Category ram = Category.builder().name("RAM").build();
-                Category motherboard = Category.builder().name("Motherboard").build();
-                Category psu = Category.builder().name("PSU").build();
-                Category caseCategory = Category.builder().name("Case").build();
-                Category storage = Category.builder().name("Storage").build();
-                categoryRepository.save(cpu);
-                categoryRepository.save(gpu);
-                categoryRepository.save(ram);
-                categoryRepository.save(storage);
-                categoryRepository.save(motherboard);
-                categoryRepository.save(psu);
-                categoryRepository.save(caseCategory);
-            }
-        };
-    }
+    // Temporarily disabled for team project
+    // @Bean
+    // CommandLineRunner initCategories(CategoryRepository categoryRepository) {
+    //     return args -> {
+    //         if (categoryRepository.count() == 0) {
+    //             Category cpu = Category.builder().name("CPU").build();
+    //             Category gpu = Category.builder().name("GPU").build();
+    //             Category ram = Category.builder().name("RAM").build();
+    //             Category motherboard = Category.builder().name("Motherboard").build();
+    //             Category psu = Category.builder().name("PSU").build();
+    //             Category caseCategory = Category.builder().name("Case").build();
+    //             Category storage = Category.builder().name("Storage").build();
+    //             categoryRepository.save(cpu);
+    //             categoryRepository.save(gpu);
+    //             categoryRepository.save(ram);
+    //             categoryRepository.save(storage);
+    //             categoryRepository.save(motherboard);
+    //             categoryRepository.save(psu);
+    //             categoryRepository.save(caseCategory);
+    //         }
+    //     };
+    // }
 //    @Bean
 //    CommandLineRunner initPCs(PCRepository pcRepository) {
 //        return args -> {

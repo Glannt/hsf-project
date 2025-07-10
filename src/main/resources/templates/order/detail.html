@@ -127,6 +127,14 @@
                                         <a th:href="@{/products}" class="btn btn-primary btn-block mt-2">
                                             <i class="icon-shopping-cart"></i> Continue Shopping
                                         </a>
+                                        <div th:if="${order.status.name() == 'PENDING'}">
+                                            <form th:action="@{/payment/start}" method="post">
+                                                <input type="hidden" name="orderId" th:value="${order.id}" />
+                                                <button type="submit" class="btn btn-success btn-block mt-2">
+                                                    <i class="icon-credit-card"></i> Thanh toán
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

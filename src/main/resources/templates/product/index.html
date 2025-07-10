@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Products - HSF Store</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
@@ -200,7 +200,9 @@
                                 <a th:href="@{/cart}" class="dropdown-item">View Cart</a>
                                 <a th:href="@{/orders}" class="dropdown-item">My Orders</a>
                                 <div class="dropdown-divider"></div>
-                                <a th:href="@{/logout}" class="dropdown-item">Logout</a>
+                                <form th:action="@{/logout}" method="post" style="display:inline;">
+                                    <button type="submit" class="dropdown-item" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -353,7 +355,7 @@
             </div>
         </div>
     </footer>
-</div>
+  </div>
 
 <script th:src="@{/assets/js/jquery.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>

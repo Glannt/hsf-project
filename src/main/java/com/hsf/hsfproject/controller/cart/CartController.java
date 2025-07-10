@@ -57,13 +57,50 @@ public class CartController {
     }
 
 
+    @GetMapping("/debug")
+    @ResponseBody
+    public String debugUser(Principal principal) {
+        if (principal == null) {
+            return "No user logged in";
+        }
+        
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return "User not found in database";
+        }
+        
+        return String.format("User: %s, Role: %s, Authorities: %s", 
+            user.getUsername(), 
+            user.getRole() != null ? user.getRole().getName() : "NULL",
+            user.getAuthorities());
+    }
+
+    @GetMapping("/debug-security")
+    @ResponseBody
+    public String debugSecurity(Principal principal) {
+        if (principal == null) {
+            return "No user logged in";
+        }
+        
+        return String.format("Principal: %s, Class: %s", 
+            principal.getName(), 
+            principal.getClass().getSimpleName());
+    }
+
     @PostMapping("/add")
+    // @PreAuthorize("hasAuthority('ROLE_USER')")  // Tạm thời comment để test
     public String addToCart(@RequestParam("productId") String productId,
                             @RequestParam("cartId") String cartId,
                             @RequestParam("quantity") int quantity,
                             @RequestHeader(value = "Referer", required = false) String referer,
-                            Model model
+                            Model model,
+                            Principal principal
     ) {
+        System.out.println("=== DEBUG: User attempting to add to cart ===");
+        System.out.println("Principal: " + (principal != null ? principal.getName() : "NULL"));
+        if (principal != null) {
+            System.out.println("User authorities: " + principal.getClass().getSimpleName());
+        }
         System.out.println("Add to cart request - ProductId: " + productId + ", CartId: " + cartId + ", Quantity: " + quantity);
         try {
             System.out.println("Adding to cart - Product ID: " + productId + ", Cart ID: " + cartId + ", Quantity: " + quantity);

@@ -130,17 +130,22 @@ public class CartService implements ICartService {
     public void updateQuantity(String username, UUID itemId, int quantity) {
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
-        
         // Verify the cart item belongs to the user
         if (!cartItem.getCart().getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException("Cart item does not belong to user");
         }
-
+        if (quantity <= 0) {
+            // Remove item if quantity is zero or less
+            Cart cart = cartItem.getCart();
+            double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
+            cartItemRepository.delete(cartItem);
+            updateCart(cart, -priceToRemove);
+            return;
+        }
         double oldPrice = cartItem.getUnitPrice() * cartItem.getQuantity();
         cartItem.setQuantity(quantity);
         cartItem.setSubtotal(cartItem.getUnitPrice() * quantity);
         double newPrice = cartItem.getUnitPrice() * quantity;
-        
         cartItemRepository.save(cartItem);
         updateCart(cartItem.getCart(), newPrice - oldPrice);
     }
@@ -188,7 +193,8 @@ public class CartService implements ICartService {
     }
 
     private void updateCart(Cart cart, double addedPrice) {
-        cart.setTotalPrice(cart.getTotalPrice() + addedPrice);
+        Double currentTotal = cart.getTotalPrice() != null ? cart.getTotalPrice() : 0.0;
+        cart.setTotalPrice(currentTotal + addedPrice);
         Long count = cartItemRepository.countCartItemsByCartId(cart.getId());
         cart.setItemCount(count.intValue());
         cartRepository.save(cart);

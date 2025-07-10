@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface IUserService {
     User createUser(CreateUserDTO user);
     void updateUser(Long userId, String username, String password);
+    void updateUserPassword(String username, String newPassword);
     void deleteUser(UUID id);
     User getUserByName(String name);
     Page<User> getUsers(Pageable pageable);

@@ -40,3 +40,8 @@ logging:
     org.springframework: DEBUG
     org.hibernate: DEBUG
 
+# Data Seeder Configuration
+app:
+  data-seeder:
+    enabled: false  # Set to true to enable data seeding
+

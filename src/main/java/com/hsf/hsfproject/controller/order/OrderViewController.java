@@ -10,10 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hsf.hsfproject.constants.enums.OrderStatus;
 import java.security.Principal;
 import java.util.UUID;
 
@@ -98,5 +98,21 @@ public class OrderViewController {
         model.addAttribute("isAdminView", true);
         
         return "admin/order";
+    }
+    
+    @PostMapping("/{orderId}/status")
+    @PreAuthorize("hasAuthority('ROLE_MANAGER') or hasAuthority('ROLE_ADMIN')")
+    public String updateOrderStatus(@PathVariable UUID orderId,
+                                   @RequestParam("status") OrderStatus status,
+                                   Principal principal,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            Order order = orderService.updateOrderStatus(orderId, status, principal.getName());
+            redirectAttributes.addFlashAttribute("success", "Order status updated successfully to " + status.getDisplayName());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to update order status: " + e.getMessage());
+        }
+        
+        return "redirect:/orders/admin";
     }
 } 

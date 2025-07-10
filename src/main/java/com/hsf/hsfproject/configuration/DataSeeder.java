@@ -8,6 +8,7 @@ import com.hsf.hsfproject.repository.RoleRepository;
 import com.hsf.hsfproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DataSeeder implements CommandLineRunner {
     
+    @Value("${app.data-seeder.enabled:false}")
+    private boolean dataSeederEnabled;
+    
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
@@ -24,8 +28,13 @@ public class DataSeeder implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
+        if (dataSeederEnabled) {
         seedRoles();
         seedTestUsers();
+            log.info("DataSeeder enabled - data seeded successfully");
+        } else {
+            log.info("DataSeeder disabled - set app.data-seeder.enabled=true to enable");
+        }
     }
     
     private void seedRoles() {
@@ -36,23 +45,30 @@ public class DataSeeder implements CommandLineRunner {
         log.info("Roles seeded successfully");
     }
     
-    private void createRoleIfNotExists(String roleName, String description) {
-        if (roleRepository.findByName(roleName).isEmpty()) {
+    private Role createRoleIfNotExists(String roleName, String description) {
+        return roleRepository.findByName(roleName)
+                .orElseGet(() -> {
             Role role = Role.builder()
                     .name(roleName)
                     .description(description)
                     .build();
-            roleRepository.save(role);
+                    Role savedRole = roleRepository.save(role);
             log.info("Created role: {}", roleName);
-        }
+                    return savedRole;
+                });
     }
     
     private void seedTestUsers() {
-        // Create test user if not exists
-        if (userRepository.findByUsername("user").isEmpty()) {
+        // Always create/update test user with current password
             Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new RuntimeException("Role USER not found"));
+                .orElseGet(() -> {
+                    log.warn("Role USER not found, creating it now");
+                    return createRoleIfNotExists("ROLE_USER", "Regular user with basic access");
+                });
             
+        User existingUser = userRepository.findByUsername("user").orElse(null);
+        if (existingUser == null) {
+            // Create new user
             User user = User.builder()
                     .username("user")
                     .password(passwordEncoder.encode("password"))
@@ -68,12 +84,20 @@ public class DataSeeder implements CommandLineRunner {
             
             userRepository.save(user);
             log.info("Created test user: user/password");
+        } else {
+            // Update existing user's password
+            existingUser.setPassword(passwordEncoder.encode("password"));
+            userRepository.save(existingUser);
+            log.info("Updated test user password: user/password");
         }
         
         // Create test admin if not exists
         if (userRepository.findByUsername("admin").isEmpty()) {
             Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+                    .orElseGet(() -> {
+                        log.warn("Role ADMIN not found, creating it now");
+                        return createRoleIfNotExists("ROLE_ADMIN", "Administrator with full system access");
+                    });
             
             User admin = User.builder()
                     .username("admin")
@@ -95,7 +119,10 @@ public class DataSeeder implements CommandLineRunner {
         // Create another admin with email login
         if (userRepository.findByUsername("admin@hsf.com").isEmpty()) {
             Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+                    .orElseGet(() -> {
+                        log.warn("Role ADMIN not found, creating it now");
+                        return createRoleIfNotExists("ROLE_ADMIN", "Administrator with full system access");
+                    });
             
             User adminEmail = User.builder()
                     .username("admin@hsf.com")
@@ -117,7 +144,10 @@ public class DataSeeder implements CommandLineRunner {
         // Create test manager if not exists
         if (userRepository.findByUsername("manager").isEmpty()) {
             Role managerRole = roleRepository.findByName("ROLE_MANAGER")
-                    .orElseThrow(() -> new RuntimeException("Role MANAGER not found"));
+                    .orElseGet(() -> {
+                        log.warn("Role MANAGER not found, creating it now");
+                        return createRoleIfNotExists("ROLE_MANAGER", "Manager with order management access");
+                    });
             
             User manager = User.builder()
                     .username("manager")

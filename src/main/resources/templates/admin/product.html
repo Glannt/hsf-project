@@ -21,7 +21,26 @@
 </head>
 <body class="bg-light">
 <div class="container mt-4">
+    <div class="d-flex justify-content-end mb-3">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+        </form>
+    </div>
+    <div class="mb-3">
+        <a th:href="@{/admin}" class="btn btn-outline-primary">← Quay lại Dashboard Admin</a>
+    </div>
     <h2 class="text-primary mb-4">Quản lý Sản phẩm</h2>
+
+    <!-- Thông báo thành công/lỗi -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}">Thao tác thành công!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}">Có lỗi xảy ra!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
     <!-- PC TABLE -->
     <div class="mb-5">
@@ -190,19 +209,33 @@
         </nav>
 
     </div>
-    // Modal for creating new product
+    <!-- Modal Thêm/Sửa Sản phẩm (PC/Linh kiện) -->
     <div class="modal fade" id="modalCreateProduct" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <form id="create-product-form" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalCreateProductTitle">Thêm sản phẩm</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="modalCreateProductBody">
-                    <!-- Nội dung sẽ được JS gán động -->
+                <div class="modal-body">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Tên sản phẩm</label>
+                        <input type="text" class="form-control" id="productName" name="name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="productPrice" class="form-label">Giá (VND)</label>
+                        <input type="number" class="form-control" id="productPrice" name="price" min="0" required />
+                    </div>
+                    <div class="mb-3" id="categoryField" style="display:none;">
+                        <label for="productCategory" class="form-label">Loại linh kiện</label>
+                        <select class="form-select" id="productCategory" name="categoryId">
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Huỷ</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                     <button type="submit" class="btn btn-success">Lưu</button>
                 </div>
             </form>
@@ -399,5 +432,18 @@
 <script th:src="@{/assets/js/jquery.elevateZoom.min.js}"></script>
 <script th:src="@{/assets/js/jquery.magnific-popup.min.js}"></script>
 <script th:src="@{/assets/js/main.js}"></script>
+<script>
+    // Hiển thị đúng field cho PC hoặc linh kiện
+    function openCreateProductModal(type) {
+        document.getElementById('create-product-form').reset();
+        document.getElementById('modalCreateProductTitle').textContent = type === 'pc' ? 'Thêm PC' : 'Thêm linh kiện';
+        document.getElementById('categoryField').style.display = (type === 'computerItem') ? '' : 'none';
+        // Set action URL
+        document.getElementById('create-product-form').action = type === 'pc' ? '/admin/product/pc/add' : '/admin/product/item/add';
+        var modal = new bootstrap.Modal(document.getElementById('modalCreateProduct'));
+        modal.show();
+    }
+    // Có thể bổ sung logic openEditModalFromList tương tự nếu cần
+</script>
 </body>
 </html>

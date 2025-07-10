@@ -65,7 +65,16 @@ public class UserService implements IUserService {
 
     @Override
     public void updateUser(Long userId, String username, String password) {
-
+        // Implementation for updating user
+    }
+    
+    public void updateUserPassword(String username, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        log.info("Password updated for user: {}", username);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class Cart extends BaseEntity {
 
 
     @Column(name = "total_price")
-    private Double totalPrice;
+    private Double totalPrice = 0.0;
 
     @Column(name = "item_count")
     private Integer itemCount;

@@ -143,7 +143,14 @@
                         <li><a th:href="@{/}">Home</a></li>
                         <li><a th:href="@{/products}">Products</a></li>
                         <li><a th:href="@{/cart}">Cart</a></li>
-                        <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
+                        <li th:if="${user != null}"><a th:href="@{/orders}">My Orders</a></li>
+                        <li th:if="${user != null and user.role.name == 'ROLE_ADMIN'}"><a th:href="@{/admin}">Admin</a></li>
+                        <li th:if="${user != null and user.role.name == 'ROLE_MANAGER'}"><a th:href="@{/orders/admin}">Manage Orders</a></li>
+                        <li th:if="${user != null}">
+                            <form th:action="@{/logout}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                            </form>
+                        </li>
                         <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
                         <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
                     </ul>
@@ -174,6 +181,7 @@
 
                                     <div class="product-action">
                                         <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="display: flex; justify-content: center;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                             <input type="hidden" name="id" th:value="${pc.id}" />
                                             <input type="hidden" name="cartId" th:value="${user.cart.id}" />
                                             <input type="hidden" name="quantity" value="1" />
@@ -262,7 +270,8 @@
                                     </div><!-- End .product-action-vertical -->
 
                                     <div class="product-action">
-                                        <form th:if="${isLogin}" th:action="@{/cart/add}" method="post" style="width: 100%">
+                                        <form th:if="${isLogin}" th:action="@{/user/cart/add}" method="post" style="width: 100%">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                             <input type="hidden" name="id" th:value="${item.id}"/>
                                             <input type="hidden" name="cartId" th:value="${user.cart.id}"/>
                                             <input type="hidden" name="quantity" value="1"/>
