@@ -168,7 +168,7 @@
         <div class="col-lg-9 col-12">
           <div class="d-flex justify-content-end align-items-center mb-3">
     <form th:action="@{/logout}" method="post" style="display:inline;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        
         <button type="submit" class="btn btn-outline-danger">
             <i class="fas fa-sign-out-alt"></i> Log out
         </button>
@@ -267,22 +267,16 @@
                           <i class="fas fa-edit"></i
                           ><span class="d-none d-xl-inline ms-1"> Sửa</span>
                         </button>
-                        <form
-                          th:action="@{'/admin/product/pc/delete/' + ${pc.id}}"
-                          method="post"
-                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá pc này không?');"
-                          style="display: inline"
+                        <button
+                          class="btn btn-danger modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Xoá"
+                          th:attr="data-id=${pc.id}, data-name=${pc.name}"
+                          onclick="deletePC(this)"
                         >
-                          <button
-                            type="submit"
-                            class="btn btn-danger modern-btn"
-                            data-bs-toggle="tooltip"
-                            title="Xoá"
-                          >
-                            <i class="fas fa-trash-alt"></i
-                            ><span class="d-none d-xl-inline ms-1"> Xoá</span>
-                          </button>
-                        </form>
+                          <i class="fas fa-trash-alt"></i
+                          ><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -422,22 +416,16 @@
                           <i class="fas fa-edit"></i
                           ><span class="d-none d-xl-inline ms-1"> Sửa</span>
                         </button>
-                        <form
-                          th:action="@{'/admin/product/item/delete/' + ${item.id}}"
-                          method="post"
-                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá linh kiện này không?');"
-                          style="display: inline"
+                        <button
+                          class="btn btn-danger modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Xoá"
+                          th:attr="data-id=${item.id}, data-name=${item.name}"
+                          onclick="deleteComputerItem(this)"
                         >
-                          <button
-                            type="submit"
-                            class="btn btn-danger modern-btn"
-                            data-bs-toggle="tooltip"
-                            title="Xoá"
-                          >
-                            <i class="fas fa-trash-alt"></i
-                            ><span class="d-none d-xl-inline ms-1"> Xoá</span>
-                          </button>
-                        </form>
+                          <i class="fas fa-trash-alt"></i
+                          ><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -547,25 +535,14 @@
           </div>
 
           <!-- Modal for viewing product details -->
-          <div
-            class="modal fade"
-            id="modalViewProduct"
-            tabindex="-1"
-            aria-labelledby="modalViewTitle"
-            aria-hidden="true"
-          >
+          <div class="modal fade" id="modalViewProduct" tabindex="-1" aria-labelledby="modalViewTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl">
               <div class="modal-content rounded-4 shadow-lg border-0">
-                <div class="modal-header bg-info text-white rounded-top-4">
-                  <h5 class="modal-title fw-bold" id="modalViewTitle">
-                    Chi tiết sản phẩm
-                  </h5>
-                  <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Đóng"
-                  ></button>
+                <div class="modal-header bg-info text-white rounded-top-4" style="position: relative;">
+                  <h5 class="modal-title fw-bold" id="modalViewTitle">Chi tiết sản phẩm</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; top: 8px; right: 16px; z-index: 10; font-size: 2rem; color: #fff; opacity: 1;">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
                 <div class="modal-body p-4 px-5">
                   <div class="container-fluid">
@@ -673,44 +650,21 @@
           </div>
 
           <!-- Modal for editing product -->
-          <div
-            class="modal fade"
-            id="modalEditProduct"
-            tabindex="-1"
-            aria-labelledby="edit-modal-title"
-            aria-hidden="true"
-          >
+          <div class="modal fade" id="modalEditProduct" tabindex="-1" aria-labelledby="edit-modal-title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-              <form
-                id="edit-product-form"
-                method="post"
-                class="modal-content rounded-4 shadow-lg border-0"
-              >
-                <div class="modal-header bg-warning text-white rounded-top-4">
-                  <h5 class="modal-title fw-bold" id="edit-modal-title">
-                    Chỉnh sửa sản phẩm
-                  </h5>
-                  <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Đóng"
-                  ></button>
+              <form id="edit-product-form" method="post" class="modal-content rounded-4 shadow-lg border-0">
+                <div class="modal-header bg-warning text-white rounded-top-4" style="position: relative;">
+                  <h5 class="modal-title fw-bold" id="edit-modal-title">Chỉnh sửa sản phẩm</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; top: 8px; right: 16px; z-index: 10; font-size: 2rem; color: #fff; opacity: 1;">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
                 <div class="modal-body p-4" id="modalEditProductBody">
                   <!-- JS sẽ gán form tùy loại sản phẩm -->
                 </div>
                 <div class="modal-footer bg-light rounded-bottom-4">
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-lg px-4"
-                    data-bs-dismiss="modal"
-                  >
-                    Huỷ
-                  </button>
-                  <button type="submit" class="btn btn-primary btn-lg px-4">
-                    Lưu thay đổi
-                  </button>
+                  <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">Huỷ</button>
+                  <button type="submit" class="btn btn-primary btn-lg px-4">Lưu thay đổi</button>
                 </div>
               </form>
             </div>
@@ -739,8 +693,11 @@
     <script th:src="@{/assets/js/jquery.magnific-popup.min.js}"></script>
     <script th:src="@{/assets/js/main.js}"></script>
     <script>
+      console.log('Admin product page loaded');
+      
       // Khởi tạo tooltip cho Bootstrap 5
       document.addEventListener("DOMContentLoaded", function () {
+        console.log('DOM loaded, initializing tooltips');
         var tooltipTriggerList = [].slice.call(
           document.querySelectorAll('[data-bs-toggle="tooltip"]')
         );
@@ -748,6 +705,120 @@
           new bootstrap.Tooltip(tooltipTriggerEl);
         });
       });
+
+      // Delete functions
+      function deletePC(btn) {
+        console.log('deletePC function called');
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        console.log('Attempting to delete PC:', { id: id, name: name });
+        
+        if (confirm('Bạn có chắc chắn muốn xoá PC: ' + name + '?')) {
+          console.log('User confirmed deletion, sending request...');
+          
+          fetch(`/admin/product/pc/delete/${id}`, {
+            method: 'POST',
+            credentials: 'same-origin'
+          })
+          .then(response => {
+            console.log('Response received:', response.status, response.statusText);
+            if (response.ok) {
+              return response.text();
+            } else {
+              return response.text().then(text => {
+                throw new Error(text || 'Network response was not ok');
+              });
+            }
+          })
+          .then(result => {
+            console.log('Delete result:', result);
+            showSuccessMessage('PC đã được xoá thành công!');
+            // Luôn reload trang để đảm bảo UI cập nhật
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Lỗi khi xoá PC: ' + error.message);
+          });
+        }
+      }
+
+      function deleteComputerItem(btn) {
+        console.log('deleteComputerItem function called');
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        console.log('Attempting to delete item:', { id: id, name: name });
+        
+        if (confirm('Bạn có chắc chắn muốn xoá linh kiện: ' + name + '?')) {
+          console.log('User confirmed deletion, sending request...');
+          
+          fetch(`/admin/product/item/delete/${id}`, {
+            method: 'POST',
+            credentials: 'same-origin'
+          })
+          .then(response => {
+            console.log('Response received:', response.status, response.statusText);
+            if (response.ok) {
+              return response.text();
+            } else {
+              return response.text().then(text => {
+                throw new Error(text || 'Network response was not ok');
+              });
+            }
+          })
+          .then(result => {
+            console.log('Delete result:', result);
+            showSuccessMessage('Linh kiện đã được xoá thành công!');
+            // Luôn reload trang để đảm bảo UI cập nhật
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Lỗi khi xoá linh kiện: ' + error.message);
+          });
+        }
+      }
+
+      // Hàm hiển thị thông báo thành công
+      function showSuccessMessage(message) {
+        showMessage(message, 'success');
+      }
+
+      // Hàm hiển thị thông báo lỗi
+      function showErrorMessage(message) {
+        showMessage(message, 'danger');
+      }
+
+      // Hàm hiển thị thông báo chung
+      function showMessage(message, type) {
+        console.log('Showing message:', message, 'Type:', type);
+        // Tạo thông báo Bootstrap
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        `;
+        
+        // Thêm vào đầu trang
+        const container = document.querySelector('.container');
+        if (container) {
+          container.insertBefore(alertDiv, container.firstChild);
+        }
+        
+        // Tự động ẩn sau 3 giây
+        setTimeout(() => {
+          if (alertDiv.parentNode) {
+            alertDiv.remove();
+          }
+        }, 3000);
+      }
     </script>
   </body>
 </html>

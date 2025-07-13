@@ -70,21 +70,22 @@ public class OrderViewController {
     @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_MANAGER') or hasAuthority('ROLE_ADMIN')")
     public String getOrderDetail(@PathVariable UUID orderId, Model model, Principal principal) {
         addUserInfo(model, principal);
-        
         try {
             Order order = orderService.getOrderById(orderId);
-            
+            // Nếu không còn sản phẩm nào, chuyển hướng về danh sách
+            if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+                model.addAttribute("error", "Đơn hàng này không còn sản phẩm nào do admin đã xóa sản phẩm khỏi hệ thống.");
+                return "redirect:/orders?error=order_empty";
+            }
             // Kiểm tra phân quyền: USER chỉ xem đơn hàng của mình
             if (principal != null) {
                 User user = userService.findByUsername(principal.getName());
                 boolean isManager = user.getRole().getName().equals("ROLE_MANAGER");
                 boolean isAdmin = user.getRole().getName().equals("ROLE_ADMIN");
-                
                 if (!isManager && !isAdmin && !order.getUser().getUsername().equals(principal.getName())) {
                     return "redirect:/orders?error=access_denied";
                 }
             }
-            
             model.addAttribute("order", order);
             return "order/detail";
         } catch (Exception e) {

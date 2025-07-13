@@ -23,12 +23,12 @@ const formTemplates = {
       <div class="mb-3">
         <label class="form-label fw-bold">Linh kiện đã chọn:</label>
         <ul id="pc-selected-list" class="list-group small mb-2"></ul>
-        <div><strong>Tổng giá:</strong> <span id="pc-total-price" class="text-primary">0</span> VND</div>
+        <div><strong>Tổng giá tham khảo:</strong> <span id="pc-total-price" class="text-primary">0</span> VND</div>
       </div>
       <div id="pc-selected-hidden-inputs"></div>
       <div class="mb-3">
         <label class="form-label fw-bold">Giá</label>
-        <input type="number" name="price" id="pc-price" class="form-control form-control-lg rounded-3 fs-4" readonly>
+        <input type="number" name="price" id="pc-price" class="form-control form-control-lg rounded-3 fs-4">
       </div>
       <div class="mb-3">
         <label class="form-label fw-bold">Hình ảnh URL</label>
@@ -181,7 +181,7 @@ function updateSelectedDisplay(
     }
   });
 
-  priceInput.value = total;
+  // Không tự động set giá nữa, chỉ hiển thị tổng giá tham khảo
   priceDisplay.textContent = total.toLocaleString("vi-VN");
   selectedList.innerHTML = selectedHTML.join("");
 

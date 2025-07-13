@@ -176,7 +176,7 @@ public class OrderService implements IOrderService {
     public Page<Order> getUserOrders(String username, Pageable pageable) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return orderRepository.findByUserOrderByOrderDateDesc(user, pageable);
+        return orderRepository.findByUserWithDetails(user, pageable);
     }
 
     public Page<Order> getAllOrders(Pageable pageable) {

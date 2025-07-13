@@ -78,10 +78,30 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        userRepository.delete(user);
+    public void deleteUser(UUID id, String currentUsername) {
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            // Prevent self-deletion
+            if (user.getUsername().equals(currentUsername)) {
+                throw new IllegalArgumentException("Cannot delete your own account while logged in");
+            }
+            
+            log.info("Attempting to delete user: {} (ID: {}) by user: {}", user.getUsername(), id, currentUsername);
+            
+            // Check if user has any orders
+            if (user.getOrders() != null && !user.getOrders().isEmpty()) {
+                log.warn("User {} has {} orders, deleting them first", user.getUsername(), user.getOrders().size());
+                // You might want to handle orders differently - either delete them or prevent user deletion
+            }
+            
+            userRepository.delete(user);
+            log.info("User deleted successfully: {} by {}", user.getUsername(), currentUsername);
+        } catch (Exception e) {
+            log.error("Error deleting user with ID {} by user {}: {}", id, currentUsername, e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override

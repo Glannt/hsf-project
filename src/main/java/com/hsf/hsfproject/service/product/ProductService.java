@@ -7,6 +7,7 @@ import com.hsf.hsfproject.model.PC;
 import com.hsf.hsfproject.repository.CategoryRepository;
 import com.hsf.hsfproject.repository.ComputerItemRepository;
 import com.hsf.hsfproject.repository.ImageRepository;
+import com.hsf.hsfproject.repository.OrderDetailRepository;
 import com.hsf.hsfproject.repository.OrderRepository;
 import com.hsf.hsfproject.repository.PCRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService implements IProductService {
 
     private final PCRepository pcRepository;
@@ -29,6 +32,7 @@ public class ProductService implements IProductService {
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -54,14 +58,11 @@ public class ProductService implements IProductService {
         if (existingPc != null) {
             throw new IllegalArgumentException("PC with name " + request.getName() + " already exists");
         }
-        Double price = request.getComputerItems().stream()
-                .map(ComputerItem::getPrice)
-                .reduce(0.0, Double::sum);
         PC newPc = PC.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .computerItems(request.getComputerItems())
-                .price(price)
+                .price(request.getPrice())
                 .build();
         pcRepository.save(newPc);
         return newPc;
@@ -85,11 +86,10 @@ public class ProductService implements IProductService {
         }
         if (request.getComputerItems() != null && !request.getComputerItems().isEmpty()) {
             existingPc.setComputerItems(request.getComputerItems());
-            // Tính lại giá dựa trên các linh kiện
-            Double price = request.getComputerItems().stream()
-                    .map(ComputerItem::getPrice)
-                    .reduce(0.0, Double::sum);
-            existingPc.setPrice(price);
+        }
+        // Cho phép cập nhật giá trực tiếp
+        if (request.getPrice() != null) {
+            existingPc.setPrice(request.getPrice());
         }
         
         pcRepository.save(existingPc);
@@ -179,9 +179,19 @@ public class ProductService implements IProductService {
 
     @Override
     public ComputerItem deleteComputerItem(UUID id) {
+        log.info("=== Service: Starting Computer Item deletion ===");
+        log.info("Service: Deleting computer item with ID: {}", id);
+        
         ComputerItem existingItem = computerItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Computer item not found"));
+        
+        log.info("Service: Found item to delete: {}", existingItem.getName());
+        log.info("Service: Item details - ID: {}, Name: {}, Price: {}", 
+                existingItem.getId(), existingItem.getName(), existingItem.getPrice());
+        
         computerItemRepository.delete(existingItem);
+        log.info("Service: Successfully deleted computer item from repository");
+        
         return null;
     }
 
@@ -192,9 +202,17 @@ public class ProductService implements IProductService {
 
     @Override
     public PC deletePc(UUID id) {
+        log.info("=== Service: Starting PC deletion ===");
+        log.info("Service: Deleting PC with ID: {}", id);
+        // Xóa order_detail liên quan trước
+        orderDetailRepository.deleteByPcId(id);
         PC existingPc = pcRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("PC not found"));
+        log.info("Service: Found PC to delete: {}", existingPc.getName());
+        log.info("Service: PC details - ID: {}, Name: {}, Price: {}", 
+                existingPc.getId(), existingPc.getName(), existingPc.getPrice());
         pcRepository.delete(existingPc);
+        log.info("Service: Successfully deleted PC from repository");
         return null;
     }
 

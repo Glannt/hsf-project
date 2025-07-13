@@ -2,7 +2,6 @@ package com.hsf.hsfproject.controller.admin;
 
 import com.hsf.hsfproject.constants.enums.OrderStatus;
 import com.hsf.hsfproject.dtos.request.CreatePCRequest;
-import com.hsf.hsfproject.dtos.request.UpdateUserRoleRequest;
 import com.hsf.hsfproject.model.Category;
 import com.hsf.hsfproject.model.ComputerItem;
 import com.hsf.hsfproject.model.Order;
@@ -21,11 +20,16 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
     private final IUserService userService;
     private final IProductService productService;
@@ -141,9 +145,27 @@ public class AdminController {
     }
 
     @PostMapping("/product/item/delete/{id}")
-    public String deleteComputerItem(@PathVariable UUID id) {
-        productService.deleteComputerItem(id); // Assuming this method deletes the item
-        return "redirect:/admin/product";
+    @ResponseBody
+    public ResponseEntity<String> deleteComputerItem(@PathVariable UUID id) {
+        try {
+            log.info("=== Admin: Starting Computer Item deletion process ===");
+            log.info("Admin: Deleting computer item with ID: {}", id);
+            
+            // Kiểm tra item có tồn tại không
+            ComputerItem existingItem = productService.findItemById(id);
+            log.info("Admin: Found item to delete: {}", existingItem.getName());
+            
+            // Thực hiện xóa
+            productService.deleteComputerItem(id);
+            log.info("Admin: Successfully deleted computer item with ID: {}", id);
+            
+            return ResponseEntity.ok("Computer item deleted successfully");
+        } catch (Exception e) {
+            log.error("=== Admin: Error during Computer Item deletion ===");
+            log.error("Admin: Error deleting computer item with ID {}: {}", id, e.getMessage());
+            log.error("Admin: Stack trace:", e);
+            return ResponseEntity.badRequest().body("Error deleting computer item: " + e.getMessage());
+        }
     }
 
 
@@ -174,15 +196,37 @@ public class AdminController {
     }
 
     @PostMapping("/product/pc/delete/{id}")
-    public String deletePC(@PathVariable UUID id) {
-        productService.deletePc(id); // Assuming this method deletes the item
-        return "redirect:/admin/product";
+    @ResponseBody
+    public ResponseEntity<String> deletePC(@PathVariable UUID id) {
+        try {
+            log.info("=== Admin: Starting PC deletion process ===");
+            log.info("Admin: Deleting PC with ID: {}", id);
+            
+            // Kiểm tra PC có tồn tại không
+            PC existingPc = productService.findPcById(id);
+            log.info("Admin: Found PC to delete: {}", existingPc.getName());
+            
+            // Thực hiện xóa
+            productService.deletePc(id);
+            log.info("Admin: Successfully deleted PC with ID: {}", id);
+            
+            return ResponseEntity.ok("PC deleted successfully");
+        } catch (Exception e) {
+            log.error("=== Admin: Error during PC deletion ===");
+            log.error("Admin: Error deleting PC with ID {}: {}", id, e.getMessage());
+            log.error("Admin: Stack trace:", e);
+            return ResponseEntity.badRequest().body("Error deleting PC: " + e.getMessage());
+        }
     }
 
     @PostMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable UUID id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
+    public String deleteUser(@PathVariable UUID id, Principal principal) {
+        try {
+            userService.deleteUser(id, principal.getName());
+            return "redirect:/admin?success=user_deleted";
+        } catch (Exception e) {
+            return "redirect:/admin?error=user_delete_failed&message=" + e.getMessage();
+        }
     }
 
     @GetMapping("/orders")
@@ -223,27 +267,6 @@ public class AdminController {
         return "admin/users";
     }
 
-    @PutMapping("/api/users/{userId}/role")
-    @ResponseBody
-    public String updateUserRole(@PathVariable UUID userId, 
-                                @RequestBody UpdateUserRoleRequest request) {
-        try {
-            userService.updateUserRole(userId, request.getRoleName());
-            return "User role updated successfully";
-        } catch (Exception e) {
-            return "Error updating user role: " + e.getMessage();
-        }
-    }
 
-    @DeleteMapping("/api/users/{userId}")
-    @ResponseBody
-    public String deleteUserApi(@PathVariable UUID userId) {
-        try {
-            userService.deleteUser(userId);
-            return "User deleted successfully";
-        } catch (Exception e) {
-            return "Error deleting user: " + e.getMessage();
-        }
-    }
 
 }

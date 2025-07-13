@@ -8,7 +8,7 @@
     <h1>Test Add to Cart</h1>
     
     <form th:action="@{/user/cart/add}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        
         <input type="hidden" name="id" value="test-product-id" />
         <input type="hidden" name="cartId" value="test-cart-id" />
         <input type="hidden" name="quantity" value="1" />

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 
 
-    <title>User Management - Admin</title>
+    <title>User Management - Manager</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
     <style>
@@ -40,12 +40,6 @@
             display: flex;
             gap: 8px;
         }
-        .action-buttons button {
-            border: 2px solid #000 !important;
-            background: #fff !important;
-            color: #000 !important;
-            z-index: 1000;
-        }
         .btn-sm {
             padding: 4px 12px;
             font-size: 0.8rem;
@@ -75,22 +69,21 @@
             <div class="header-middle sticky-header">
                 <div class="container">
                     <div class="header-left">
-                        <a href="/admin" class="logo">
+                        <a href="/manager" class="logo">
                             <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
                         </a>
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
-                                <li><a th:href="@{/admin}">Dashboard</a></li>
-                                <li><a th:href="@{/admin/product}">Products</a></li>
-                                <li><a th:href="@{/admin/orders}">Orders</a></li>
-                                <li><a th:href="@{/admin/users}" class="active">Users</a></li>
+                                <li><a th:href="@{/manager}">Dashboard</a></li>
+                                <li><a th:href="@{/manager/products}">Products</a></li>
+                                <li><a th:href="@{/manager/users}" class="active">Users</a></li>
                             </ul>
                         </nav>
                     </div>
                     <div class="header-right">
                         <span th:if="${isLogin}" th:text="${user.username}"></span>
                         <form th:action="@{/logout}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-outline-primary-2">Logout</button>
+                            <button type="submit" class="btn btn-outline-primary-2">Log out</button>
                         </form>
                     </div>
                 </div>
@@ -106,30 +99,35 @@
 
             <div class="page-content">
                 <div class="container">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:if="${param.success == 'user_deleted'}">User deleted successfully!</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:if="${param.error == 'user_delete_failed'}">Error deleting user: <span th:text="${param.message}"></span></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
                     <!-- Statistics -->
-                    <div class="row">
-                        <div class="col-md-3">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
                             <div class="stats-card">
-                                <div class="stats-number" th:text="${totalUsers}">0</div>
-                                <div>Total Users</div>
+                                <h5>Total Users</h5>
+                                <div class="stats-number" th:text="${users.totalElements}">0</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                <div class="stats-number" th:text="${totalRegularUsers}">0</div>
-                                <div>Regular Users</div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h5>Regular Users</h5>
+                                <div class="stats-number" th:text="${#lists.size(users.content.?[role.name == 'ROLE_USER'])}">0</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                <div class="stats-number" th:text="${totalManagers}">0</div>
-                                <div>Managers</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                                <div class="stats-number" th:text="${totalAdmins}">0</div>
-                                <div>Admins</div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h5>Current Page</h5>
+                                <div class="stats-number" th:text="${users.number + 1}">1</div>
                             </div>
                         </div>
                     </div>
@@ -170,14 +168,8 @@
                                         </div>
                                         <div class="col-md-2">
                                             <div class="action-buttons">
-                                                <button class="btn btn-primary btn-sm me-2 edit-role-btn"
-                                                        th:attr="onclick=|editUserRole('${user.id}', '${user.role.name}')|">
-                                                    Edit Role
-                                                </button>
-                                                <button class="btn btn-danger btn-sm delete-user-btn"
-                                                        th:attr="onclick=|deleteUser('${user.id}', '${user.username}')|">
-                                                    Delete
-                                                </button>
+                                                <!-- Manager không được phép sửa/xóa user -->
+                                                <span class="text-muted">View only</span>
                                             </div>
                                         </div>
                                     </div>
@@ -190,17 +182,15 @@
                     <div class="pagination-container" th:if="${users.totalPages > 1}">
                         <nav>
                             <ul class="pagination">
-                                <li class="page-item" th:classappend="${users.first ? 'disabled' : ''}">
-                                    <a class="page-link" th:href="@{/admin/users(page=${users.number - 1})}">Previous</a>
+                                <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/manager/users(page=${users.number - 1})}">Previous</a>
                                 </li>
-                                
                                 <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, users.totalPages - 1)}"
-                                    th:classappend="${pageNum == users.number ? 'active' : ''}">
-                                    <a class="page-link" th:href="@{/admin/users(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                                    th:classappend="${pageNum == users.number} ? 'active'">
+                                    <a class="page-link" th:href="@{/manager/users(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
                                 </li>
-                                
-                                <li class="page-item" th:classappend="${users.last ? 'disabled' : ''}">
-                                    <a class="page-link" th:href="@{/admin/users(page=${users.number + 1})}">Next</a>
+                                <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/manager/users(page=${users.number + 1})}">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -208,87 +198,74 @@
                 </div>
             </div>
         </main>
+    </div>
 
-        <!-- Edit Role Modal -->
-        <div class="modal fade" id="editRoleModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit User Role</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editRoleForm">
-                            <div class="mb-3">
-                                <label for="newRole" class="form-label">New Role</label>
-                                <select class="form-select" id="newRole" name="roleName" required>
-                                    <option value="ROLE_USER">USER</option>
-                                    <option value="ROLE_MANAGER">MANAGER</option>
-                                    <option value="ROLE_ADMIN">ADMIN</option>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="saveUserRole()">Save Changes</button>
-                    </div>
+    <!-- Edit Role Modal -->
+    <div class="modal fade" id="editRoleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User Role</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editRoleForm">
+                        <div class="mb-3">
+                            <label for="newRole" class="form-label">New Role</label>
+                            <select class="form-select" id="newRole" name="roleName" required>
+                                <option value="ROLE_USER">USER</option>
+                                <option value="ROLE_MANAGER">MANAGER</option>
+                                <option value="ROLE_ADMIN">ADMIN</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUserRole()">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/main.js"></script>
-    <script>
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script th:inline="javascript">
         let currentUserId = null;
-        let editRoleModalInstance = null;
-        
         function editUserRole(userId, currentRole) {
-            console.log('Edit Role Clicked', userId, currentRole);
             currentUserId = userId;
             document.getElementById('newRole').value = currentRole;
-            const modalEl = document.getElementById('editRoleModal');
-            editRoleModalInstance = new bootstrap.Modal(modalEl);
-            editRoleModalInstance.show();
+            $('#editRoleModal').modal('show');
         }
         
         function saveUserRole() {
             const newRole = document.getElementById('newRole').value;
-            console.log('Save Role Clicked', currentUserId, newRole);
-            
-            fetch(`/api/admin/users/${currentUserId}/role`, {
+            fetch(`/api/manager/users/${currentUserId}/role`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    roleName: newRole
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roleName: newRole })
             })
             .then(response => response.text())
             .then(result => {
                 alert(result);
                 if (result.includes('successfully')) {
-                    if (editRoleModalInstance) editRoleModalInstance.hide();
+                    $('#editRoleModal').modal('hide');
                     location.reload();
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 alert('Error updating user role');
             });
         }
         
         function deleteUser(userId, username) {
-            console.log('Delete Clicked', userId, username);
             if (!confirm('Are you sure you want to delete user: ' + username + '?')) return;
-            
-            fetch(`/api/admin/users/${userId}`, {
+            fetch(`/api/manager/users/${userId}`, { 
                 method: 'DELETE',
-                credentials: 'same-origin', // Đảm bảo gửi cookie session
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
@@ -303,18 +280,25 @@
             })
             .then(result => {
                 alert(result);
-                if (result.includes('successfully')) {
-                    location.reload();
-                }
+                if (result.includes('successfully')) location.reload();
             })
-            .catch(error => {
+            .catch(error => { 
                 console.error('Error:', error);
-                alert('Error deleting user: ' + error.message);
+                alert('Error deleting user: ' + error.message); 
             });
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            console.log('Page loaded successfully');
+            document.querySelectorAll('.edit-role-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    editUserRole(this.getAttribute('data-id'), this.getAttribute('data-role'));
+                });
+            });
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteUser(this.getAttribute('data-id'), this.getAttribute('data-username'));
+                });
+            });
         });
     </script>
 </body>

@@ -10,7 +10,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-end mb-3">
         <form th:action="@{/logout}" method="post" style="display:inline;">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            
             <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
         </form>
     </div>
@@ -125,8 +125,8 @@
                                     </a>
                                     <button type="button" 
                                             class="btn btn-sm btn-outline-warning" 
-                                            data-bs-toggle="modal" 
-                                            th:data-bs-target="'#updateOrderModal' + ${order.id}">
+                                            data-toggle="modal" 
+                                            th:data-target="'#updateOrderModal' + ${order.id}">
                                         <i class="icon-edit"></i> Update
                                     </button>
                                 </div>
@@ -181,7 +181,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Update Order Status</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -197,7 +197,7 @@
                     </div>
                     
                     <form th:action="@{/orders/{orderId}/status(orderId=${order.id})}" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        
                         <div class="mb-3">
                             <label th:for="'status' + ${order.id}" class="form-label">New Status:</label>
                             <select th:name="'status'" th:id="'status' + ${order.id}" class="form-select" required>
@@ -209,7 +209,7 @@
                             </select>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">Update Status</button>
                         </div>
                     </form>
@@ -220,6 +220,6 @@
     </div>
 </div>
 
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.min.js}"></script>
 </body>
 </html>

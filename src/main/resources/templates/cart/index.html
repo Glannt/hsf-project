@@ -145,7 +145,7 @@
                             <li th:if="${isLogin}"><a th:href="@{/transaction}">Transaction History</a></li>
                             <li th:if="${isLogin}">
                                 <form th:action="@{/logout}" method="post" style="display:inline;">
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
                                     <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
                                 </form>
                             </li>
@@ -184,7 +184,7 @@
                     <div th:if="${cart != null and cart.itemCount > 0}">
                         <!-- Update Cart Form -->
                         <form th:action="@{/cart/user/cart/update}" method="post" id="updateCartForm">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            
                             <table class="table table-cart table-mobile">
                                 <thead>
                                 <tr>
@@ -229,14 +229,14 @@
                         <!-- Hidden form for remove action -->
                         <form th:action="@{/cart/user/cart/remove}" method="post" id="removeForm" style="display:none;">
                             <input type="hidden" name="cartItemId" id="removeCartItemId" />
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            
                         </form>
                         
                         <!-- Checkout Form (separate, not nested) -->
                         <div class="row">
                             <div class="col-lg-4 offset-lg-8">
                                 <form th:action="@{/orders}" method="post" style="margin-top: 10px">
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
                                     <input type="hidden" name="cartId" th:value="${cart.id}" />
                                     <input type="hidden" name="userId" th:value="${user.id}" />
                                     <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>

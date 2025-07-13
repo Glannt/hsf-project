@@ -66,7 +66,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))  // Chỉ disable CSRF cho API
+        http.csrf(AbstractHttpConfigurer::disable)  // Disable CSRF cho toàn bộ ứng dụng
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(configure -> configure
                         // Public endpoints
@@ -86,6 +86,7 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/orders").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
                         .requestMatchers("/api/orders/*/status").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/manager/**").hasAuthority("ROLE_MANAGER")
                         
                         // Traditional MVC endpoints
                         .requestMatchers("/user/**").hasAuthority("ROLE_USER")

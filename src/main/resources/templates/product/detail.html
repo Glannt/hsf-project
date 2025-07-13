@@ -19,8 +19,8 @@
     <meta name="msapplication-TileColor" content="#cc9966">
     <meta name="msapplication-config" th:content="@{/assets/images/icons/browserconfig.xml}">
     <meta name="theme-color" content="#ffffff">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
     <!-- Plugins CSS File -->
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
@@ -194,7 +194,7 @@
                                         th:action="@{/user/cart/add}"
                                         method="post"
                                         class="product-details-form">
-                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        
                                 <h1 class="product-title" th:text="${productCI != null} ? ${productCI.name} : ${productPC.name}">Product Name</h1>
                                 <!-- End .product-title -->
 

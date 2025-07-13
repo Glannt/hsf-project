@@ -38,7 +38,7 @@ public class User extends BaseEntity implements UserDetails {
     @JsonBackReference
     private Role role;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cart_id")
     @JsonBackReference
     private Cart cart;

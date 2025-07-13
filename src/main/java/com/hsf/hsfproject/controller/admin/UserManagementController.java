@@ -6,18 +6,21 @@ import com.hsf.hsfproject.service.user.IUserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+@Slf4j
 public class UserManagementController {
     
     private final IUserService userService;
@@ -42,11 +45,14 @@ public class UserManagementController {
     }
     
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<String> deleteUser(@PathVariable UUID userId, Principal principal) {
         try {
-            userService.deleteUser(userId);
+            log.info("Admin attempting to delete user: {} by user: {}", userId, principal.getName());
+            userService.deleteUser(userId, principal.getName());
+            log.info("User {} deleted successfully by admin {}", userId, principal.getName());
             return ResponseEntity.ok("User deleted successfully");
         } catch (Exception e) {
+            log.error("Error deleting user {} by admin {}: {}", userId, principal.getName(), e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error deleting user: " + e.getMessage());
         }
     }

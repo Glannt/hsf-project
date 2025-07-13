@@ -25,5 +25,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     // Tổng doanh thu
     @Query("SELECT SUM(o.totalPrice) FROM Order o")
     Double sumTotalRevenue();
+
+    @Query("SELECT o FROM Order o WHERE o.user = :user AND SIZE(o.orderItems) > 0 ORDER BY o.orderDate DESC")
+    Page<Order> findByUserWithDetails(User user, Pageable pageable);
 }
 

@@ -12,7 +12,7 @@ public interface IUserService {
     User createUser(CreateUserDTO user);
     void updateUser(Long userId, String username, String password);
     void updateUserPassword(String username, String newPassword);
-    void deleteUser(UUID id);
+    void deleteUser(UUID id, String currentUsername);
     User getUserByName(String name);
     Page<User> getUsers(Pageable pageable);
     User findByUsername(String username);

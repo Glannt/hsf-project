@@ -56,7 +56,7 @@ function updateSelectedDisplayEdit(
     }
   });
 
-  if (priceInput) priceInput.value = total;
+  // Không tự động set giá nữa, chỉ hiển thị tổng giá tham khảo
   if (priceDisplay) priceDisplay.textContent = total.toLocaleString("vi-VN");
   if (selectedList) selectedList.innerHTML = selectedHTML.join("");
   if (hiddenInputsContainer)
@@ -182,13 +182,17 @@ const formEditTemplates = {
         <div class="form-group">
             <label><strong>Linh kiện đã chọn:</strong></label>
             <ul id="edit-pc-selected-list" class="list-group small mb-2"></ul>
-            <div><strong>Tổng giá:</strong> <span id="edit-pc-total-price" class="text-primary">0</span> VND</div>
+            <div><strong>Tổng giá tham khảo:</strong> <span id="edit-pc-total-price" class="text-primary">0</span> VND</div>
         </div>
         <div id="edit-pc-selected-hidden-inputs"></div>
         <input type="hidden" name="price" id="edit-price" />
         <div class="form-group">
             <label>Hình ảnh URL</label>
             <input type="text" name="imageUrl" class="form-control" id="edit-imageUrl" />
+        </div>
+        <div class="form-group">
+            <label>Giá (VND)</label>
+            <input type="text" class="form-control" id="edit-price-display" />
         </div>
         `,
   },
@@ -201,7 +205,7 @@ const formEditTemplates = {
             <input type="text" name="name" class="form-control" id="edit-name" required>
         </div>
         <div class="form-group">
-            <label>Giá</label>
+            <label>Giá (VND)</label>
             <input type="text" class="form-control" id="edit-price-display" />
             <input type="hidden" name="price" id="edit-price" />
         </div>
@@ -252,7 +256,9 @@ function openEditModalFromList(button, type = "computerItem") {
   // Bind dữ liệu chung
   document.getElementById("edit-id").value = item.id || "";
   document.getElementById("edit-name").value = item.name || "";
-  document.getElementById("edit-imageUrl").value = item.imageUrl || "";
+  if (type === "pc") {
+    document.getElementById("edit-imageUrl").value = item.imageUrl || "";
+  }
   const price = item.price || 0;
   const priceInput = document.getElementById("edit-price");
   const priceDisplay = document.getElementById("edit-price-display");
@@ -282,8 +288,43 @@ function openEditModalFromList(button, type = "computerItem") {
     }
   }
 
+  // Luôn gọi lại binding giá sau khi render modal (cả PC và linh kiện)
+  initPriceInputBinding();
+
   $("#modalEditProduct").modal("show");
+}
+
+function deletePC(button) {
+  const id = button.getAttribute('data-id');
+  const name = button.getAttribute('data-name');
+  if (!confirm('Bạn có chắc muốn xóa PC: ' + name + '?')) return;
+  fetch(`/admin/product/pc/delete/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(response => response.text())
+    .then(result => {
+      alert(result);
+      if (result.toLowerCase().includes('thành công') || result.toLowerCase().includes('success')) {
+        location.reload();
+      }
+    })
+    .catch(error => {
+      alert('Lỗi khi xóa PC: ' + error);
+    });
 }
 
 // ==== On Load ====
 document.addEventListener("DOMContentLoaded", initPriceInputBinding);
+
+// ==== Reload page after edit form submit ====
+document.addEventListener("DOMContentLoaded", function() {
+  var editForm = document.getElementById("edit-product-form");
+  if (editForm) {
+    editForm.addEventListener("submit", function() {
+      setTimeout(function() {
+        window.location.reload();
+      }, 500); // Đợi 0.5s để backend xử lý xong
+    });
+  }
+});
