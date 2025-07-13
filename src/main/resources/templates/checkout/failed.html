@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Payment Failed - HSF Project</title>
+  <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="page-wrapper">
+  <header class="header">
+    <div class="header-middle sticky-header">
+      <div class="container">
+        <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
+                                      height="25"/></a>
+
+        <nav class="main-nav">
+          <ul class="menu">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/products}">Products</a></li>
+            <li><a th:href="@{/cart}">Cart</a></li>
+            <li th:if="${user != null}">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                </form>
+            </li>
+            <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+            <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container mt-5 mb-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card shadow">
+            <div class="card-body text-center p-5">
+              <div class="mb-4">
+                <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+              </div>
+              <h2 class="text-danger mb-3">Payment Failed</h2>
+              <p class="lead mb-4" th:text="${message ?: 'Your payment could not be processed. Please try again.'}">Your payment could not be processed. Please try again.</p>
+
+              <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>What happened?</strong> Your payment was not successful. This could be due to:
+                <ul class="mt-2 mb-0 text-start">
+                  <li>Insufficient funds</li>
+                  <li>Card declined by bank</li>
+                  <li>Network connection issues</li>
+                  <li>Payment gateway timeout</li>
+                </ul>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="padding-top: 40px;">
+                <a href="/cart" class="btn btn-primary me-md-2">
+                  <i class="fas fa-shopping-cart me-2"></i>Back to Cart
+                </a>
+                <a href="/" class="btn btn-outline-secondary">
+                  <i class="fas fa-home me-2"></i>Continue Shopping
+                </a>
+              </div>
+
+              <div class="mt-4">
+                <small class="text-muted">
+                  Need help? Contact our support team at
+                  <a href="mailto:support@hsfproject.com">support@hsfproject.com</a>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-middle">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 col-lg-3">
+            <div class="widget widget-about">
+              <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                   height="25">
+              <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna
+                eros eu erat. </p>
+
+              <div class="social-icons">
+                <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                        class="icon-facebook-f"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                        class="icon-twitter"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                        class="icon-instagram"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                        class="icon-youtube"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                        class="icon-pinterest"></i></a>
+              </div><!-- End .soial-icons -->
+            </div><!-- End .widget about-widget -->
+          </div><!-- End .col-sm-6 col-lg-3 -->
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="widget">
+              <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+              <ul class="widget-list">
+                <li><a href="about.html">About Molla</a></li>
+                <li><a href="#">How to shop on Molla</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="contact.html">Contact us</a></li>
+                <li><a href="login.html">Log in</a></li>
+              </ul><!-- End .widget-list -->
+            </div><!-- End .widget -->
+          </div><!-- End .col-sm-6 col-lg-3 -->
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="widget">
+              <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+              <ul class="widget-list">
+                <li><a href="#">Payment Methods</a></li>
+                <li><a href="#">Money-back guarantee!</a></li>
+                <li><a href="#">Returns</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Terms and conditions</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+              </ul><!-- End .widget-list -->
+            </div><!-- End .widget -->
+          </div><!-- End .col-sm-6 col-lg-3 -->
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="widget">
+              <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+              <ul class="widget-list">
+                <li><a href="#">Sign In</a></li>
+                <li><a href="cart.html">View Cart</a></li>
+                <li><a href="#">My Wishlist</a></li>
+                <li><a href="#">Track My Order</a></li>
+                <li><a href="#">Help</a></li>
+              </ul><!-- End .widget-list -->
+            </div><!-- End .widget -->
+          </div><!-- End .col-sm-6 col-lg-3 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .footer-middle -->
+
+    <div class="footer-bottom">
+      <div class="container">
+        <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+        <!-- End .footer-copyright -->
+        <figure class="footer-payments">
+          <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
+        </figure><!-- End .footer-payments -->
+      </div><!-- End .container -->
+    </div><!-- End .footer-bottom -->
+  </footer><!-- End .footer -->
+</div>
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html>

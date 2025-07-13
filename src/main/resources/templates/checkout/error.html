@@ -1,65 +1,105 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Payment Error - HSF Project</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
 <div class="page-wrapper">
-    <main class="main">
-        <div class="login-page bg-image pt-8 pb-8"
-             th:style="|background-image: url('@{/assets/images/backgrounds/login-bg.jpg}');|">
+    <header class="header">
+        <div class="header-middle sticky-header">
             <div class="container">
-                <div class="form-box">
-                    <div class="form-tab">
-                        <h2 class="text-center mb-4">Register</h2>
-                        <form th:action="@{/register}" method="post">
-                            <div class="form-group">
-                                <label for="username">Username *</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                <a href="#" class="logo"><img th:src="@{/assets/images/logo.png}" alt="Logo" width="105"
+                                              height="25"/></a>
+
+                <nav class="main-nav">
+                    <ul class="menu">
+                        <li><a th:href="@{/}">Home</a></li>
+                        <li><a th:href="@{/products}">Products</a></li>
+                        <li><a th:href="@{/cart}">Cart</a></li>
+                        <li th:if="${user != null}">
+                            <form th:action="@{/logout}" method="post" style="display:inline;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                            </form>
+                        </li>
+                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container mt-5 mb-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-body text-center p-5">
+                            <div class="mb-4">
+                                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                            </div>
+                            <h2 class="text-warning mb-3">Payment Error</h2>
+                            <p class="lead mb-4" th:text="${message ?: 'An unexpected error occurred during payment processing.'}">An unexpected error occurred during payment processing.</p>
+
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-bug me-2"></i>
+                                <strong>Technical Error</strong><br>
+                                We encountered a technical issue while processing your payment. Our team has been notified and is working to resolve this issue.
                             </div>
 
-                            <div class="form-group">
-                                <label for="password">Password *</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="bg-light p-4 rounded mb-4">
+                                <h6 class="mb-3">What you can do:</h6>
+                                <ul class="list-unstyled text-start">
+                                    <li class="mb-2">
+                                        <i class="fas fa-redo text-primary me-2"></i>
+                                        Try refreshing the page and attempting the payment again
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-clock text-info me-2"></i>
+                                        Wait a few minutes and try again
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-credit-card text-success me-2"></i>
+                                        Try using a different payment method
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-phone text-warning me-2"></i>
+                                        Contact our support team if the issue persists
+                                    </li>
+                                </ul>
                             </div>
 
-                            <div class="form-group">
-                                <label for="email">Email *</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <a href="/cart" class="btn btn-primary me-md-2">
+                                    <i class="fas fa-shopping-cart me-2"></i>Back to Cart
+                                </a>
+                                <a href="/" class="btn btn-outline-secondary">
+                                    <i class="fas fa-home me-2"></i>Home
+                                </a>
                             </div>
 
-                            <div class="form-group">
-                                <label for="phoneNumber">Phone Number</label>
-                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
+                            <div class="mt-4">
+                                <small class="text-muted">
+                                    Error Code: <span class="badge bg-secondary">PAY_ERR_001</span><br>
+                                    Support: <a href="mailto:support@hsfproject.com">support@hsfproject.com</a> |
+                                    Phone: <a href="tel:+1234567890">+1 (234) 567-890</a>
+                                </small>
                             </div>
-
-                            <div class="form-footer">
-                                <button type="submit" class="btn btn-outline-primary-2">
-                                    <span>SIGN UP</span>
-                                    <i class="icon-long-arrow-right"></i>
-                                </button>
-
-                                <div class="custom-control custom-checkbox mt-2">
-                                    <input type="checkbox" class="custom-control-input" id="policy" required>
-                                    <label class="custom-control-label" for="policy">
-                                        I agree to the <a href="#">privacy policy</a> *
-                                    </label>
-                                </div>
-                            </div>
-                        </form>
-
-                        <div th:if="${registerError}" class="mt-2 text-danger" th:text="${registerError}"></div>
-                        <div th:if="${registerSuccess}" class="mt-2 text-success" th:text="${registerSuccess}"></div>
-
-                        <p class="text-center mt-3">Already have an account? <a th:href="@{/login}">Login</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </main>
+
     <footer class="footer">
         <div class="footer-middle">
             <div class="container">
@@ -137,7 +177,7 @@
                 <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
                 <!-- End .footer-copyright -->
                 <figure class="footer-payments">
-                    <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                    <img th:src="@{/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
                 </figure><!-- End .footer-payments -->
             </div><!-- End .container -->
         </div><!-- End .footer-bottom -->

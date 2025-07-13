@@ -1,5 +1,6 @@
 package com.hsf.hsfproject.configuration;
 
+import com.hsf.hsfproject.model.User;
 import com.hsf.hsfproject.service.auth.JwtService;
 import com.hsf.hsfproject.service.user.IUserService;
 import jakarta.servlet.FilterChain;
@@ -44,13 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         username = jwtService.extractUsername(jwt);
         
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.findByUsername(username);
+            User user = userService.findByUsername(username);
             
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (user != null && jwtService.isTokenValid(jwt, user)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        user,
                         null,
-                        userDetails.getAuthorities()
+                        user.getAuthorities()
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

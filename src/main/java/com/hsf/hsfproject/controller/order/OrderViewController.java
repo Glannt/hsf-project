@@ -1,7 +1,9 @@
 package com.hsf.hsfproject.controller.order;
 
+import com.hsf.hsfproject.dtos.request.CreateOrderRequest;
 import com.hsf.hsfproject.model.Order;
 import com.hsf.hsfproject.model.User;
+import com.hsf.hsfproject.service.cart.CartService;
 import com.hsf.hsfproject.service.order.OrderService;
 import com.hsf.hsfproject.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.hsf.hsfproject.constants.enums.OrderStatus;
 import java.security.Principal;
 import java.util.UUID;
+import com.hsf.hsfproject.model.Cart;
 
 @Controller
 @RequestMapping("/orders")
@@ -24,6 +27,7 @@ public class OrderViewController {
     
     private final OrderService orderService;
     private final IUserService userService;
+    private final CartService cartService;
     
     // Helper method to add user info to model (theo style hiện tại)
     private void addUserInfo(Model model, Principal principal) {
@@ -88,7 +92,7 @@ public class OrderViewController {
         }
     }
     
-    @GetMapping("/admin")
+    @GetMapping("/management")
     @PreAuthorize("hasAuthority('ROLE_MANAGER') or hasAuthority('ROLE_ADMIN')")
     public String getAllOrdersForAdmin(Model model, Principal principal, Pageable pageable) {
         addUserInfo(model, principal);
@@ -97,7 +101,7 @@ public class OrderViewController {
         model.addAttribute("orders", orders);
         model.addAttribute("isAdminView", true);
         
-        return "admin/order";
+        return "order/admin";
     }
     
     @PostMapping("/{orderId}/status")
@@ -113,6 +117,62 @@ public class OrderViewController {
             redirectAttributes.addFlashAttribute("error", "Failed to update order status: " + e.getMessage());
         }
         
-        return "redirect:/orders/admin";
+        return "redirect:/orders/management";
+    }
+    
+    // Handle order creation from cart
+    @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public String createOrderFromCart(@RequestParam("cartId") String cartId,
+                                     @RequestParam("userId") String userId,
+                                     Principal principal,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            // Get user from principal
+            User user = userService.findByUsername(principal.getName());
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "User not found");
+                return "redirect:/cart";
+            }
+            
+            // Get cart
+            Cart cart = cartService.getCartById(UUID.fromString(cartId));
+            if (cart == null || cart.getCartItems().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Cart is empty or not found");
+                return "redirect:/cart";
+            }
+            
+            // Create order request from cart
+            CreateOrderRequest orderRequest = CreateOrderRequest.builder()
+                    .shippingAddress("Default Address") // You can add a form to collect this
+                    .orderItems(cart.getCartItems().stream()
+                            .map(item -> {
+                                CreateOrderRequest.OrderItemRequest orderItem = new CreateOrderRequest.OrderItemRequest();
+                                if (item.getComputerItem() != null) {
+                                    orderItem.setComputerItemId(item.getComputerItem().getId());
+                                    orderItem.setProductType("COMPUTER_ITEM");
+                                } else if (item.getPc() != null) {
+                                    orderItem.setPcId(item.getPc().getId());
+                                    orderItem.setProductType("PC");
+                                }
+                                orderItem.setQuantity(item.getQuantity());
+                                return orderItem;
+                            })
+                            .collect(java.util.stream.Collectors.toList()))
+                    .build();
+            
+            // Create order
+            Order order = orderService.createOrder(principal.getName(), orderRequest);
+            
+            // Clear cart after successful order creation
+            cartService.clearCart(cart.getId());
+            
+            redirectAttributes.addFlashAttribute("success", "Order created successfully! Order number: " + order.getOrderNumber());
+            return "redirect:/orders/" + order.getId();
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to create order: " + e.getMessage());
+            return "redirect:/cart";
+        }
     }
 } 

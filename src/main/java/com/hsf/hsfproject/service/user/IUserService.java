@@ -18,4 +18,5 @@ public interface IUserService {
     User findByUsername(String username);
 //    LoginResponse login(LoginRequest loginRequest);
     long count();
+    void updateUserRole(UUID userId, String roleName);
 }

@@ -1,319 +1,244 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
-            http-equiv="X-UA-Compatible"
-            content="IE=edge"
-    />
-    <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta
-            name="msapplication-TileColor"
-            content="#cc9966"
-    />
-    <meta
-            name="msapplication-config"
-            content="assets/images/icons/browserconfig.xml"
-    />
-    <meta
-            name="theme-color"
-            content="#ffffff"
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <title>My Orders</title>
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
-</head>
-<body>
-<div class="page-wrapper">
-    <header class="header">
-        <!-- Tùy bạn giữ lại hoặc rút gọn -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <style>
+      .order-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+      .order-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .order-body {
+        padding: 20px;
+      }
+      .order-item {
+        border-bottom: 1px solid #e9ecef;
+        padding: 10px 0;
+      }
+      .order-item:last-child {
+        border-bottom: none;
+      }
+      .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .status-pending { background: #fff3cd; color: #856404; }
+      .status-confirmed { background: #d1ecf1; color: #0c5460; }
+      .status-shipped { background: #d4edda; color: #155724; }
+      .status-delivered { background: #d1e7dd; color: #0f5132; }
+      .status-cancelled { background: #f8d7da; color: #721c24; }
+      .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #333;
+      }
+      .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+      }
+      .empty-orders i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #dee2e6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="header">
         <div class="header-middle sticky-header">
-            <div class="container">
-                <div class="header-left">
-                    <a href="/" class="logo">
-                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
-                    </a>
-                    <nav class="main-nav">
-                        <ul class="menu sf-arrows">
-                            <li><a th:href="@{/}">Home</a></li>
-                            <li><a th:href="@{/products}">Shop</a></li>
-                        </ul>
-                    </nav>
-                </div>
+          <div class="container">
+            <div class="header-left">
+              <a href="/" class="logo">
+                <img
+                  th:src="@{/assets/images/logo.png}"
+                  alt="Logo"
+                  width="105"
+                  height="25"
+                />
+              </a>
+              <nav class="main-nav">
+                <ul class="menu sf-arrows">
+                  <li><a th:href="@{/}">Home</a></li>
+                  <li th:if="${isLogin}">
+                    <a th:href="@{/transaction}">Transaction History</a>
+                  </li>
+                  <li th:if="${isLogin}">
+                      <form th:action="@{/logout}" method="post" style="display:inline;">
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                          <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                      </form>
+                  </li>
+                </ul>
+              </nav>
             </div>
+            <div class="header-right">
+              <a th:href="@{/cart}" class="icon-shopping-cart"
+                ><i class="icon-shopping-cart"></i
+              ></a>
+            </div>
+          </div>
         </div>
-    </header>
-    <main class=" main">
+      </header>
+
+      <main class="main">
         <div
-                class="page-header text-center"
-                style="background-image: url('/assets/images/page-header-bg.jpg')"
+          class="page-header text-center"
+          style="background-image: url('/assets/images/page-header-bg.jpg')"
         >
-            <div class="container">
-                <h1 class="page-title">My Orders<span>History</span></h1>
-            </div>
-            <!-- End .container -->
+          <div class="container">
+            <h1 class="page-title">My Orders</h1>
+          </div>
         </div>
-        <nav aria-label="breadcrumb" class="breadcrumb-nav">
-            <div class="container">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a th:href="@{/}">Home</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        My Orders
-                    </li>
-                </ol>
-            </div>
-        </nav>
+
         <div class="page-content">
-                <div class="container">
-                <!-- Orders List -->
-                <div th:if="${orders != null and orders.content.size() > 0}">
-                            <div class="row">
-                        <div class="col-lg-12">
-                            <h2 class="text-center mb-4">Your Order History</h2>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Order Number</th>
-                                            <th>Order Date</th>
-                                            <th>Status</th>
-                                            <th>Total Amount</th>
-                                            <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                        <tr th:each="order : ${orders.content}">
-                                            <td th:text="${order.orderNumber}">ORD-123456</td>
-                                            <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
-                                            <td>
-                                                <span th:class="|badge ${order.status.name() == 'PENDING' ? 'badge-warning' : 
-                                                                      order.status.name() == 'CONFIRMED' ? 'badge-info' :
-                                                                      order.status.name() == 'SHIPPED' ? 'badge-primary' :
-                                                                      order.status.name() == 'DELIVERED' ? 'badge-success' : 'badge-danger'}|"
-                                                      th:text="${order.status.displayName}">Pending</span>
-                                                </td>
-                                            <td th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')} + ' VND'">1,000,000 VND</td>
-                                            <td>
-                                                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="icon-eye"></i> View Details
-                                                </a>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                            </div>
-
-                            <!-- Pagination -->
-                            <nav aria-label="Orders Pagination" th:if="${orders.totalElements > 0}">
-                                <ul class="pagination justify-content-center">
-                                    <!-- Previous button -->
-                                    <li class="page-item" th:classappend="${!orders.hasPrevious()} ? 'disabled'">
-                                        <a class="page-link page-link-prev"
-                                           th:href="@{/orders(page=${orders.number - 1})}"
-                                           aria-label="Previous">
-                                            <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-                                        </a>
-                                    </li>
-
-                                    <!-- Page numbers -->
-                                    <li class="page-item"
-                                        th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}"
-                                        th:classappend="${i == orders.number} ? 'active'">
-                                        <a class="page-link" th:href="@{/orders(page=${i})}" th:text="${i + 1}">1</a>
-                                    </li>
-
-                                    <!-- Next button -->
-                                    <li class="page-item" th:classappend="${!orders.hasNext()} ? 'disabled'">
-                                        <a class="page-link page-link-next"
-                                           th:href="@{/orders(page=${orders.number + 1})}"
-                                           aria-label="Next">
-                                            Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                <!-- No Orders Message -->
-                <div th:if="${orders == null or orders.content.size() == 0}" class="text-center mt-5">
-                    <div class="alert alert-info">
-                        <h4><i class="icon-info-circle"></i> No Orders Found</h4>
-                        <p>You haven't placed any orders yet. Start shopping to see your order history here.</p>
-                    </div>
-                    <a th:href="@{/products}" class="btn btn-outline-primary-2">
-                        <span>Continue Shopping</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </main>
-    <footer class="footer">
-        <div class="footer-middle">
             <div class="container">
-                <div class="row">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget widget-about">
-                            <img
-                                    src="assets/images/logo.png"
-                                    class="footer-logo"
-                                    alt="Footer Logo"
-                                    width="105"
-                                    height="25"
-                            />
-                            <p>
-                                Praesent dapibus, neque id cursus ucibus, tortor neque
-                                egestas augue, eu vulputate magna eros eu erat.
-                            </p>
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+              <i class="icon-exclamation-triangle"></i>
+              <span th:text="${error}">Error message</span>
+            </div>
 
-                            <div class="social-icons">
-                                <a
-                                        href="#"
-                                        class="social-icon"
-                                        target="_blank"
-                                        title="Facebook"
-                                ><i class="icon-facebook-f"></i
-                                ></a>
-                                <a
-                                        href="#"
-                                        class="social-icon"
-                                        target="_blank"
-                                        title="Twitter"
-                                ><i class="icon-twitter"></i
-                                ></a>
-                                <a
-                                        href="#"
-                                        class="social-icon"
-                                        target="_blank"
-                                        title="Instagram"
-                                ><i class="icon-instagram"></i
-                                ></a>
-                                <a
-                                        href="#"
-                                        class="social-icon"
-                                        target="_blank"
-                                        title="Youtube"
-                                ><i class="icon-youtube"></i
-                                ></a>
-                                <a
-                                        href="#"
-                                        class="social-icon"
-                                        target="_blank"
-                                        title="Pinterest"
-                                ><i class="icon-pinterest"></i
-                                ></a>
+            <!-- Success Message -->
+            <div th:if="${success}" class="alert alert-success" role="alert">
+              <i class="icon-check-circle"></i>
+              <span th:text="${success}">Success message</span>
+            </div>
+            
+            <!-- Orders List -->
+            <div th:if="${orders != null and orders.content.size() > 0}">
+              <div th:each="order : ${orders.content}" class="order-card">
+                <div class="order-header">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <h5 class="mb-0">
+                        <strong>Order #</strong>
+                        <span th:text="${order.orderNumber}">ORD-123456</span>
+                      </h5>
+                      <small class="text-muted">
+                        <i class="icon-calendar"></i>
+                        <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                      </small>
+                    </div>
+                    <div class="col-md-3">
+                      <span class="status-badge" 
+                            th:classappend="'status-' + ${#strings.toLowerCase(order.status)}"
+                            th:text="${order.status.getDisplayName()}">Pending</span>
                             </div>
-                            <!-- End .soial-icons -->
+                    <div class="col-md-3 text-md-right">
+                      <strong class="text-primary">
+                        <span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 0, 'POINT')}"></span> VND
+                      </strong>
+                            </div>
+                          </div>
                         </div>
-                        <!-- End .widget about-widget -->
-                    </div>
-                    <!-- End .col-sm-6 col-lg-3 -->
 
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Useful Links</h4>
-                            <!-- End .widget-title -->
+                <div class="order-body">
+                  <!-- Order Items -->
+                  <div th:each="item : ${order.orderItems}" class="order-item">
+                    <div class="row align-items-center">
+                      <div class="col-md-6">
+                        <h6 class="mb-1" th:text="${item.productName}">Product Name</h6>
+                        <small class="text-muted">
+                          <span th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 0, 'POINT')}">100,000</span> VND x 
+                          <span th:text="${item.quantity}">1</span>
+                        </small>
+                      </div>
+                      <div class="col-md-3">
+                        <span class="text-muted">Quantity: <span th:text="${item.quantity}">1</span></span>
+                  </div>
+                      <div class="col-md-3 text-md-right">
+                        <strong>
+                          <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 0, 'POINT')}"></span> VND
+                        </strong>
+            </div>
+          </div>
+        </div>
 
-                            <ul class="widget-list">
-                                <li><a href="about.html">About Molla</a></li>
-                                <li><a href="#">How to shop on Molla</a></li>
-                                <li><a href="#">FAQ</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                                <li><a href="login.html">Log in</a></li>
-                            </ul>
-                            <!-- End .widget-list -->
-                        </div>
-                        <!-- End .widget -->
-                    </div>
-                    <!-- End .col-sm-6 col-lg-3 -->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">Customer Service</h4>
-                            <!-- End .widget-title -->
-
-                            <ul class="widget-list">
-                                <li><a href="#">Payment Methods</a></li>
-                                <li><a href="#">Money-back guarantee!</a></li>
-                                <li><a href="#">Returns</a></li>
-                                <li><a href="#">Shipping</a></li>
-                                <li><a href="#">Terms and conditions</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                            </ul>
-                            <!-- End .widget-list -->
-                        </div>
-                        <!-- End .widget -->
-                    </div>
-                    <!-- End .col-sm-6 col-lg-3 -->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="widget">
-                            <h4 class="widget-title">My Account</h4>
-                            <!-- End .widget-title -->
-
-                            <ul class="widget-list">
-                                <li><a href="#">Sign In</a></li>
-                                <li><a href="cart.html">View Cart</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
-                                <li><a href="#">Help</a></li>
-                            </ul>
-                            <!-- End .widget-list -->
-                        </div>
-                        <!-- End .widget -->
-                    </div>
-                    <!-- End .col-sm-6 col-lg-3 -->
+                  <!-- Order Actions -->
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <small class="text-muted">
+                        <strong>Shipping Address:</strong><br/>
+                        <span th:text="${order.shippingAddress != null ? order.shippingAddress : 'Not specified'}">
+                          Not specified
+                        </span>
+                      </small>
+          </div>
+                    <div class="col-md-6 text-md-right">
+                      <a th:href="@{'/orders/' + ${order.id}}" class="btn btn-outline-primary btn-sm">
+                        <i class="icon-eye"></i> View Details
+                      </a>
+        </div>
+                  </div>
                 </div>
-                <!-- End .row -->
+              </div>
+
+              <!-- Pagination -->
+              <nav aria-label="Orders Pagination" th:if="${orders.totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" th:classappend="${!orders.hasPrevious()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/orders(page=${orders.number - 1})}">
+                      <i class="icon-angle-left"></i> Previous
+                    </a>
+                  </li>
+                  
+                  <li th:each="page : ${#numbers.sequence(0, orders.totalPages - 1)}"
+                      class="page-item"
+                      th:classappend="${page == orders.number} ? 'active'">
+                    <a class="page-link" th:href="@{/orders(page=${page})}" th:text="${page + 1}">1</a>
+                  </li>
+                  
+                  <li class="page-item" th:classappend="${!orders.hasNext()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/orders(page=${orders.number + 1})}">
+                      Next <i class="icon-angle-right"></i>
+                    </a>
+                  </li>
+                  </ul>
+              </nav>
+              </div>
+
+            <!-- Empty Orders -->
+            <div th:if="${orders == null or orders.content.size() == 0}" class="empty-orders">
+              <i class="icon-shopping-bag"></i>
+              <h4>No Orders Found</h4>
+              <p>You haven't placed any orders yet.</p>
+              <a th:href="@{/}" class="btn btn-primary">
+                <i class="icon-shopping-cart"></i> Start Shopping
+              </a>
             </div>
-            <!-- End .container -->
+          </div>
         </div>
-        <!-- End .footer-middle -->
+      </main>
 
-        <div class="footer-bottom">
-            <div class="container">
-                <p class="footer-copyright">
-                    Copyright © 2019 Molla Store. All Rights Reserved.
-                </p>
-                <!-- End .footer-copyright -->
-                <figure class="footer-payments">
-                    <img
-                            src="assets/images/payments.png"
-                            alt="Payment methods"
-                            width="272"
-                            height="20"
-                    />
-                </figure>
-                <!-- End .footer-payments -->
-            </div>
-            <!-- End .container -->
+      <footer class="footer text-center">
+          <div class="container">
+          <p class="mb-0">&copy; 2025 Your Store</p>
         </div>
-        <!-- End .footer-bottom -->
-    </footer>
+      </footer>
+    </div>
 
-</div>
-<button
-        id="scroll-top"
-        title="Back to Top"
->
-    <i class="icon-arrow-up"></i>
-</button>
-
-
-<script th:src="@{/assets/js/jquery.min.js}"></script>
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
-<script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>
-<script th:src="@{/assets/js/superfish.min.js}"></script>
-<script th:src="@{/assets/js/owl.carousel.min.js}"></script>
-<!-- Main JS File -->
-<script th:src="@{/assets/js/main.js}"></script>
-</body>
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+  </body>
 </html>

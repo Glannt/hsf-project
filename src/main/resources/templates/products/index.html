@@ -79,24 +79,14 @@
                         </form>
                     </div>
                     <div class="header-dropdown-link">
-                        <div class="account">
-                            <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="icon-user"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <div class="dropdown-custom-header">
-                                    <span th:if="${isLogin}" th:text="${user.username}">User</span>
-                                    <span th:unless="${isLogin}">Guest</span>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a th:if="${isLogin}" th:href="@{/user/dashboard}" class="dropdown-item">Dashboard</a>
-                                <a th:if="${isLogin}" th:href="@{/orders}" class="dropdown-item">My Orders</a>
-                                <a th:if="${isLogin}" th:href="@{/cart}" class="dropdown-item">Cart</a>
-                                <a th:if="${!isLogin}" th:href="@{/login}" class="dropdown-item">Login</a>
-                                <form th:action="@{/logout}" method="post" style="display:inline;">
-                                    <button type="submit" class="dropdown-item" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
-                                </form>
-                            </div>
+                        <div th:unless="${isLogin}">
+                            <a th:href="@{/login}" class="btn login-btn">Login</a>
+                        </div>
+                        <div th:if="${isLogin}">
+                            <span class="btn login-btn" th:text="${user.username}"></span>
+                            <form th:action="@{/logout}" method="post" style="display:inline;">
+                                <button type="submit" class="btn login-btn">Logout</button>
+                            </form>
                         </div>
                         <a th:if="${isLogin}" th:href="@{/cart}" class="wishlist-link">
                             <i class="icon-heart-o"></i>

@@ -2,6 +2,7 @@ package com.hsf.hsfproject.controller.admin;
 
 import com.hsf.hsfproject.constants.enums.OrderStatus;
 import com.hsf.hsfproject.dtos.request.CreatePCRequest;
+import com.hsf.hsfproject.dtos.request.UpdateUserRoleRequest;
 import com.hsf.hsfproject.model.Category;
 import com.hsf.hsfproject.model.ComputerItem;
 import com.hsf.hsfproject.model.Order;
@@ -68,6 +69,25 @@ public class AdminController {
         return "admin/product";
     }
 
+    @GetMapping("/product/add-pc")
+    public String showAddPcForm(Model model, Principal principal) {
+        addUserToModel(model, principal);
+        List<Category> categories = productService.getAllCategories();
+        model.addAttribute("pc", new PC());
+        model.addAttribute("categories", categories);
+        model.addAttribute("computerItemsSelect", productService.getComputerItems());
+        return "admin/add-pc";
+    }
+
+    @GetMapping("/product/add-item")
+    public String showAddItemForm(Model model, Principal principal) {
+        addUserToModel(model, principal);
+        List<Category> categories = productService.getAllCategories();
+        model.addAttribute("computerItem", new ComputerItem());
+        model.addAttribute("categories", categories);
+        return "admin/add-item";
+    }
+
     @GetMapping("")
     public String adminDashboard(Model model, Principal principal,
                                 @RequestParam(name = "userPage", defaultValue = "0") int userPage,
@@ -102,11 +122,15 @@ public class AdminController {
 
 //    Computer Item
     @PostMapping("/product/item/save")
-    public String addComputerItem(@ModelAttribute ComputerItem item,Model model) {
-        System.out.println("Adding item: " + item.getName());
-        ComputerItem newItem = productService.addComputerItem(item);
-        model.addAttribute("message", "Item added successfully: " + newItem.getName());
-        return "redirect:/admin/product";
+    public String addComputerItem(@ModelAttribute ComputerItem item, Model model) {
+        try {
+            System.out.println("Adding item: " + item.getName());
+            ComputerItem newItem = productService.addComputerItem(item);
+            return "redirect:/admin/product?success=item_added&message=" + newItem.getName();
+        } catch (Exception e) {
+            System.out.println("Error adding item: " + e.getMessage());
+            return "redirect:/admin/product/add-item?error=item_add_failed&message=" + e.getMessage();
+        }
     }
 
     @PostMapping("/product/item/edit/{id}")
@@ -126,13 +150,26 @@ public class AdminController {
 //    PC
     @PostMapping("/product/pc/save")
     public String addNewPC(@ModelAttribute PC item, Model model) {
-        System.out.println("Adding item: " + item.getComputerItems());
-       for (ComputerItem computerItem : item.getComputerItems()) {
-            System.out.println("Computer Item: " + computerItem.getName());
+        try {
+            System.out.println("Adding PC: " + item.getName());
+            if (item.getComputerItems() != null) {
+                for (ComputerItem computerItem : item.getComputerItems()) {
+                    System.out.println("Computer Item: " + computerItem.getName());
+                }
+            }
+            // Assuming productService.addPc() returns the newly created PC
+            PC newItem = productService.addPc(item);
+            return "redirect:/admin/product?success=pc_added&message=" + newItem.getName();
+        } catch (Exception e) {
+            System.out.println("Error adding PC: " + e.getMessage());
+            return "redirect:/admin/product/add-pc?error=pc_add_failed&message=" + e.getMessage();
         }
-        // Assuming productService.addPc() returns the newly created PC
-        PC newItem = productService.addPc(item);
-        model.addAttribute("message", "Item added successfully: " + newItem.getName());
+    }
+
+    @PostMapping("/product/pc/edit/{id}")
+    public String editPC(@ModelAttribute PC pc, Model model) {
+        System.out.println("Editing PC: " + pc.getName());
+        PC updatedPc = productService.updatePc(pc);
         return "redirect:/admin/product";
     }
 
@@ -170,6 +207,42 @@ public class AdminController {
             return "Order status updated successfully";
         } catch (Exception e) {
             return "Error updating order status: " + e.getMessage();
+        }
+    }
+
+    // User Management endpoints
+    @GetMapping("/users")
+    public String adminUsers(Model model, Principal principal,
+                            @RequestParam(name = "page", defaultValue = "0") int page) {
+        addUserToModel(model, principal);
+        
+        // Lấy danh sách tất cả users với pagination
+        Page<User> users = userService.getUsers(PageRequest.of(page, 10));
+        model.addAttribute("users", users);
+        
+        return "admin/users";
+    }
+
+    @PutMapping("/api/users/{userId}/role")
+    @ResponseBody
+    public String updateUserRole(@PathVariable UUID userId, 
+                                @RequestBody UpdateUserRoleRequest request) {
+        try {
+            userService.updateUserRole(userId, request.getRoleName());
+            return "User role updated successfully";
+        } catch (Exception e) {
+            return "Error updating user role: " + e.getMessage();
+        }
+    }
+
+    @DeleteMapping("/api/users/{userId}")
+    @ResponseBody
+    public String deleteUserApi(@PathVariable UUID userId) {
+        try {
+            userService.deleteUser(userId);
+            return "User deleted successfully";
+        } catch (Exception e) {
+            return "Error deleting user: " + e.getMessage();
         }
     }
 

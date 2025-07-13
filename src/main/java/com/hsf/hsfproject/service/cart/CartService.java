@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Iterator;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class CartService implements ICartService {
                 existingPC.setQuantity(existingPC.getQuantity() + request.getQuantity());
                 existingPC.setSubtotal(existingPC.getUnitPrice() * existingPC.getQuantity());
                 cartItemRepository.save(existingPC);
-                updateCart(cart, pcOpt.get().getPrice() * request.getQuantity());
+                updateCart(cart, 0.0); // Recalculate total
                 return existingPC;
             }
             return addPCToCart(cart, pcOpt.get(), request.getQuantity());
@@ -61,7 +63,7 @@ public class CartService implements ICartService {
                 existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
                 existingItem.setSubtotal(existingItem.getUnitPrice() * existingItem.getQuantity());
                 cartItemRepository.save(existingItem);
-                updateCart(cart, itemOpt.get().getPrice() * request.getQuantity());
+                updateCart(cart, 0.0); // Recalculate total
                 return existingItem;
             }
             return addComputerItemToCart(cart, itemOpt.get(), request.getQuantity());
@@ -75,15 +77,12 @@ public class CartService implements ICartService {
         CartItem cartItem = cartItemRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
-        double oldPrice = 0.0;
-        oldPrice = cartItem.getUnitPrice() * cartItem.getQuantity();
         cartItem.setQuantity(newQuantity);
-        double newPrice = cartItem.getUnitPrice() * newQuantity;
-        updateCart(cartItem.getCart(), newPrice - oldPrice);
-
-
+        cartItem.setSubtotal(cartItem.getUnitPrice() * newQuantity);
         cartItemRepository.save(cartItem);
-
+        
+        // Recalculate cart total
+        updateCart(cartItem.getCart(), 0.0); // 0.0 is ignored, total is recalculated
     }
 
     @Override
@@ -103,27 +102,33 @@ public class CartService implements ICartService {
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
         Cart cart = cartItem.getCart();
-        double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
-
         cartItemRepository.delete(cartItem);
-        updateCart(cart, -priceToRemove);
+        updateCart(cart, 0.0); // Recalculate total
     }
     
     @Override
+    @Transactional
     public void removeFromCart(String username, UUID itemId) {
+        System.out.println("===> Service: removeFromCart, username: " + username + ", itemId: " + itemId);
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
-        
         // Verify the cart item belongs to the user
         if (!cartItem.getCart().getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException("Cart item does not belong to user");
         }
-
         Cart cart = cartItem.getCart();
-        double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
-
+        
+        // Remove from database first
         cartItemRepository.delete(cartItem);
-        updateCart(cart, -priceToRemove);
+        
+        // Then remove from cart's set
+        if (cart.getCartItems() != null) {
+            cart.getCartItems().removeIf(item -> item.getId().equals(itemId));
+        }
+        
+        // Save cart and recalculate total
+        cartRepository.save(cart);
+        updateCart(cart, 0.0); // Recalculate total
     }
     
     @Override
@@ -137,17 +142,19 @@ public class CartService implements ICartService {
         if (quantity <= 0) {
             // Remove item if quantity is zero or less
             Cart cart = cartItem.getCart();
-            double priceToRemove = cartItem.getUnitPrice() * cartItem.getQuantity();
+            if (cart.getCartItems() != null) {
+                cart.getCartItems().remove(cartItem);
+            }
+            cartItem.setCart(null);
             cartItemRepository.delete(cartItem);
-            updateCart(cart, -priceToRemove);
+            updateCart(cart, 0.0); // Recalculate total
+            cartRepository.save(cart);
             return;
         }
-        double oldPrice = cartItem.getUnitPrice() * cartItem.getQuantity();
         cartItem.setQuantity(quantity);
         cartItem.setSubtotal(cartItem.getUnitPrice() * quantity);
-        double newPrice = cartItem.getUnitPrice() * quantity;
         cartItemRepository.save(cartItem);
-        updateCart(cartItem.getCart(), newPrice - oldPrice);
+        updateCart(cartItem.getCart(), 0.0); // Recalculate total
     }
 
     public void clearCart(UUID userId) {
@@ -158,6 +165,20 @@ public class CartService implements ICartService {
             cart.setItemCount(0);
             cartRepository.save(cart);
         }
+    }
+
+    public Cart getCartById(UUID cartId) {
+        return cartRepository.findById(cartId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found with ID: " + cartId));
+    }
+    
+    /**
+     * Recalculate cart total price from all cart items
+     * This method can be used to fix cart total inconsistencies
+     */
+    public void recalculateCartTotal(UUID cartId) {
+        Cart cart = getCartById(cartId);
+        updateCart(cart, 0.0); // 0.0 is ignored, total is recalculated
     }
 
     private CartItem addPCToCart(Cart cart, PC pc, int quantity) {
@@ -171,8 +192,7 @@ public class CartService implements ICartService {
                 .build();
 
         cartItemRepository.save(cartItem);
-        double price = pc.getPrice() * quantity;
-        updateCart(cart, price);
+        updateCart(cart, 0.0); // Recalculate total
         return cartItem;
     }
 
@@ -187,14 +207,21 @@ public class CartService implements ICartService {
                 .build();
 
         cartItemRepository.save(cartItem);
-        double price = item.getPrice() * quantity;
-        updateCart(cart, price);
+        updateCart(cart, 0.0); // Recalculate total
         return cartItem;
     }
 
     private void updateCart(Cart cart, double addedPrice) {
-        Double currentTotal = cart.getTotalPrice() != null ? cart.getTotalPrice() : 0.0;
-        cart.setTotalPrice(currentTotal + addedPrice);
+        // Recalculate total price from database to ensure accuracy
+        double totalPrice = 0.0;
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+        if (cartItems != null) {
+            for (CartItem item : cartItems) {
+                totalPrice += item.getUnitPrice() * item.getQuantity();
+            }
+        }
+        cart.setTotalPrice(totalPrice);
+        
         Long count = cartItemRepository.countCartItemsByCartId(cart.getId());
         cart.setItemCount(count.intValue());
         cartRepository.save(cart);

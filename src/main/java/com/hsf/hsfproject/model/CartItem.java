@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Table(name = "cart_items")
 @Entity
@@ -42,4 +43,16 @@ public class CartItem extends BaseEntity {
     @JsonBackReference
     private PC pc;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CartItem cartItem = (CartItem) o;
+        return this.getId() != null && this.getId().equals(cartItem.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

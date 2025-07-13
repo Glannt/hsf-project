@@ -52,6 +52,25 @@ public class ManagerController {
         return "manager/products";
     }
 
+    @GetMapping("/products/add-pc")
+    public String showAddPcForm(Model model, Principal principal) {
+        addUserToModel(model, principal);
+        List<Category> categories = productService.getAllCategories();
+        model.addAttribute("pc", new PC());
+        model.addAttribute("categories", categories);
+        model.addAttribute("computerItemsSelect", productService.getComputerItems());
+        return "manager/add-pc";
+    }
+
+    @GetMapping("/products/add-item")
+    public String showAddItemForm(Model model, Principal principal) {
+        addUserToModel(model, principal);
+        List<Category> categories = productService.getAllCategories();
+        model.addAttribute("computerItem", new ComputerItem());
+        model.addAttribute("categories", categories);
+        return "manager/add-item";
+    }
+
     // Computer Item Management
     @PostMapping("/products/item/save")
     public String addComputerItem(@ModelAttribute ComputerItem item, Model model) {
@@ -59,10 +78,10 @@ public class ManagerController {
             log.info("Adding computer item: {}", item.getName());
             ComputerItem newItem = productService.addComputerItem(item);
             log.info("Successfully added computer item: {}", newItem.getName());
-            return "redirect:/manager/products?success=item_added";
+            return "redirect:/manager/products?success=item_added&message=" + newItem.getName();
         } catch (Exception e) {
             log.error("Error adding computer item: {}", e.getMessage());
-            return "redirect:/manager/products?error=item_add_failed&message=" + e.getMessage();
+            return "redirect:/manager/products/add-item?error=item_add_failed&message=" + e.getMessage();
         }
     }
 
@@ -100,10 +119,10 @@ public class ManagerController {
             log.info("Adding PC: {}", pc.getName());
             PC newPc = productService.addPc(pc);
             log.info("Successfully added PC: {}", newPc.getName());
-            return "redirect:/manager/products?success=pc_added";
+            return "redirect:/manager/products?success=pc_added&message=" + newPc.getName();
         } catch (Exception e) {
             log.error("Error adding PC: {}", e.getMessage());
-            return "redirect:/manager/products?error=pc_add_failed&message=" + e.getMessage();
+            return "redirect:/manager/products/add-pc?error=pc_add_failed&message=" + e.getMessage();
         }
     }
 

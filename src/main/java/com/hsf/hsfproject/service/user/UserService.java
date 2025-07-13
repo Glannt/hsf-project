@@ -105,4 +105,17 @@ public class UserService implements IUserService {
     public long count() {
         return userRepository.count();
     }
+
+    @Override
+    public void updateUserRole(UUID userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        
+        user.setRole(role);
+        userRepository.save(user);
+        log.info("Role updated for user: {} to role: {}", user.getUsername(), roleName);
+    }
 }

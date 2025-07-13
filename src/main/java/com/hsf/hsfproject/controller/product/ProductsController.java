@@ -25,17 +25,6 @@ public class ProductsController {
     private final IProductService productService;
     private final IUserService userService;
 
-    private void addUserToModel(Model model, Principal principal) {
-        if (principal != null && !model.containsAttribute("user")) {
-            User user = userService.findByUsername(principal.getName());
-            model.addAttribute("user", user);
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("isLogin", true);
-        } else {
-            model.addAttribute("isLogin", false);
-        }
-    }
-
     @GetMapping
     public String showAllProducts(
             Model model,
@@ -44,14 +33,12 @@ public class ProductsController {
             @RequestParam(name = "computerItemPage", defaultValue = "0") int computerItemPage) {
         
         log.info("Products page accessed by: {}", principal != null ? principal.getName() : "Anonymous");
-        addUserToModel(model, principal);
-        
         Page<PC> pcList = productService.getPcList(pcPage, 6);
         Page<ComputerItem> computerItems = productService.getComputerItemList(computerItemPage, 6);
         
         model.addAttribute("pcs", pcList);
         model.addAttribute("computerItems", computerItems);
         
-        return "product/index";
+        return "products/index";
     }
 } 

@@ -1,13 +1,16 @@
 spring:
   application:
     name: HSF-Project
-
   datasource:
     url: jdbc:mysql://localhost:3306/hsf_project?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  #  datasource:
+  #    url: jdbc:sqlserver://localhost:1433;databaseName=SMK22;encrypt=false;trustServerCertificate=true
+  #    username: sa
+  #    password: 12345
+  #    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,11 +18,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  #  hibernate:
+  #    dialect: org.hibernate.dialect.SQLServerDialect
 
-  web:
-    resources:
-      static-locations: classpath:/static/
-
+  # XAMPP default MySQL user is 'root' with no password. Adjust 'username' and 'password' if you have changed them.
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -33,6 +35,13 @@ vnp:
   hash-secret: J593OQSIWKX1D2BFO2BQ7UJIA1GTWNWQ
   return-url: http://localhost:3000/vn-pay/callback
 
+stripe:
+  secret:
+    key:
+  public:
+    key:
+  webhook:
+    key:
 logging:
   level:
     root: INFO
@@ -43,5 +52,5 @@ logging:
 # Data Seeder Configuration
 app:
   data-seeder:
-    enabled: false  # Set to true to enable data seeding
+    enabled: true  # Set to true to enable data seeding
 

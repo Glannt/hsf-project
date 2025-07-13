@@ -20,26 +20,8 @@
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
                     <h5 class="card-title">Quản lý User</h5>
-                    <p class="card-text">Xem, thêm, sửa, xoá tài khoản người dùng.</p>
+                    <p class="card-text">Xem, thêm, sửa, xoá tài khoản người dùng, quản trị viên, quản lý.</p>
                     <a th:href="@{/admin/users}" class="btn btn-primary btn-block">Tới trang User</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Quản lý Admin</h5>
-                    <p class="card-text">Quản lý tài khoản quản trị viên.</p>
-                    <a th:href="@{/admin/users(role='ADMIN')}" class="btn btn-primary btn-block">Tới trang Admin</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Quản lý Manager</h5>
-                    <p class="card-text">Quản lý tài khoản quản lý.</p>
-                    <a th:href="@{/admin/users(role='MANAGER')}" class="btn btn-primary btn-block">Tới trang Manager</a>
                 </div>
             </div>
         </div>
@@ -57,7 +39,7 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">Quản lý Đơn hàng</h5>
                     <p class="card-text">Xem và cập nhật trạng thái đơn hàng.</p>
-                    <a th:href="@{/orders/admin}" class="btn btn-primary btn-block">Tới trang Đơn hàng</a>
+                    <a th:href="@{/admin/orders}" class="btn btn-primary btn-block">Tới trang Đơn hàng</a>
                 </div>
             </div>
         </div>

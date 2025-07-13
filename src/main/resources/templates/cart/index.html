@@ -1,106 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Your Cart</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
-        .cart-table {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
-        }
-        .table-cart th, .table-cart td {
-            vertical-align: middle !important;
-            text-align: center;
-            font-size: 1rem;
-        }
-        .product-col {
-            min-width: 220px;
-            text-align: left;
-        }
-        .product-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-        .product-image-container {
-            width: 60px;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        .quantity-input {
-            width: 80px;
-            text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            padding: 6px;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .quantity-input:focus {
-            border-color: #c96;
-            outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25);
-        }
-        .btn-remove {
-            background: #ff4d4f;
-            border: none;
-            color: #fff;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            margin: 0 auto;
-        }
-        .btn-remove:hover {
-            background: #d32f2f;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(255,77,79,0.15);
-        }
         .cart-summary {
-            background: #f8f9fa;
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid #dee2e6;
-            margin-top: 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+              0 1.5px 4px rgba(0, 0, 0, 0.08);
+            padding: 24px 24px 18px 24px;
+            margin-top: 24px;
+            margin-bottom: 24px;
         }
         .cart-summary h4 {
+            font-size: 1.8rem;
             font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .cart-summary p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e67e22;
             margin-bottom: 18px;
         }
-        .btn-primary, .btn-outline-primary {
-            font-weight: 600;
-            font-size: 1rem;
+        .btn-outline-primary-2,
+        .btn-primary {
             border-radius: 8px;
-            padding: 10px 24px;
+            font-weight: 600;
+            padding: 10px 18px;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+        .btn-danger {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .table-cart {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            font-size: 1.18rem;
+        }
+        .table-cart th,
+        .table-cart td {
+            vertical-align: middle !important;
+            padding: 22px 18px;
+            font-size: 1.8rem;
+        }
+        .table-cart th {
+            background: #f8f9fa;
+            font-size: 1.8rem;
+            font-weight: 800;
+            border-bottom: 2.5px solid #e9ecef;
+            letter-spacing: 0.5px;
+        }
+        .table-cart td {
+            font-size: 1.8rem;
+        }
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+        .form-control[type="number"] {
+            border-radius: 8px;
+            width: 90px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        .main {
+            background: #f5f6fa;
+            min-height: 80vh;
+            padding-top: 32px;
+            padding-bottom: 32px;
+        }
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .btn-block {
+            width: 100%;
+        }
+        .cart .container {
+            padding-top: 24px;
+            padding-bottom: 24px;
+        }
+        .footer {
+            margin-top: 32px;
+            background: #fff;
+            border-top: 1px solid #e9ecef;
+            padding: 18px 0;
+            border-radius: 0 0 16px 16px;
+        }
+        .icon-shopping-cart {
+            font-size: 1.5rem;
+            color: #e67e22;
+            margin-left: 8px;
+        }
+        .btn-danger.btn-sm {
+            font-size: 1.8rem;
+            padding: 8px 18px;
+        }
+        .text-center,
+        .text-md-center {
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+        .cart-empty-message {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 32px;
+            margin-bottom: 18px;
+            color: #e67e22;
+        }
+        .btn-continue-shopping {
+            font-size: 1.15rem;
+            font-weight: 600;
+            padding: 12px 32px;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto 32px auto;
         }
     </style>
 </head>
-
 <body>
 <div class="page-wrapper">
     <header class="header">
-        <!-- Tùy bạn giữ lại hoặc rút gọn -->
         <div class="header-middle sticky-header">
             <div class="container">
                 <div class="header-left">
                     <a href="/" class="logo">
-                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
                     </a>
                     <nav class="main-nav">
                         <ul class="menu sf-arrows">
-                            <li><a th:href="@{/}">Home</a></li>
-                            <li><a th:href="@{/products}">Shop</a></li>
+                            <li><a th:href="@{/products}">Product</a></li>
+                            <li th:if="${isLogin}"><a th:href="@{/transaction}">Transaction History</a></li>
+                            <li th:if="${isLogin}">
+                                <form th:action="@{/logout}" method="post" style="display:inline;">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="btn btn-link" style="padding:0; color:inherit; background:none; border:none;">Logout</button>
+                                </form>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -117,100 +165,82 @@
                 <h1 class="page-title">Shopping Cart</h1>
             </div>
         </div>
-
         <div class="page-content">
             <div class="cart">
                 <div class="container">
-                    <div th:if="${#lists.isEmpty(cart.cartItems)}">
-                        <div class="text-center py-5">
-                            <h3>Your cart is empty.</h3>
-                            <p class="text-muted">Add some products to your cart to get started.</p>
-                            <a th:href="@{/products}" class="btn btn-primary">Continue Shopping</a>
-                        </div>
+                    <!-- Debug lỗi nếu cart hoặc cartItems bị null -->
+                    <div th:if="${cart == null}">
+                        <p style="color:red; font-weight:bold;">LỖI: Cart is null!</p>
+                    </div>
+                    <div th:if="${cart != null and cart.cartItems == null}">
+                        <p style="color:red; font-weight:bold;">LỖI: cart.cartItems is null!</p>
                     </div>
 
-                    <div th:unless="${#lists.isEmpty(cart.cartItems)}">
-                        <!-- Update Cart Form -->
-                        <form th:action="@{/cart/update}" method="post" id="updateCartForm">
-                            <div class="cart-table">
-                                <table class="table table-cart table-mobile">
-                                    <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Price (VND)</th>
-                                        <th>Quality</th>
-                                        <th>Total</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="item : ${cart.cartItems}">
-                                        <td class="product-col">
-                                            <figure class="product-image-container">
-                                                <a href="product.html" class="product-image">
-                                                    <img th:src="@{/assets/images/products/product-1.jpg}" alt="product">
-                                                </a>
-                                            </figure>
-                                            <div>
-                                                <h2 class="product-title">
-                                                    <a th:href="@{/product/{id}(id=${item.computerItem != null ? item.computerItem.id : item.pc.id})}" 
-                                                       th:text="${item.computerItem != null ? item.computerItem.name : item.pc.name}">Product Name</a>
-                                                </h2>
-                                            </div>
-                                        </td>
-                                        <td class="price-col"><span th:text="${#numbers.formatDecimal(item.computerItem != null ? item.computerItem.price : item.pc.price, 1, 'COMMA', 2, 'POINT')}"></span> VND</td>
-                                        <td class="quantity-col">
-                                            <div class="product-details-quantity">
-                                                <input type="number" th:value="${item.quantity}" min="1" max="10" 
-                                                       class="form-control quantity-input" 
-                                                       th:data-item-id="${item.id}"
-                                                       name="quantities"
-                                                       oninput="updateTotalPrice(this)" 
-                                                       onblur="updateCartItemQuantityFromData(this)">
-                                            </div>
-                                        </td>
-                                        <td class="total-col"><span th:text="${#numbers.formatDecimal((item.computerItem != null ? item.computerItem.price : item.pc.price) * item.quantity, 1, 'COMMA', 2, 'POINT')}"></span> VND</td>
-                                        <td class="remove-col">
-                                            <button type="button" class="btn-remove" 
-                                                    th:data-item-id="${item.id}"
-                                                    onclick="removeCartItemFromData(this)">
-                                                <i class="icon-close"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div th:if="${cart != null and cart.itemCount == 0}">
+                        <p class="cart-empty-message">Your cart is empty.</p>
+                        <a th:href="@{/products}" class="btn btn-outline-primary-2 btn-continue-shopping">Continue Shopping</a>
+                    </div>
 
-                            <div class="row mt-4">
+                    <div th:if="${cart != null and cart.itemCount > 0}">
+                        <!-- Update Cart Form -->
+                        <form th:action="@{/cart/user/cart/update}" method="post" id="updateCartForm">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <table class="table table-cart table-mobile">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price (VND)</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${cart.cartItems}">
+                                    <td class="product-col">
+                                        <div class="product">
+                                            <h3 class="product-title" th:text="${item.computerItem != null ? item.computerItem.name : item.pc.name}">Product Name</h3>
+                                        </div>
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger((item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
+                                    <td>
+                                        <input class="form-control" type="number" name="quantities" th:value="${item.quantity}" min="1" style="width: 80px" />
+                                        <input type="hidden" name="itemIds" th:value="${item.id}" />
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(item.quantity * (item.computerItem != null ? item.computerItem.price : item.pc.price), 0, 'POINT')}">0</td>
+                                    <td>
+                                        <!-- Remove button with onclick to submit separate form -->
+                                        <button type="button" class="btn btn-danger btn-sm remove-btn" th:attr="data-id=${item.id}">Remove</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
                                 <div class="col-lg-4 offset-lg-8">
                                     <div class="cart-summary">
-                                        <h4>Cart Summary</h4>
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <span>Total Items:</span>
-                                            <span th:text="${cart.itemCount}">0</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <strong>Total Amount:</strong>
-                                            <strong th:text="${cart.totalPrice != null ? #numbers.formatInteger(cart.totalPrice, 0, 'POINT') + ' VND' : '0 VND'}">0 VND</strong>
-                                        </div>
+                                        <h4>Total:</h4>
+                                        <p th:text="${#numbers.formatInteger(cart.totalPrice, 0, 'POINT') + ' VND'}">0 VND</p>
+                                        <button type="submit" class="btn btn-outline-primary-2 btn-block">Update Cart</button>
                                     </div>
                                 </div>
                             </div>
                         </form>
                         
-                        <!-- Checkout Form - Separate from update form -->
-                        <div class="row mt-3">
+                        <!-- Hidden form for remove action -->
+                        <form th:action="@{/cart/user/cart/remove}" method="post" id="removeForm" style="display:none;">
+                            <input type="hidden" name="cartItemId" id="removeCartItemId" />
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        </form>
+                        
+                        <!-- Checkout Form (separate, not nested) -->
+                        <div class="row">
                             <div class="col-lg-4 offset-lg-8">
-                                <form th:action="@{/order}" method="post">
+                                <form th:action="@{/orders}" method="post" style="margin-top: 10px">
                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                     <input type="hidden" name="cartId" th:value="${cart.id}" />
                                     <input type="hidden" name="userId" th:value="${user.id}" />
-                                    <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>
                                 </form>
-                                <div class="mt-2">
-                                    <a th:href="@{/orders}" class="btn btn-outline-secondary btn-block">View My Orders</a>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -218,118 +248,24 @@
             </div>
         </div>
     </main>
-
     <footer class="footer text-center">
         <div class="container">
             <p class="mb-0">&copy; 2025 Your Store</p>
         </div>
     </footer>
 </div>
-
 <script th:src="@{/assets/js/jquery.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/js/main.js}"></script>
 <script th:inline="javascript">
-    let isUpdatingQuantity = false;
-    // Function to update cart item quantity from data attribute
-    function updateCartItemQuantityFromData(input) {
-        if (isUpdatingQuantity) return;
-        isUpdatingQuantity = true;
-        const itemId = input.getAttribute('data-item-id');
-        const quantity = input.value;
-        
-        const formData = new FormData();
-        formData.append('itemId', itemId);
-        formData.append('quantity', quantity);
-        
-        // Lấy CSRF token và header name từ meta tag
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-        fetch('/cart/update-quantity', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                [csrfHeader]: csrfToken
-            }
-        })
-        .then(response => {
-            isUpdatingQuantity = false;
-            if (response.ok) {
-                window.location.reload(); // Reload to update totals
-            } else {
-                alert('Failed to update quantity');
-            }
-        })
-        .catch(error => {
-            isUpdatingQuantity = false;
-            console.error('Error:', error);
-            alert('An error occurred while updating quantity');
-        });
-    }
-    
-    // Function to remove cart item from data attribute
-    function removeCartItemFromData(button) {
-        if (isUpdatingQuantity) {
-            alert('Please wait for quantity update to finish before removing item.');
-            return;
-        }
-        const itemId = button.getAttribute('data-item-id');
-        if (confirm('Are you sure you want to remove this item from cart?')) {
-            const formData = new FormData();
-            formData.append('itemId', itemId);
-
-            // Lấy CSRF token và header name từ meta tag
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-            fetch('/cart/remove', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    [csrfHeader]: csrfToken
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".remove-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                var cartItemId = this.getAttribute("data-id");
+                if (confirm('Are you sure you want to remove this item from your cart?')) {
+                    document.getElementById('removeCartItemId').value = cartItemId;
+                    document.getElementById('removeForm').submit();
                 }
-            })
-            .then(response => {
-                if (response.ok) {
-                    const row = button.closest('tr');
-                    row.remove();
-                    window.location.reload();
-                } else {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Failed to remove item');
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while removing item: ' + error.message);
-            });
-        }
-    }
-    
-    // Function to update total price when quantity changes
-    function updateTotalPrice(input) {
-        const row = input.closest('tr');
-        const priceElement = row.querySelector('.price-col span');
-        const totalElement = row.querySelector('.total-col span');
-        const quantity = parseInt(input.value) || 0;
-        const price = parseFloat(priceElement.textContent.replace(/[^\d.]/g, '')) || 0;
-        const total = quantity * price;
-        // Format total with commas and 2 decimal places
-        totalElement.textContent = total.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-    
-    // Add event listeners for quantity inputs
-    document.addEventListener('DOMContentLoaded', function() {
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                updateTotalPrice(this);
             });
         });
     });

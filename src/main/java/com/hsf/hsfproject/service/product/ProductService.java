@@ -68,6 +68,35 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public PC updatePc(PC request) {
+        PC existingPc = pcRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalArgumentException("PC not found"));
+        
+        // Kiểm tra tên PC đã tồn tại (trừ PC hiện tại)
+        PC pcWithSameName = pcRepository.findByName(request.getName());
+        if (pcWithSameName != null && !pcWithSameName.getId().equals(request.getId())) {
+            throw new IllegalArgumentException("PC with name " + request.getName() + " already exists");
+        }
+        
+        // Cập nhật thông tin
+        existingPc.setName(request.getName());
+        if (request.getDescription() != null) {
+            existingPc.setDescription(request.getDescription());
+        }
+        if (request.getComputerItems() != null && !request.getComputerItems().isEmpty()) {
+            existingPc.setComputerItems(request.getComputerItems());
+            // Tính lại giá dựa trên các linh kiện
+            Double price = request.getComputerItems().stream()
+                    .map(ComputerItem::getPrice)
+                    .reduce(0.0, Double::sum);
+            existingPc.setPrice(price);
+        }
+        
+        pcRepository.save(existingPc);
+        return existingPc;
+    }
+
+    @Override
     public ComputerItem addComputerItem(ComputerItem computerItem) {
         ComputerItem existingItem = computerItemRepository.findByName(computerItem.getName());
         if (existingItem != null) {
@@ -117,29 +146,35 @@ public class ProductService implements IProductService {
     public ComputerItem updateComputerItem(ComputerItem computerItem) {
         ComputerItem existingItem = computerItemRepository.findById(computerItem.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Computer item not found"));
-        if( existingItem.getName() != null && !existingItem.getName().equals(computerItem.getName())) {
+        
+        // Kiểm tra tên sản phẩm đã tồn tại (trừ sản phẩm hiện tại)
+        ComputerItem itemWithSameName = computerItemRepository.findByName(computerItem.getName());
+        if (itemWithSameName != null && !itemWithSameName.getId().equals(computerItem.getId())) {
             throw new IllegalArgumentException("Computer item with name " + computerItem.getName() + " already exists");
         }
+        
+        // Cập nhật thông tin
         existingItem.setName(computerItem.getName());
-        if( computerItem.getPrice() != null) {
+        if (computerItem.getPrice() != null) {
             existingItem.setPrice(computerItem.getPrice());
         }
-        if( computerItem.getDescription() != null) {
+        if (computerItem.getDescription() != null) {
             existingItem.setDescription(computerItem.getDescription());
         }
-        if( computerItem.getBrand() != null) {
+        if (computerItem.getBrand() != null) {
             existingItem.setBrand(computerItem.getBrand());
         }
-        if( computerItem.getModel() != null) {
+        if (computerItem.getModel() != null) {
             existingItem.setModel(computerItem.getModel());
         }
-        if( computerItem.getCategory() != null) {
+        if (computerItem.getCategory() != null) {
             Category category = categoryRepository.findById(computerItem.getCategory().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Category not found"));
             existingItem.setCategory(category);
         }
+        
         computerItemRepository.save(existingItem);
-        return computerItem;
+        return existingItem;
     }
 
     @Override

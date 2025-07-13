@@ -93,7 +93,7 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/manager/**").hasAuthority("ROLE_MANAGER")
                         .requestMatchers("/cart/**").hasAuthority("ROLE_USER")
                         .requestMatchers("/user/cart/**").hasAuthority("ROLE_USER")
-                        .requestMatchers("/orders/admin").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                        .requestMatchers("/orders/management").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
                         .requestMatchers("/orders/**").hasAuthority("ROLE_USER")
                         .requestMatchers("/debug", "/debug-user", "/user/debug-auth", "/health").permitAll()  // Allow debug endpoints
                         
@@ -117,7 +117,7 @@ public class WebSecurityConfiguration {
                 // JWT configuration for API endpoints
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authenticationProvider(applicationConfiguration.authenticationProvider())
-                // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         ;
         return http.build();
     }

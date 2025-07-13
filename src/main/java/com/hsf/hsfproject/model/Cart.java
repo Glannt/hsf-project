@@ -27,7 +27,7 @@ public class Cart extends BaseEntity {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 //    @JoinColumn(name = "cart_id")
     private Set<CartItem> cartItems;
 

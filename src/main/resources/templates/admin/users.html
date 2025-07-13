@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management - Admin</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <style>
+        .user-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e67e22;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .role-user { background: #e3f2fd; color: #1976d2; }
+        .role-manager { background: #fff3e0; color: #f57c00; }
+        .role-admin { background: #fce4ec; color: #c2185b; }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <a href="/admin" class="logo">
+                            <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25">
+                        </a>
+                        <nav class="main-nav">
+                            <ul class="menu sf-arrows">
+                                <li><a th:href="@{/admin}">Dashboard</a></li>
+                                <li><a th:href="@{/admin/product}">Products</a></li>
+                                <li><a th:href="@{/admin/orders}">Orders</a></li>
+                                <li><a th:href="@{/admin/users}" class="active">Users</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="header-right">
+                        <span th:if="${isLogin}" th:text="${user.username}"></span>
+                        <form th:action="@{/logout}" method="post" style="display:inline;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-outline-primary-2">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">User Management</h1>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="container">
+                    <!-- Statistics -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${totalUsers}">0</div>
+                                <div>Total Users</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="stats-number" th:text="${totalRegularUsers}">0</div>
+                                <div>Regular Users</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <div class="stats-number" th:text="${totalManagers}">0</div>
+                                <div>Managers</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                <div class="stats-number" th:text="${totalAdmins}">0</div>
+                                <div>Admins</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User List -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="user-card">
+                                <h3 class="mb-4">User List</h3>
+                                
+                                <div th:if="${users.content.isEmpty()}" class="text-center py-5">
+                                    <p class="text-muted">No users found.</p>
+                                </div>
+                                
+                                <div th:each="user : ${users.content}" class="user-item border-bottom py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2">
+                                            <div class="user-avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">
+                                                U
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h6 class="mb-1" th:text="${user.username}">Username</h6>
+                                            <small class="text-muted" th:text="${user.email}">email@example.com</small>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <span th:class="${'role-badge ' + 
+                                                (user.role.name == 'ROLE_ADMIN' ? 'role-admin' : 
+                                                user.role.name == 'ROLE_MANAGER' ? 'role-manager' : 'role-user')}"
+                                                  th:text="${user.role.name.replace('ROLE_', '')}">
+                                                USER
+                                            </span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted">
+                                                Phone: <span th:text="${user.phoneNumber != null ? user.phoneNumber : 'N/A'}">N/A</span>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-primary btn-sm edit-role-btn" th:attr="data-id=${user.id},data-role=${user.role.name}">Edit Role</button>
+                                                <button class="btn btn-outline-danger btn-sm delete-user-btn" th:attr="data-id=${user.id},data-username=${user.username}">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container" th:if="${users.totalPages > 1}">
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${users.first ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/users(page=${users.number - 1})}">Previous</a>
+                                </li>
+                                
+                                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, users.totalPages - 1)}"
+                                    th:classappend="${pageNum == users.number ? 'active' : ''}">
+                                    <a class="page-link" th:href="@{/admin/users(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${users.last ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/users(page=${users.number + 1})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Edit Role Modal -->
+        <div class="modal fade" id="editRoleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit User Role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editRoleForm">
+                            <div class="mb-3">
+                                <label for="newRole" class="form-label">New Role</label>
+                                <select class="form-select" id="newRole" name="roleName" required>
+                                    <option value="ROLE_USER">USER</option>
+                                    <option value="ROLE_MANAGER">MANAGER</option>
+                                    <option value="ROLE_ADMIN">ADMIN</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveUserRole()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script th:inline="javascript">
+        let currentUserId = null;
+        
+        function editUserRole(userId, currentRole) {
+            currentUserId = userId;
+            document.getElementById('newRole').value = currentRole;
+            new bootstrap.Modal(document.getElementById('editRoleModal')).show();
+        }
+        
+        function saveUserRole() {
+            const newRole = document.getElementById('newRole').value;
+            
+            fetch(`/api/admin/users/${currentUserId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    roleName: newRole
+                })
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result);
+                if (result.includes('successfully')) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating user role');
+            });
+        }
+        
+        function deleteUser(userId, username) {
+            if (confirm(`Are you sure you want to delete user "${username}"?`)) {
+                fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.text())
+                .then(result => {
+                    alert(result);
+                    if (result.includes('successfully')) {
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting user');
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.edit-role-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    editUserRole(this.getAttribute('data-id'), this.getAttribute('data-role'));
+                });
+            });
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteUser(this.getAttribute('data-id'), this.getAttribute('data-username'));
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

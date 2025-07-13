@@ -12,6 +12,7 @@ public interface IProductService {
     Page<PC> getPcList(int page, int limit);
     Page<ComputerItem> getComputerItemList(int page, int limit);
     PC addPc(PC pc);
+    PC updatePc(PC pc);
     ComputerItem addComputerItem(ComputerItem computerItem);
     Object getProduct(UUID id);
     PC findPcById(UUID id);
