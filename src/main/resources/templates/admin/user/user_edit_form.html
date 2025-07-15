@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa thông tin người dùng</title>
+</head>
+<body>
+<h2>✏️ Sửa thông tin người dùng</h2>
+
+<form th:action="@{/admin/users/update}" method="post">
+    <input type="hidden" name="id" th:value="${uuidView}" />
+
+    <label>Username:</label>
+    <input type="text" name="username" th:value="${user.username}" required />
+
+    <label>Email:</label>
+    <input type="email" name="email" th:value="${user.email}" required />
+
+    <label>Phone:</label>
+    <input type="text" name="phoneNumber" th:value="${user.phoneNumber}" />
+
+    <label>Password (để trống nếu không đổi):</label>
+    <input type="password" name="password" />
+
+
+    <button type="submit">Lưu</button>
+</form>
+</body>
+</html>

@@ -126,6 +126,8 @@
                 <li th:if="${user != null}">
                   <a th:href="@{/transaction}">Transaction History</a>
                 </li>
+                <li th:if="${user != null and user.role.name == 'ROLE_ADMIN'}"> <a th:href="@{/admin/users}">👤 Quản lý người dùng</a>
+                </li>         
                 <li th:if="${user != null}">
                   <a th:href="@{/logout}">Logout</a>
                 </li>

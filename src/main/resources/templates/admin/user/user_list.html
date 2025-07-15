@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* CSS tùy chỉnh để giao diện đẹp hơn */
+        body {
+            background-color: #f8f9fa;
+        }
+        .table-actions {
+            white-space: nowrap; /* Ngăn các nút xuống dòng */
+            width: 1%; /* Giúp cột chiếm độ rộng tối thiểu */
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📋 Quản lý người dùng</h2>
+        <a href="/admin/users/create" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Thêm mới
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Tài khoản</th>
+                <th scope="col">Email</th>
+                <th scope="col">Vai trò</th>
+                <th scope="col" class="text-center">Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${users != null and !users.empty}">
+                <tr th:each="user : ${users.content}">
+                    <th scope="row" th:text="${user.id}"></th>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td>
+                        <span class="badge bg-secondary" th:text="${user.role.name}"></span>
+                    </td>
+                    <td class="text-center table-actions">
+                        <a th:if="${user.id != null}" th:href="@{'/admin/users/edit/' + ${user.id}}" class="btn btn-sm btn-warning me-2">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <a th:href="@{'/admin/users/delete/' + ${user.id}}" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                            <i class="fas fa-trash"></i> Xoá
+                        </a>
+                    </td>
+                </tr>
+            </th:block>
+            <tr th:if="${users == null or users.empty}">
+                <td colspan="5" class="text-center text-muted">Không có dữ liệu người dùng.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

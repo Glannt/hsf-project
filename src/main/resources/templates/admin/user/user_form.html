@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Tạo user</title></head>
+<body>
+<h2>➕ Tạo tài khoản mới</h2>
+<form th:action="@{/admin/users/create}" th:object="${user}" method="post">
+    <label>Username:</label><input type="text" th:field="*{username}" required><br>
+    <label>Email:</label><input type="email" th:field="*{email}" required><br>
+    <label>Password:</label><input type="password" th:field="*{password}" required><br>
+    <label>Phone:</label><input type="text" th:field="*{phoneNumber}" required><br>
+    <button type="submit">Tạo mới</button>
+</form>
+</body>
+</html>
