@@ -5,34 +5,28 @@ const formTemplates = {
     html: `
       <div class="mb-3">
         <label class="form-label fw-bold">Tên sản phẩm</label>
-        <input type="text" name="name" class="form-control form-control-lg rounded-3 fs-4" required>
+        <input type="text" name="name" class="form-control form-control-lg rounded-3 fs-3" required>
       </div>
       <div class="mb-3">
         <label class="form-label fw-bold">Loại linh kiện</label>
-        <select name="category.id" class="form-select form-select-lg rounded-3 fs-4" required id="create-category">
+        <select name="category.id" class="form-select form-select-lg rounded-3 fs-3" required id="create-category">
           <option value="" disabled selected>-- Chọn loại --</option>
         </select>
       </div>
       <div class="mb-3">
-        <label for="pc-computer-items" class="form-label fw-bold mb-2">Chọn linh kiện</label>
-        <select name="pc-computer-items" id="pc-computer-items" class="form-select rounded-3" multiple required size="8" style="min-height: 180px;"></select>
-        <small class="form-text text-muted mt-2">
-          Giữ <kbd>Ctrl</kbd> (hoặc <kbd>Cmd</kbd>) để chọn nhiều linh kiện.
-        </small>
+        <label for="pc-computer-items-list" class="form-label fw-bold mb-2">Chọn linh kiện</label>
+        <div id="pc-computer-items-list" class="row g-2"></div>
       </div>
       <div class="mb-3">
-        <label class="form-label fw-bold">Linh kiện đã chọn:</label>
-        <ul id="pc-selected-list" class="list-group small mb-2"></ul>
-        <div><strong>Tổng giá:</strong> <span id="pc-total-price" class="text-primary">0</span> VND</div>
+        <label class="form-label fw-bold fs-3">Linh kiện đã chọn:</label>
+        <ul id="pc-selected-list" class="list-group mb-2 fs-2"></ul>
+        <div class="fs-1"><strong>Tổng giá:</strong> <span id="pc-total-price" class="text-primary">0</span> VND</div>
       </div>
       <div id="pc-selected-hidden-inputs"></div>
+
       <div class="mb-3">
-        <label class="form-label fw-bold">Giá</label>
-        <input type="number" name="price" id="pc-price" class="form-control form-control-lg rounded-3 fs-4" readonly>
-      </div>
-      <div class="mb-3">
-        <label class="form-label fw-bold">Hình ảnh URL</label>
-        <input type="text" name="imageUrl" class="form-control form-control-lg rounded-3 fs-4">
+        <label class="form-label fw-bold fs-3">Hình ảnh URL</label>
+        <input type="text" name="imageUrl" class="form-control form-control-lg rounded-3 fs-3">
       </div>
     `,
   },
@@ -96,58 +90,67 @@ function openCreateProductModal(type) {
   }
 
   if (type === "pc") {
-    const itemSelect = document.getElementById("pc-computer-items");
-    const priceInput = document.getElementById("pc-price");
+    const itemsListDiv = document.getElementById("pc-computer-items-list");
     const priceDisplay = document.getElementById("pc-total-price");
     const selectedList = document.getElementById("pc-selected-list");
+    const allItemsMap = new Map();
+    const selectedIds = new Set();
 
-    const allItemsMap = new Map(); // Mọi item từng load
-    const selectedIds = new Set(); // Các ID được chọn
-
-    // Khi đổi category
     catSelect.addEventListener("change", () => {
       const selectedCategoryId = catSelect.value;
       const category = window.categories.find(
         (c) => String(c.id) === selectedCategoryId
       );
       const newItems = category?.computerItems || [];
-
-      // Lưu vào map
+      allItemsMap.clear();
       newItems.forEach((ci) => allItemsMap.set(String(ci.id), ci));
 
-      // Hiển thị lại select với chỉ item thuộc category
-      itemSelect.innerHTML = newItems
-        .map((ci) => {
-          const selected = selectedIds.has(String(ci.id)) ? "selected" : "";
-          return `<option value="${ci.id}" data-price="${ci.price}" ${selected}>
-                  ${ci.name} (${Number(ci.price).toLocaleString("vi-VN")} VND)
-                </option>`;
-        })
-        .join("");
+      // Hiển thị danh sách checkbox
+      itemsListDiv.innerHTML = newItems.length
+        ? newItems
+            .map(
+              (ci, idx) => `
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ci-${
+                  ci.id
+                }" value="${ci.id}" data-price="${ci.price}">
+                <label class="form-check-label" for="ci-${ci.id}">
+                  ${ci.name} <span class="text-muted">(${Number(
+                ci.price
+              ).toLocaleString("vi-VN")} VND)</span>
+                </label>
+              </div>
+            </div>
+          `
+            )
+            .join("")
+        : '<div class="text-muted">Không có linh kiện nào cho loại này.</div>';
 
-      // Cập nhật UI
+      // Reset selected
+      selectedIds.clear();
       updateSelectedDisplay(
         selectedIds,
         allItemsMap,
-        priceInput,
         priceDisplay,
         selectedList
       );
-    });
 
-    // Khi chọn item từ select
-    itemSelect.addEventListener("change", () => {
-      Array.from(itemSelect.options).forEach((opt) => {
-        if (opt.selected) selectedIds.add(opt.value);
-        else selectedIds.delete(opt.value);
+      // Gán sự kiện cho checkbox
+      Array.from(
+        itemsListDiv.querySelectorAll('input[type="checkbox"]')
+      ).forEach((cb) => {
+        cb.addEventListener("change", function () {
+          if (this.checked) selectedIds.add(this.value);
+          else selectedIds.delete(this.value);
+          updateSelectedDisplay(
+            selectedIds,
+            allItemsMap,
+            priceDisplay,
+            selectedList
+          );
+        });
       });
-      updateSelectedDisplay(
-        selectedIds,
-        allItemsMap,
-        priceInput,
-        priceDisplay,
-        selectedList
-      );
     });
   }
 
@@ -158,7 +161,6 @@ function openCreateProductModal(type) {
 function updateSelectedDisplay(
   selectedIds,
   allItemsMap,
-  priceInput,
   priceDisplay,
   selectedList
 ) {
@@ -181,7 +183,6 @@ function updateSelectedDisplay(
     }
   });
 
-  priceInput.value = total;
   priceDisplay.textContent = total.toLocaleString("vi-VN");
   selectedList.innerHTML = selectedHTML.join("");
 

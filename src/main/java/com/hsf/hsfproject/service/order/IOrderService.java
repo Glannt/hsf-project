@@ -5,6 +5,9 @@ import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.model.Order;
 
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
 
 public interface IOrderService {
 
@@ -25,4 +28,8 @@ public interface IOrderService {
     Order saveOrder(Order order);
 
     Order findOrderByOrderNumber(String orderNumber);
+
+    Page<Order> getOrderList(int page, int limit);
+
+    Order updateOrderStatus(UUID orderId, String status);
 }

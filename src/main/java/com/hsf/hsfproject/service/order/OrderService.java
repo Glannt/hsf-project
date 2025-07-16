@@ -5,12 +5,19 @@ import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.mapper.Mapper;
 import com.hsf.hsfproject.model.*;
 import com.hsf.hsfproject.repository.*;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -140,5 +147,24 @@ public class OrderService implements IOrderService {
     public Order findOrderByOrderNumber(String orderNumber) {
         return orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + orderNumber));
+    }
+
+    @Override
+    public Page<Order> getOrderList(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Order> result = orderRepository.findAll(pageable);
+        return result;
+    }
+
+    @Override
+    public Order updateOrderStatus(UUID orderId, String status){
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            throw new EntityNotFoundException("Order not found with id: " + orderId);
+        }
+        Order order = optionalOrder.get();
+        order.setStatus(status);
+        orderRepository.save(order);
+        return order;
     }
 }

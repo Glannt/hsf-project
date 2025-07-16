@@ -1,88 +1,74 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Product Page</title>
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
-</head>
-<body class="bg-light">
-<div class="container mt-4">
-    <h2 class="text-primary mb-4">Quản lý Sản phẩm</h2>
-
-    <!-- Table PC -->
-    <div class="table-container">
-        <h4 class="text-info">Danh sách PC</h4>
-        <table class="table table-bordered table-hover table-light">
-            <thead class="table-info">
-            <tr>
-                <th>ID</th>
-                <th>Tên</th>
-                <th>Giá (VND)</th>
-                <th>Hành động</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="pc : ${pcs.content}">
-                <td th:text="${pc.id}"></td>
-                <td th:text="${pc.name}"></td>
-                <td th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"></td>
-                <td>
-                    <a th:href="@{'/admin/product/pc/' + ${pc.id}}" class="btn btn-sm btn-info">Xem</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <!-- PC pagination -->
-        <nav th:if="${pcs.totalPages > 1}">
-            <ul class="pagination">
-                <li th:each="page : ${#numbers.sequence(0, pcs.totalPages - 1)}"
-                    class="page-item"
-                    th:classappend="${page == pcs.number} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{'/product?(pcPage=' + ${page} + '&computerItemPage=' + ${computerItems.number} + ')'}"
-                       th:text="${page + 1}">1</a>
-                </li>
-            </ul>
-        </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Admin</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-primary">Chào mừng admin</h1>
+        <p class="lead text-secondary">
+          Quản lý hệ thống dễ dàng với các chức năng chính bên dưới
+        </p>
+      </div>
+      <div class="row justify-content-center g-4">
+        <!-- Card: Đơn hàng -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <a th:href="@{/admin/order}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0 hover-shadow transition">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="bi bi-bag-check display-4 text-info"></i>
+                </div>
+                <h5 class="card-title text-dark">Quản lý Đơn hàng</h5>
+                <p class="card-text text-secondary">
+                  Xem, duyệt và quản lý các đơn hàng của khách hàng.
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <!-- Card: Sản phẩm -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <a th:href="@{/admin/product}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0 hover-shadow transition">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="bi bi-box-seam display-4 text-success"></i>
+                </div>
+                <h5 class="card-title text-dark">Quản lý Sản phẩm</h5>
+                <p class="card-text text-secondary">
+                  Thêm, sửa, xóa và quản lý danh mục sản phẩm.
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <!-- Card: Người dùng -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <a th:href="@{/admin/user}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0 hover-shadow transition">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="bi bi-people display-4 text-warning"></i>
+                </div>
+                <h5 class="card-title text-dark">Quản lý Người dùng</h5>
+                <p class="card-text text-secondary">
+                  Xem và quản lý thông tin tài khoản người dùng.
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
-
-    <!-- Table ComputerItem -->
-    <div class="table-container">
-        <h4 class="text-info">Danh sách Linh kiện</h4>
-        <table class="table table-bordered table-hover table-light">
-            <thead class="table-info">
-            <tr>
-                <th>ID</th>
-                <th>Tên</th>
-                <th>Giá (VND)</th>
-                <th>Hành động</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${computerItems.content}">
-                <td th:text="${item.id}"></td>
-                <td th:text="${item.name}"></td>
-                <td th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"></td>
-                <td>
-                    <a th:href="@{'/admin/product/item/' + ${item.id}}" class="btn btn-sm btn-info">Xem</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <!-- ComputerItem pagination -->
-        <nav th:if="${computerItems.totalPages > 1}">
-            <ul class="pagination">
-                <li th:each="page : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
-                    class="page-item"
-                    th:classappend="${page == computerItems.number} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{'/product?(pcPage=' + ${pcs.number} + '&computerItemPage=' + ${page} + ')'}"
-                       th:text="${page + 1}">1</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-</body>
+    <!-- Bootstrap Icons CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+  </body>
 </html>
