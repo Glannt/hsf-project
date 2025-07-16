@@ -161,3 +161,214 @@
 .sidebar-link-icon {
   font-size: 2rem;
 }
+.modern-card {
+  box-shadow: 0 6px 32px rgba(23, 162, 184, 0.13),
+    0 1.5px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+  margin-bottom: 2.5rem;
+  background: #fff;
+}
+.modern-card .card-header {
+  background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-top-left-radius: 1.25rem;
+  border-top-right-radius: 1.25rem;
+  padding: 1.5rem 2rem 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modern-card .card-header .header-title {
+  flex: 1;
+  text-align: center;
+}
+.modern-card .card-header .header-action {
+  flex-shrink: 0;
+}
+.modern-card .card-body {
+  padding: 2.5rem 2rem 2rem 2rem;
+}
+.modern-table {
+  font-size: 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(23, 162, 184, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.modern-table th,
+.modern-table td {
+  padding: 1.25rem 1rem;
+  vertical-align: middle;
+  text-align: center;
+  border-bottom: 1.5px solid #e0e0e0;
+}
+.modern-table thead th {
+  background: linear-gradient(90deg, #17a2b8 60%, #138496 100%) !important;
+  color: #fff !important;
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border: none;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.1);
+}
+.modern-table tbody tr {
+  background: #f8f9fa;
+  transition: background 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+}
+.modern-table tbody tr:hover {
+  background: #e0f7fa !important;
+  box-shadow: 0 2px 12px rgba(23, 162, 184, 0.13);
+  z-index: 2;
+}
+.modern-table tbody tr.active,
+.modern-table tbody tr.selected {
+  background: #b2ebf2 !important;
+  font-weight: 600;
+  color: #138496;
+}
+.modern-table .table-empty-row {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  background: #f8f9fa;
+  font-size: 1.25rem;
+}
+.modern-table .table-empty-row i {
+  color: #b0bec5;
+  margin-bottom: 4px;
+}
+.modern-btn {
+  border-radius: 50px !important;
+  font-size: 1.75rem !important;
+  padding: 0.25rem 0.7rem !important;
+  margin: 0 0.12rem !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.08);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.modern-btn:hover {
+  transform: scale(1.13);
+  box-shadow: 0 4px 16px rgba(23, 162, 184, 0.16);
+}
+/* Modal UI/UX improvements */
+.modal-content {
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 40px rgba(23, 162, 184, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none;
+}
+.modal-header {
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  border-top-left-radius: 1.5rem !important;
+  border-top-right-radius: 1.5rem !important;
+  background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(23, 162, 184, 0.1);
+}
+.modal-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.modal-body {
+  padding: 2.5rem 2.5rem 2rem 2.5rem !important;
+}
+.modal-footer {
+  padding: 1.5rem 2.5rem 1.5rem 2.5rem !important;
+  border-bottom-left-radius: 1.5rem !important;
+  border-bottom-right-radius: 1.5rem !important;
+}
+.modal .form-label {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #138496;
+  margin-bottom: 0.5rem;
+}
+.modal .form-control,
+.modal .form-select {
+  font-size: 1.15rem;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.1rem;
+  margin-bottom: 1.2rem;
+}
+.modal .form-check {
+  font-size: 1.4rem;
+  background: #f8f9fa;
+  border-radius: 0.7rem;
+  border: 1.5px solid #e0e0e0;
+  padding: 0.7rem 1.8rem;
+  margin-bottom: 0.7rem;
+  transition: box-shadow 0.15s, border 0.15s;
+  box-shadow: 0 1px 4px rgba(23, 162, 184, 0.06);
+}
+.modal .form-check:hover {
+  border: 1.5px solid #17a2b8;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.13);
+  background: #e0f7fa;
+}
+.modal .form-check-input:checked {
+  background-color: #17a2b8;
+  border-color: #138496;
+}
+.modal .form-check-label {
+  margin-left: 1rem;
+  font-size: 1.4rem;
+  color: #222;
+  font-weight: 500;
+}
+.modal .list-group-item {
+  border-radius: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+.modal .btn {
+  font-size: 1.15rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 2rem;
+}
+.modal .form-check-input {
+  padding-right: 1.5rem;
+  /* margin-left: 0; */
+  transform: scale(1.25);
+}
+@media (max-width: 768px) {
+  .modern-card .card-header {
+    font-size: 1.2rem;
+    padding: 1rem 0.5rem;
+  }
+  .modern-card .card-body {
+    padding: 1rem 0.2rem;
+  }
+  .modern-table th,
+  .modern-table td {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.98rem;
+  }
+  .modern-table {
+    font-size: 1.05rem;
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem 0.5rem !important;
+  }
+  .modal-title {
+    font-size: 1.3rem;
+  }
+}
+.modal-content,
+.modal .modal-body,
+.modal .modal-header,
+.modal .modal-footer {
+  font-size: 1.25rem;
+}
+.modal .form-check-label span.text-muted {
+  font-size: 1.08rem !important;
+}

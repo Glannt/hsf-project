@@ -3,8 +3,10 @@ package com.hsf.hsfproject.controller.admin;
 import com.hsf.hsfproject.dtos.request.CreatePCRequest;
 import com.hsf.hsfproject.model.Category;
 import com.hsf.hsfproject.model.ComputerItem;
+import com.hsf.hsfproject.model.Order;
 import com.hsf.hsfproject.model.PC;
 import com.hsf.hsfproject.model.User;
+import com.hsf.hsfproject.service.order.IOrderService;
 import com.hsf.hsfproject.service.product.IProductService;
 import com.hsf.hsfproject.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class AdminController {
 
     private final IUserService userService;
     private final IProductService productService;
+    private final IOrderService orderService;
     public void addUserToModel(Model model, Principal principal) {
         if (principal != null && !model.containsAttribute("user")) {
             User user = userService.findByUsername(principal.getName());
@@ -100,5 +103,23 @@ public class AdminController {
         return "redirect:/admin/product";
     }
 
+    @GetMapping("/order")
+    public String adminOrder(Model model,
+                                 @RequestParam(name = "orderPage", defaultValue = "0") int orderPage,
+                                 Principal principal) {
+        addUserToModel(model,principal);
+        Page<Order> orders = orderService.getOrderList(orderPage, 2);
+        model.addAttribute("orders", orders);
+        return "admin/order";
+    }
 
+    @PostMapping("/order/{orderId}")
+    public String updateOrderStatus(
+    @PathVariable UUID orderId,
+    @RequestParam("status") String status
+    ){
+        orderService.updateOrderStatus(orderId ,status);
+        return "redirect:/admin/order";
+    }
+    
 }
