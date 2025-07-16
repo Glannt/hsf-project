@@ -387,6 +387,7 @@
               </div>
             </div>
           </div>
+          <!-- Modal Order detail -->
           <div th:each="order : ${orders != null ? orders.content : {}}">
             <div
               class="modal fade"
@@ -394,20 +395,19 @@
               tabindex="-1"
               aria-hidden="true"
             >
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                   <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Order Detail</h5>
                     <button
                       type="button"
-                      class="close"
-                      data-dismiss="modal"
+                      class="btn-close btn-close-white"
+                      data-bs-dismiss="modal"
                       aria-label="Close"
-                    >
-                      <span aria-hidden="true">&times;</span>
-                    </button>
+                    ></button>
                   </div>
                   <div class="modal-body">
+                    <!-- Thông tin đơn hàng -->
                     <div class="mb-3">
                       <p>
                         <strong>Order Number:</strong>
@@ -418,67 +418,86 @@
                         <span th:text="${order.user.username}"></span>
                       </p>
                       <p>
-                        <strong>Current Status:</strong>
+                        <strong>Status:</strong>
                         <span
-                          th:class="|badge ${order.status == 'PENDING' ? 'badge-warning' : order.status == 'CONFIRMED' ? 'badge-info' : order.status == 'SHIPPED' ? 'badge-primary' : order.status == 'DELIVERED' ? 'badge-success' : 'badge-danger'}|"
+                          th:class="|badge ${order.status == 'PENDING' ? 'bg-warning text-dark' : order.status == 'CONFIRMED' ? 'bg-info text-dark' : order.status == 'SHIPPED' ? 'bg-primary' : order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger'}|"
                           th:text="${order.status}"
                         ></span>
                       </p>
+                      <p>
+                        <strong>Total Price:</strong>
+                        <span
+                          th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')}"
+                        ></span>
+                        VND
+                      </p>
+                      <p>
+                        <strong>Shipping Address:</strong>
+                        <span th:text="${order.shippingAddress}"></span>
+                      </p>
                     </div>
+                    <!-- Danh sách sản phẩm trong đơn -->
+                    <div>
+                      <h6 class="fw-bold mb-2">Order Items</h6>
+                      <div
+                        th:if="${order.orderItems != null and #lists.size(order.orderItems) > 0}"
+                      >
+                        <div class="table-responsive">
+                          <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                              <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr
+                                th:each="item, iterStat : ${order.orderItems}"
+                              >
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${item.productName}"></td>
+                                <td>
+                                  <span th:if="${item.computerItem != null}"
+                                    >Computer Item</span
+                                  >
+                                  <span th:if="${item.pc != null}">PC</span>
+                                </td>
+                                <td
+                                  th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}"
+                                ></td>
+                                <td th:text="${item.quantity}"></td>
+                                <td
+                                  th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}"
+                                ></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      <div
+                        th:if="${order.orderItems == null or #lists.size(order.orderItems) == 0}"
+                        class="text-muted"
+                      >
+                        No items in this order.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Order Detail Modal (client-side only) - moved to be direct child of body -->
-    <div
-      class="modal fade"
-      id="orderDetailModal"
-      tabindex="-1"
-      aria-labelledby="orderDetailModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header bg-info text-white">
-            <h5 class="modal-title" id="orderDetailModalLabel">
-              Chi tiết đơn hàng
-            </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Đóng"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <strong>Mã đơn:</strong> <span id="modal-order-number"></span>
-            </div>
-            <div class="mb-3">
-              <strong>Khách hàng:</strong> <span id="modal-order-user"></span>
-            </div>
-            <div class="mb-3">
-              <strong>Trạng thái:</strong>
-              <span id="modal-order-status" class="badge"></span>
-            </div>
-            <div class="mb-3">
-              <strong>Tổng tiền:</strong>
-              <span id="modal-order-total"></span> VND
-            </div>
-            <!-- Nếu muốn hiển thị thêm chi tiết, có thể bổ sung ở đây -->
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Đóng
-            </button>
           </div>
         </div>
       </div>

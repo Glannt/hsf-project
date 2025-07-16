@@ -254,7 +254,7 @@
             <div class="list-group list-group-flush mx-3 mt-4">
               <a
                 href="/admin/product"
-                class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
+                class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active"
               >
                 <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i
                 ><span class="sidebar-link-text">Sản phẩm</span>
@@ -640,7 +640,7 @@
                   <button
                     type="button"
                     class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
+                    data-dismiss="modal"
                     aria-label="Đóng"
                   ></button>
                 </div>
@@ -651,7 +651,7 @@
                   <button
                     type="button"
                     class="btn btn-secondary btn-lg px-4"
-                    data-bs-dismiss="modal"
+                    data-dismiss="modal"
                   >
                     Huỷ
                   </button>
@@ -810,7 +810,7 @@
                   <button
                     type="button"
                     class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
+                    data-dismiss="modal"
                     aria-label="Đóng"
                   ></button>
                 </div>
@@ -821,7 +821,7 @@
                   <button
                     type="button"
                     class="btn btn-secondary btn-lg px-4"
-                    data-bs-dismiss="modal"
+                    data-dismiss="modal"
                   >
                     Huỷ
                   </button>
@@ -837,9 +837,9 @@
     </div>
     <script th:inline="javascript">
       /*<![CDATA[*/
-      window.computerItems = [[${computerItems.content}]];
-      window.pcs = [[${pcs.content}]];
-      window.categories = [[${categories}]];
+      window.computerItems = /*[[${computerItems.content}]]*/ [];
+      window.pcs = /*[[${pcs.content}]]*/ [];
+      window.categories = /*[[${categories}]]*/ [];
       /*]]>*/
     </script>
     <script th:src="@{/assets/js/edit-product.js}"></script>
