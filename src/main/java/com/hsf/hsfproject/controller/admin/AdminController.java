@@ -33,6 +33,15 @@ public class AdminController {
             model.addAttribute("isLogin", false);
         }
     }
+
+    @GetMapping
+    public String adminDashboard(Model model, Principal principal){
+        addUserToModel(model, principal);
+
+        return "admin/index";
+    }
+
+
     @GetMapping("/product")
     public String adminProduct(Model model,
                                  @RequestParam(name = "pcPage", defaultValue = "0") int pcPage,
