@@ -5,6 +5,7 @@ import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.model.Order;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IOrderService {
 
@@ -25,4 +26,6 @@ public interface IOrderService {
     Order saveOrder(Order order);
 
     Order findOrderByOrderNumber(String orderNumber);
+
+    Order findById(UUID orderId);
 }

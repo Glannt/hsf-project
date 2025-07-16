@@ -1,21 +1,15 @@
 package com.hsf.hsfproject.common;
 
-import com.hsf.hsfproject.model.Cart;
-import com.hsf.hsfproject.model.Category;
-import com.hsf.hsfproject.model.ComputerItem;
-import com.hsf.hsfproject.model.PC;
-import com.hsf.hsfproject.model.Role;
-import com.hsf.hsfproject.model.User;
-import com.hsf.hsfproject.repository.CategoryRepository;
-import com.hsf.hsfproject.repository.ComputerItemRepository;
-import com.hsf.hsfproject.repository.PCRepository;
-import com.hsf.hsfproject.repository.RoleRepository;
+import com.hsf.hsfproject.model.*;
+import com.hsf.hsfproject.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Add this import
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -25,6 +19,9 @@ public class InitApp {
     private final PCRepository pcRepository;
     private final RoleRepository roleRepository;
     private final ComputerItemRepository computerItemRepository;
+    private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
+
     @Bean
     CommandLineRunner initRoles(RoleRepository roleRepository) {
         return args -> {
@@ -38,10 +35,11 @@ public class InitApp {
             }
         };
     }
+
     @Bean
     CommandLineRunner initComputerItems(ComputerItemRepository computerItemRepository) {
         return args -> {
-            if(categoryRepository.count() != 0) {
+            if (categoryRepository.count() != 0) {
                 if (computerItemRepository.count() == 0) {
                     List<ComputerItem> items = List.of(
                             ComputerItem.builder()
@@ -135,7 +133,8 @@ public class InitApp {
             }
         };
     }
-//    @Bean
+
+    //    @Bean
 //    CommandLineRunner initPCs(PCRepository pcRepository) {
 //        return args -> {
 //            if (pcRepository.count() == 0) {
@@ -153,46 +152,102 @@ public class InitApp {
 //        };
 //    }
     @Bean
-CommandLineRunner initUsers(RoleRepository roleRepository, com.hsf.hsfproject.repository.UserRepository userRepository, com.hsf.hsfproject.repository.CartRepository cartRepository) {
-    return args -> {
-        if (userRepository.count() == 0) {
-            Role userRole = roleRepository.findByName("ROLE_USER");
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(); // Declare and initialize
+    CommandLineRunner initUsers(RoleRepository roleRepository,
+                                UserRepository userRepository,
+                                CartRepository cartRepository) {
+        return args -> {
+            if (userRepository.count() == 0) {
+                Role userRole = roleRepository.findByName("ROLE_USER");
+                Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+                if (userRole != null && adminRole != null) {
+                    Cart userCart = new Cart();
+                    Cart adminCart = new Cart();
+                    cartRepository.save(userCart);
+                    cartRepository.save(adminCart);
 
-            if (userRole != null && adminRole != null) {
-                // Tạo giỏ hàng cho từng user
-                Cart userCart = new Cart();
-                Cart adminCart = new Cart();
-                cartRepository.save(userCart);
-                cartRepository.save(adminCart);
+                    User user = User.builder()
+                            .username("user1")
+                            .email("user1@example.com")
+                            .password(encoder.encode("123"))
+                            .phoneNumber("0909123456")
+                            .role(userRole)
+                            .cart(userCart)
+                            .build();
 
-                // Tạo user thường
-                User user = User.builder()
-                        .username("user1")
-                        .email("user1@example.com")
-                        .password(encoder.encode("123")) // nếu chưa mã hóa
-                        .phoneNumber("0909123456")
-                        .role(userRole)
-                        .cart(userCart)
-                        .build();
+                    User admin = User.builder()
+                            .username("admin")
+                            .email("admin@example.com")
+                            .password(encoder.encode("123"))
+                            .phoneNumber("0987654321")
+                            .role(adminRole)
+                            .cart(adminCart)
+                            .build();
 
-                // Tạo admin
-                User admin = User.builder()
-                        .username("admin")
-                        .email("admin@example.com")
-                        .password(encoder.encode("123")) // nếu chưa mã hóa
-                        .phoneNumber("0987654321")
-                        .role(adminRole)
-                        .cart(adminCart)
-                        .build();
-
-                userRepository.save(user);
-                userRepository.save(admin);
+                    userRepository.save(user);
+                    userRepository.save(admin);
+                }
             }
-        }
-    };
+        };
+    }
+
+    @Bean
+    CommandLineRunner initOrders(OrderRepository orderRepository,
+                                 OrderDetailRepository orderDetailRepository,
+                                 UserRepository userRepository,
+                                 PCRepository pcRepository,
+                                 ComputerItemRepository computerItemRepository) {
+        return args -> {
+            if (orderRepository.count() == 0) {
+                User user = userRepository.findAll().stream().findFirst().orElse(null);
+                if (user == null) return;
+
+                Order order = Order.builder()
+                        .orderNumber("TEST-ORDER-001")
+                        .status("PENDING")
+                        .shippingAddress("123 Lê Văn Việt, Q.9, TP.HCM")
+                        .totalPrice(0.0)
+                        .user(user)
+                        .build();
+
+                List<OrderDetail> details = new ArrayList<>();
+                PC pc = pcRepository.findAll().stream().findFirst().orElse(null);
+                ComputerItem item = computerItemRepository.findAll().stream().findFirst().orElse(null);
+
+                double total = 0.0;
+
+                if (pc != null) {
+                    OrderDetail pcDetail = OrderDetail.builder()
+                            .order(order)
+                            .productName(pc.getName())
+                            .unitPrice(pc.getPrice())
+                            .quantity(1)
+                            .subtotal(pc.getPrice())
+                            .pc(pc)
+                            .build();
+                    details.add(pcDetail);
+                    total += pc.getPrice();
+                }
+
+                if (item != null) {
+                    OrderDetail itemDetail = OrderDetail.builder()
+                            .order(order)
+                            .productName(item.getName())
+                            .unitPrice(item.getPrice())
+                            .quantity(2)
+                            .subtotal(item.getPrice() * 2)
+                            .computerItem(item)
+                            .build();
+                    details.add(itemDetail);
+                    total += item.getPrice() * 2;
+                }
+
+                order.setOrderItems(new HashSet<>(details));
+                order.setTotalPrice(total);
+                orderRepository.save(order);
+            }
+        };
+    }
 }
 
-}

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,10 +49,28 @@ public class OrderController {
 
     // Show order confirmation page
     @GetMapping("/confirmation")
-    public String getConfirmationPage(Model model, Principal principal) {
+    public String getConfirmationPage(Model model, Principal principal, HttpSession session) {
         addUserInfo(model, principal);
+
+        Order order = (Order) session.getAttribute("pendingOrder");
+
+        if (order == null) {
+            // 👉 test tạm 1 UUID trong DB (ví dụ UUID có thật)
+            UUID fixedId = UUID.fromString("9f5e9012-aea9-4fbc-8c30-b1e6f1a0a342");
+            order = orderService.findById(fixedId); // hoặc orderRepository.findById(fixedId).orElse(null);
+            session.setAttribute("pendingOrder", order);
+        }
+
+        if (order == null) {
+            model.addAttribute("order", null);
+            return "order/confirmation";
+        }
+
+        model.addAttribute("order", order);
         return "order/confirmation";
     }
+
+
 
     // Create a new order and store it in session
     @PostMapping("/orders")

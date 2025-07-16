@@ -141,4 +141,9 @@ public class OrderService implements IOrderService {
         return orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with order number: " + orderNumber));
     }
+
+    @Override
+    public Order findById(UUID orderId) {
+        return orderRepository.getById(orderId);
+    }
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 public class BaseEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+        @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "created_at", updatable = false)
