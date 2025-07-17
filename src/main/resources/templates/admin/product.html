@@ -2,19 +2,29 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Product Management</title>
+  <title>Admin Product Page</title>
   <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
   <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
   <link rel="stylesheet" th:href="@{/assets/css/fontsize.css}" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}" />
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <link
+          rel="stylesheet"
+          th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}"
+  />
   <link rel="stylesheet" th:href="@{/assets/css/admin-product.css}" />
   <meta name="theme-color" content="#ffffff" />
-  <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml" />
+  <meta
+          name="msapplication-config"
+          content="assets/images/icons/browserconfig.xml"
+  />
   <style>
     /* Modern card shadow and spacing */
     .modern-card {
-      box-shadow: 0 6px 32px rgba(23, 162, 184, 0.13), 0 1.5px 6px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 6px 32px rgba(23, 162, 184, 0.13),
+      0 1.5px 6px rgba(0, 0, 0, 0.04);
       border-radius: 1.25rem;
       margin-bottom: 2.5rem;
       background: #fff;
@@ -47,18 +57,24 @@
       border-radius: 1rem;
       overflow: hidden;
       background: #fff;
-      box-shadow: 0 2px 16px rgba(23, 162, 184, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 16px rgba(23, 162, 184, 0.1),
+      0 1px 4px rgba(0, 0, 0, 0.04);
       border-collapse: separate;
       border-spacing: 0;
     }
-    .modern-table th, .modern-table td {
+    .modern-table th,
+    .modern-table td {
       padding: 1.25rem 1rem;
       vertical-align: middle;
       text-align: center;
       border-bottom: 1.5px solid #e0e0e0;
     }
     .modern-table thead th {
-      background: linear-gradient(90deg, #17a2b8 60%, #138496 100%) !important;
+      background: linear-gradient(
+              90deg,
+              #17a2b8 60%,
+              #138496 100%
+      ) !important;
       color: #fff !important;
       text-transform: uppercase;
       font-size: 1.25rem;
@@ -77,7 +93,8 @@
       box-shadow: 0 2px 12px rgba(23, 162, 184, 0.13);
       z-index: 2;
     }
-    .modern-table tbody tr.active, .modern-table tbody tr.selected {
+    .modern-table tbody tr.active,
+    .modern-table tbody tr.selected {
       background: #b2ebf2 !important;
       font-weight: 600;
       color: #138496;
@@ -111,7 +128,8 @@
     /* Modal UI/UX improvements */
     .modal-content {
       border-radius: 1.5rem !important;
-      box-shadow: 0 8px 40px rgba(23, 162, 184, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 8px 40px rgba(23, 162, 184, 0.18),
+      0 2px 8px rgba(0, 0, 0, 0.08) !important;
       border: none;
     }
     .modal-header {
@@ -141,7 +159,8 @@
       color: #138496;
       margin-bottom: 0.5rem;
     }
-    .modal .form-control, .modal .form-select {
+    .modal .form-control,
+    .modal .form-select {
       font-size: 1.15rem;
       border-radius: 0.7rem;
       padding: 0.7rem 1.1rem;
@@ -183,6 +202,7 @@
     }
     .modal .form-check-input {
       padding-right: 1.5rem;
+      /* margin-left: 0; */
       transform: scale(1.25);
     }
     @media (max-width: 768px) {
@@ -193,21 +213,27 @@
       .modern-card .card-body {
         padding: 1rem 0.2rem;
       }
-      .modern-table th, .modern-table td {
+      .modern-table th,
+      .modern-table td {
         padding: 0.5rem 0.2rem;
         font-size: 0.98rem;
       }
       .modern-table {
         font-size: 1.05rem;
       }
-      .modal-header, .modal-body, .modal-footer {
+      .modal-header,
+      .modal-body,
+      .modal-footer {
         padding: 1rem 0.5rem !important;
       }
       .modal-title {
         font-size: 1.3rem;
       }
     }
-    .modal-content, .modal .modal-body, .modal .modal-header, .modal .modal-footer {
+    .modal-content,
+    .modal .modal-body,
+    .modal .modal-header,
+    .modal .modal-footer {
       font-size: 1.25rem;
     }
     .modal .form-check-label span.text-muted {
@@ -230,19 +256,22 @@
                   href="/admin/product"
                   class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active"
           >
-            <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Sản phẩm</span>
+            <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i
+            ><span class="sidebar-link-text">Sản phẩm</span>
           </a>
           <a
                   href="/admin/order"
                   class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
           >
-            <i class="fas fa-receipt me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Đơn hàng</span>
+            <i class="fas fa-receipt me-3 sidebar-link-icon"></i
+            ><span class="sidebar-link-text">Đơn hàng</span>
           </a>
           <a
-                  href="/admin/users"
+                  href="/admin/user"
                   class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
           >
-            <i class="fas fa-users me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Người dùng</span>
+            <i class="fas fa-users me-3 sidebar-link-icon"></i
+            ><span class="sidebar-link-text">Người dùng</span>
           </a>
         </div>
       </div>
@@ -274,20 +303,32 @@
                 Danh sách PC
               </span>
           <span class="header-action">
-                <button type="button" class="btn btn-success modern-btn" onclick="openCreateProductModal('pc')">
-                  <i class="fas fa-plus"></i><span class="d-none d-md-inline">Thêm PC</span>
+                <button
+                        type="button"
+                        class="btn btn-success modern-btn"
+                        onclick="openCreateProductModal('pc')"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span class="d-none d-md-inline">Thêm PC</span>
                 </button>
               </span>
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-bordered table-hover modern-table mb-0">
+            <table
+                    class="table table-bordered table-hover modern-table mb-0"
+            >
               <thead>
               <tr>
                 <th>ID</th>
                 <th>Tên</th>
                 <th>Giá (VND)</th>
-                <th style="width: 1%; white-space: nowrap" class="text-nowrap">Hành động</th>
+                <th
+                        style="width: 1%; white-space: nowrap"
+                        class="text-nowrap"
+                >
+                  Hành động
+                </th>
               </tr>
               </thead>
               <tbody th:if="${pcs.content.size() == 0}">
@@ -298,21 +339,56 @@
                 </td>
               </tr>
               </tbody>
-              <tbody th:each="pc : ${pcs.content}" th:unless="${pcs.content.size() == 0}">
+              <tbody
+                      th:each="pc : ${pcs.content}"
+                      th:unless="${pcs.content.size() == 0}"
+              >
               <tr>
                 <td th:text="${pc.id}"></td>
                 <td th:text="${pc.name}"></td>
-                <td th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"></td>
-                <td style="width: 1%; white-space: nowrap" class="text-nowrap">
-                  <button class="btn btn-primary modern-btn" data-bs-toggle="tooltip" title="Xem chi tiết" th:attr="data-id=${pc.id}" onclick="viewProductDetailFromList(this, 'pc')">
-                    <i class="fas fa-eye"></i><span class="d-none d-xl-inline ms-1"> Xem</span>
+                <td
+                        th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"
+                ></td>
+                <td
+                        style="width: 1%; white-space: nowrap"
+                        class="text-nowrap"
+                >
+                  <button
+                          class="btn btn-primary modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Xem chi tiết"
+                          th:attr="data-id=${pc.id}"
+                          data-dismiss="modal"
+                          aria-label="Close"
+                          onclick="viewProductDetailFromList(this, 'pc')"
+                  >
+                    <i class="fas fa-eye"></i
+                    ><span class="d-none d-xl-inline ms-1"> Xem</span>
                   </button>
-                  <button class="btn btn-warning modern-btn" data-bs-toggle="tooltip" title="Sửa" th:attr="data-id=${pc.id}" onclick="openEditModalFromList(this, 'pc')">
-                    <i class="fas fa-edit"></i><span class="d-none d-xl-inline ms-1"> Sửa</span>
+                  <button
+                          class="btn btn-warning modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Sửa"
+                          th:attr="data-id=${pc.id}"
+                          onclick="openEditModalFromList(this, 'pc')"
+                  >
+                    <i class="fas fa-edit"></i
+                    ><span class="d-none d-xl-inline ms-1"> Sửa</span>
                   </button>
-                  <form th:action="@{'/admin/product/pc/delete/' + ${pc.id}}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xoá pc này không?');" style="display: inline">
-                    <button type="submit" class="btn btn-danger modern-btn" data-bs-toggle="tooltip" title="Xoá">
-                      <i class="fas fa-trash-alt"></i><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                  <form
+                          th:action="@{'/admin/product/pc/delete/' + ${pc.id}}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá pc này không?');"
+                          style="display: inline"
+                  >
+                    <button
+                            type="submit"
+                            class="btn btn-danger modern-btn"
+                            data-bs-toggle="tooltip"
+                            title="Xoá"
+                    >
+                      <i class="fas fa-trash-alt"></i
+                      ><span class="d-none d-xl-inline ms-1"> Xoá</span>
                     </button>
                   </form>
                 </td>
@@ -321,22 +397,57 @@
             </table>
           </div>
           <!-- Pagination PC -->
-          <nav aria-label="Page navigation" th:if="${pcs.totalElements > 0}">
-            <ul class="pagination pagination-lg justify-content-center my-3">
-              <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
-                <a class="page-link page-link-prev px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}" aria-label="Previous">
-                  <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+          <nav
+                  aria-label="Page navigation"
+                  th:if="${pcs.totalElements > 0}"
+          >
+            <ul
+                    class="pagination pagination-lg justify-content-center my-3"
+            >
+              <li
+                      class="page-item"
+                      th:classappend="${!pcs.hasPrevious()} ? 'disabled'"
+              >
+                <a
+                        class="page-link page-link-prev px-4 py-2 fs-5"
+                        th:href="@{product(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}"
+                        aria-label="Previous"
+                >
+                      <span aria-hidden="true"
+                      ><i class="icon-long-arrow-left"></i></span
+                      >Prev
                 </a>
               </li>
-              <li class="page-item" th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}" th:classappend="${i == pcs.number} ? 'active'">
-                <a class="page-link px-3 py-2 fs-5" th:href="@{product(pcPage=${i}, computerItemPage=${computerItems.number})}" th:text="${i + 1}">1</a>
+              <li
+                      class="page-item"
+                      th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
+                      th:classappend="${i == pcs.number} ? 'active'"
+              >
+                <a
+                        class="page-link px-3 py-2 fs-5"
+                        th:href="@{product(pcPage=${i}, computerItemPage=${computerItems.number})}"
+                        th:text="${i + 1}"
+                >1</a
+                >
               </li>
               <li class="page-item disabled ms-2">
-                <span class="page-link px-3 py-2 fs-5">of <span th:text="${pcs.totalPages}">0</span></span>
+                    <span class="page-link px-3 py-2 fs-5"
+                    >of <span th:text="${pcs.totalPages}">0</span></span
+                    >
               </li>
-              <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
-                <a class="page-link page-link-next px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}" aria-label="Next">
-                  Next<span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+              <li
+                      class="page-item"
+                      th:classappend="${!pcs.hasNext()} ? 'disabled'"
+              >
+                <a
+                        class="page-link page-link-next px-4 py-2 fs-5"
+                        th:href="@{product(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}"
+                        aria-label="Next"
+                >
+                  Next
+                  <span aria-hidden="true"
+                  ><i class="icon-long-arrow-right"></i
+                  ></span>
                 </a>
               </li>
             </ul>
@@ -346,28 +457,40 @@
 
       <!-- COMPUTER ITEM TABLE -->
       <div class="modern-card">
-        <div class="card-header">
-              <span class="header-title px-2">
-                <i class="fas fa-microchip me-2"></i>
+        <div class="card-header mx-2">
+              <span class="header-title"
+              ><i class="fas fa-microchip me-2"></i>
                 <span class="mx-1"></span>
-                Danh sách Linh kiện
-              </span>
+                Danh sách Linh kiện</span
+              >
           <span class="header-action">
-                <button type="button" class="btn btn-success modern-btn" onclick="openCreateProductModal('computerItem')">
-                  <i class="fas fa-plus"></i><span class="d-none d-md-inline">Thêm linh kiện</span>
+                <button
+                        type="button"
+                        class="btn btn-success modern-btn"
+                        onclick="openCreateProductModal('computerItem')"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span class="d-none d-md-inline">Thêm linh kiện</span>
                 </button>
               </span>
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-bordered table-hover modern-table mb-0">
+            <table
+                    class="table table-bordered table-hover modern-table mb-0"
+            >
               <thead>
               <tr>
                 <th>ID</th>
                 <th>Tên</th>
                 <th>Loại sản phẩm</th>
                 <th>Giá (VND)</th>
-                <th style="width: 1%; white-space: nowrap" class="text-nowrap">Hành động</th>
+                <th
+                        style="width: 1%; white-space: nowrap"
+                        class="text-nowrap"
+                >
+                  Hành động
+                </th>
               </tr>
               </thead>
               <tbody th:if="${computerItems.content.size() == 0}">
@@ -378,22 +501,55 @@
                 </td>
               </tr>
               </tbody>
-              <tbody th:each="item : ${computerItems.content}" th:unless="${computerItems.content.size() == 0}">
+              <tbody
+                      th:each="item : ${computerItems.content}"
+                      th:unless="${computerItems.content.size() == 0}"
+              >
               <tr>
                 <td th:text="${item.id}"></td>
                 <td th:text="${item.name}"></td>
                 <td th:text="${item.category?.name} ?: ''"></td>
-                <td th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"></td>
-                <td style="width: 1%; white-space: nowrap" class="text-nowrap">
-                  <button class="btn btn-primary modern-btn" data-bs-toggle="tooltip" title="Xem chi tiết" th:attr="data-id=${item.id}" onclick="viewProductDetailFromList(this, 'computerItem')">
-                    <i class="fas fa-eye"></i><span class="d-none d-xl-inline ms-1"> Xem</span>
+                <td
+                        th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"
+                ></td>
+                <td
+                        style="width: 1%; white-space: nowrap"
+                        class="text-nowrap"
+                >
+                  <button
+                          class="btn btn-primary modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Xem chi tiết"
+                          th:attr="data-id=${item.id}"
+                          onclick="viewProductDetailFromList(this, 'computerItem')"
+                  >
+                    <i class="fas fa-eye"></i
+                    ><span class="d-none d-xl-inline ms-1"> Xem</span>
                   </button>
-                  <button class="btn btn-warning modern-btn" data-bs-toggle="tooltip" title="Sửa" th:attr="data-id=${item.id}" onclick="openEditModalFromList(this, 'computerItem')">
-                    <i class="fas fa-edit"></i><span class="d-none d-xl-inline ms-1"> Sửa</span>
+                  <button
+                          class="btn btn-warning modern-btn"
+                          data-bs-toggle="tooltip"
+                          title="Sửa"
+                          th:attr="data-id=${item.id}"
+                          onclick="openEditModalFromList(this, 'computerItem')"
+                  >
+                    <i class="fas fa-edit"></i
+                    ><span class="d-none d-xl-inline ms-1"> Sửa</span>
                   </button>
-                  <form th:action="@{'/admin/product/item/delete/' + ${item.id}}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xoá linh kiện này không?');" style="display: inline">
-                    <button type="submit" class="btn btn-danger modern-btn" data-bs-toggle="tooltip" title="Xoá">
-                      <i class="fas fa-trash-alt"></i><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                  <form
+                          th:action="@{'/admin/product/item/delete/' + ${item.id}}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá linh kiện này không?');"
+                          style="display: inline"
+                  >
+                    <button
+                            type="submit"
+                            class="btn btn-danger modern-btn"
+                            data-bs-toggle="tooltip"
+                            title="Xoá"
+                    >
+                      <i class="fas fa-trash-alt"></i
+                      ><span class="d-none d-xl-inline ms-1"> Xoá</span>
                     </button>
                   </form>
                 </td>
@@ -402,55 +558,131 @@
             </table>
           </div>
           <!-- Pagination Items -->
-          <nav aria-label="Page navigation" th:if="${computerItems.totalElements > 0}">
-            <ul class="pagination pagination-lg justify-content-center my-3">
-              <li class="page-item" th:classappend="${!computerItems.hasPrevious()} ? 'disabled'">
-                <a class="page-link page-link-prev px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}" aria-label="Previous">
-                  <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+          <nav
+                  aria-label="Page navigation"
+                  th:if="${computerItems.totalElements > 0}"
+          >
+            <ul
+                    class="pagination pagination-lg justify-content-center my-3"
+            >
+              <li
+                      class="page-item"
+                      th:classappend="${!computerItems.hasPrevious()} ? 'disabled'"
+              >
+                <a
+                        class="page-link page-link-prev px-4 py-2 fs-5"
+                        th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}"
+                        aria-label="Previous"
+                >
+                      <span aria-hidden="true"
+                      ><i class="icon-long-arrow-left"></i></span
+                      >Prev
                 </a>
               </li>
-              <li class="page-item" th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}" th:classappend="${i == computerItems.number} ? 'active'">
-                <a class="page-link px-3 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${i})}" th:text="${i + 1}">1</a>
+              <li
+                      class="page-item"
+                      th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
+                      th:classappend="${i == computerItems.number} ? 'active'"
+              >
+                <a
+                        class="page-link px-3 py-2 fs-5"
+                        th:href="@{product(pcPage=${pcs.number}, computerItemPage=${i})}"
+                        th:text="${i + 1}"
+                >1</a
+                >
               </li>
               <li class="page-item disabled ms-2">
-                <span class="page-link px-3 py-2 fs-5">of <span th:text="${computerItems.totalPages}">0</span></span>
+                    <span class="page-link px-3 py-2 fs-5"
+                    >of
+                      <span th:text="${computerItems.totalPages}">0</span></span
+                    >
               </li>
-              <li class="page-item" th:classappend="${!computerItems.hasNext()} ? 'disabled'">
-                <a class="page-link page-link-next px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}" aria-label="Next">
-                  Next<span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+              <li
+                      class="page-item"
+                      th:classappend="${!computerItems.hasNext()} ? 'disabled'"
+              >
+                <a
+                        class="page-link page-link-next px-4 py-2 fs-5"
+                        th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}"
+                        aria-label="Next"
+                >
+                  Next
+                  <span aria-hidden="true"
+                  ><i class="icon-long-arrow-right"></i
+                  ></span>
                 </a>
               </li>
             </ul>
           </nav>
         </div>
       </div>
-
       <!-- Modal for creating new product -->
-      <div class="modal fade" id="modalCreateProduct" tabindex="-1" aria-labelledby="modalCreateProductTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <form id="create-product-form" method="post" class="modal-content rounded-4 shadow-lg border-0">
+      <div
+              class="modal fade"
+              id="modalCreateProduct"
+              tabindex="-1"
+              aria-labelledby="modalCreateProductTitle"
+              aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-xxl">
+          <form
+                  id="create-product-form"
+                  method="post"
+                  class="modal-content rounded-4 shadow-lg border-0"
+          >
             <div class="modal-header bg-primary text-white rounded-top-4">
-              <h5 class="modal-title fw-bold" id="modalCreateProductTitle">Thêm sản phẩm</h5>
-              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Đóng"></button>
+              <h5
+                      class="modal-title fw-bold fs-3"
+                      id="modalCreateProductTitle"
+              >
+                Thêm sản phẩm
+              </h5>
+              <button
+                      type="button"
+                      class="btn-close btn-close-white"
+                      data-dismiss="modal"
+                      aria-label="Đóng"
+              ></button>
             </div>
-            <div class="modal-body p-4" id="modalCreateProductBody">
+            <div class="modal-body p-4 fs-3" id="modalCreateProductBody">
               <!-- Nội dung sẽ được JS gán động -->
             </div>
             <div class="modal-footer bg-light rounded-bottom-4">
-              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Huỷ</button>
-              <button type="submit" class="btn btn-primary btn-lg px-4">Lưu</button>
+              <button
+                      type="button"
+                      class="btn btn-secondary btn-lg px-4"
+                      data-dismiss="modal"
+              >
+                Huỷ
+              </button>
+              <button type="submit" class="btn btn-success btn-lg px-4">
+                Lưu
+              </button>
             </div>
           </form>
         </div>
       </div>
 
       <!-- Modal for viewing product details -->
-      <div class="modal fade" id="modalViewProduct" tabindex="-1" aria-labelledby="modalViewTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+      <div
+              class="modal fade"
+              id="modalViewProduct"
+              tabindex="-1"
+              aria-labelledby="modalViewTitle"
+              aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-xl">
           <div class="modal-content rounded-4 shadow-lg border-0">
             <div class="modal-header bg-info text-white rounded-top-4">
-              <h5 class="modal-title fw-bold" id="modalViewTitle">Chi tiết sản phẩm</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+              <h5 class="modal-title fw-bold" id="modalViewTitle">
+                Chi tiết sản phẩm
+              </h5>
+              <button
+                      type="button"
+                      class="btn-close btn-close-white"
+                      data-bs-dismiss="modal"
+                      aria-label="Đóng"
+              ></button>
             </div>
             <div class="modal-body p-4 px-5">
               <div class="container-fluid">
@@ -458,51 +690,91 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label class="font-weight-bold">Mã sản phẩm</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-id"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-id"
+                    ></div>
                   </div>
                   <div class="col-md-6">
                     <label class="font-weight-bold">Tên</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-name"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-name"
+                    ></div>
                   </div>
                 </div>
                 <!-- Category + Price -->
                 <div class="row mb-3" id="row-category-price">
                   <div class="col-md-6" id="view-category-group">
                     <label class="font-weight-bold">Loại</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-category"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-category"
+                    ></div>
                   </div>
-                  <div class="col-md-6" id="view-computer-items-group" style="display: none">
-                    <label class="font-weight-bold">Linh kiện cấu thành</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-computer-items"></div>
+                  <div
+                          class="col-md-6"
+                          id="view-computer-items-group"
+                          style="display: none"
+                  >
+                    <label class="font-weight-bold"
+                    >Linh kiện cấu thành</label
+                    >
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-computer-items"
+                    ></div>
                   </div>
                   <div class="col-md-6">
                     <label class="font-weight-bold">Giá (VND)</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-price"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-price"
+                    ></div>
                   </div>
                 </div>
                 <!-- Brand + Model (Only ComputerItem) -->
                 <div class="row mb-3" id="row-brand-model">
                   <div class="col-md-6">
                     <label class="font-weight-bold">Brand</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-brand"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-brand"
+                    ></div>
                   </div>
                   <div class="col-md-6">
                     <label class="font-weight-bold">Model</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-model"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-model"
+                    ></div>
                   </div>
                 </div>
                 <!-- Description -->
                 <div class="row mb-3" id="row-description">
                   <div class="col-12">
                     <label class="font-weight-bold">Mô tả</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-description" style="white-space: pre-wrap"></div>
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-description"
+                            style="white-space: pre-wrap"
+                    ></div>
                   </div>
                 </div>
                 <!-- PC: Danh sách linh kiện -->
-                <div class="row mb-3" id="row-computer-items" style="display: none">
+                <div
+                        class="row mb-3"
+                        id="row-computer-items"
+                        style="display: none"
+                >
                   <div class="col-12">
-                    <label class="font-weight-bold">Danh sách linh kiện</label>
-                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-computer-items"></div>
+                    <label class="font-weight-bold"
+                    >Danh sách linh kiện</label
+                    >
+                    <div
+                            class="form-control-plaintext border rounded bg-light px-3 py-2"
+                            id="view-computer-items"
+                    ></div>
                   </div>
                 </div>
                 <!-- Image -->
@@ -513,27 +785,49 @@
                 </div>
               </div>
             </div>
-            <div class="modal-footer bg-light rounded-bottom-4">
-              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Đóng</button>
-            </div>
           </div>
         </div>
       </div>
 
       <!-- Modal for editing product -->
-      <div class="modal fade" id="modalEditProduct" tabindex="-1" aria-labelledby="edit-modal-title" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <form id="edit-product-form" method="post" class="modal-content rounded-4 shadow-lg border-0">
+      <div
+              class="modal fade"
+              id="modalEditProduct"
+              tabindex="-1"
+              aria-labelledby="edit-modal-title"
+              aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <form
+                  id="edit-product-form"
+                  method="post"
+                  class="modal-content rounded-4 shadow-lg border-0"
+          >
             <div class="modal-header bg-warning text-white rounded-top-4">
-              <h5 class="modal-title fw-bold" id="edit-modal-title">Chỉnh sửa sản phẩm</h5>
-              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Đóng"></button>
+              <h5 class="modal-title fw-bold" id="edit-modal-title">
+                Chỉnh sửa sản phẩm
+              </h5>
+              <button
+                      type="button"
+                      class="btn-close btn-close-white"
+                      data-dismiss="modal"
+                      aria-label="Đóng"
+              ></button>
             </div>
             <div class="modal-body p-4" id="modalEditProductBody">
               <!-- JS sẽ gán form tùy loại sản phẩm -->
             </div>
             <div class="modal-footer bg-light rounded-bottom-4">
-              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Huỷ</button>
-              <button type="submit" class="btn btn-primary btn-lg px-4">Lưu thay đổi</button>
+              <button
+                      type="button"
+                      class="btn btn-secondary btn-lg px-4"
+                      data-dismiss="modal"
+              >
+                Huỷ
+              </button>
+              <button type="submit" class="btn btn-primary btn-lg px-4">
+                Lưu thay đổi
+              </button>
             </div>
           </form>
         </div>
@@ -564,7 +858,9 @@
 <script>
   // Khởi tạo tooltip cho Bootstrap 5
   document.addEventListener("DOMContentLoaded", function () {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
     tooltipTriggerList.forEach(function (tooltipTriggerEl) {
       new bootstrap.Tooltip(tooltipTriggerEl);
     });
