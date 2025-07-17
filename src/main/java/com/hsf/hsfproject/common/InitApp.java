@@ -1,16 +1,11 @@
 package com.hsf.hsfproject.common;
 
-import com.hsf.hsfproject.model.Category;
-import com.hsf.hsfproject.model.ComputerItem;
-import com.hsf.hsfproject.model.PC;
-import com.hsf.hsfproject.model.Role;
-import com.hsf.hsfproject.repository.CategoryRepository;
-import com.hsf.hsfproject.repository.ComputerItemRepository;
-import com.hsf.hsfproject.repository.PCRepository;
-import com.hsf.hsfproject.repository.RoleRepository;
+import com.hsf.hsfproject.model.*;
+import com.hsf.hsfproject.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -149,4 +144,44 @@ public class InitApp {
 //            }
 //        };
 //    }
+@Bean
+CommandLineRunner initUsers(RoleRepository roleRepository,
+                            UserRepository userRepository,
+                            CartRepository cartRepository) {
+    return args -> {
+        if (userRepository.count() == 0) {
+            Role userRole = roleRepository.findByName("ROLE_USER");
+            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (userRole != null && adminRole != null) {
+                Cart userCart = new Cart();
+                Cart adminCart = new Cart();
+                cartRepository.save(userCart);
+                cartRepository.save(adminCart);
+
+                User user = User.builder()
+                        .username("user1")
+                        .email("user1@example.com")
+                        .password(encoder.encode("123"))
+                        .phoneNumber("0909123456")
+                        .role(userRole)
+                        .cart(userCart)
+                        .build();
+
+                User admin = User.builder()
+                        .username("admin")
+                        .email("admin@example.com")
+                        .password(encoder.encode("123"))
+                        .phoneNumber("0987654321")
+                        .role(adminRole)
+                        .cart(adminCart)
+                        .build();
+
+                userRepository.save(user);
+                userRepository.save(admin);
+            }
+        }
+    };
+}
 }

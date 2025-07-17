@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa thông tin người dùng</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<h2>✏️ Sửa thông tin người dùng</h2>
+
+<form th:action="@{/admin/users/update}" method="post">
+    <input type="hidden" name="id" th:value="${uuidView}" />
+
+    <label>Username:</label>
+    <input type="text" name="username" th:value="${user.username}" required />
+
+    <label>Email:</label>
+    <input type="email" name="email" th:value="${user.email}" required />
+
+    <label>Phone:</label>
+    <input type="text" name="phoneNumber" th:value="${user.phoneNumber}" />
+
+    <label>Password (để trống nếu không đổi):</label>
+    <input type="password" name="password" />
+
+    <button type="submit">💾 Lưu lại</button>
+</form>
+</body>
+</html>

@@ -1,870 +1,574 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Admin Product Page</title>
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/fontsize.css}" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}"
-    />
-    <link rel="stylesheet" th:href="@{/assets/css/admin-product.css}" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta
-      name="msapplication-config"
-      content="assets/images/icons/browserconfig.xml"
-    />
-    <style>
-      /* Modern card shadow and spacing */
-      .modern-card {
-        box-shadow: 0 6px 32px rgba(23, 162, 184, 0.13),
-          0 1.5px 6px rgba(0, 0, 0, 0.04);
-        border-radius: 1.25rem;
-        margin-bottom: 2.5rem;
-        background: #fff;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Product Management</title>
+  <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+  <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+  <link rel="stylesheet" th:href="@{/assets/css/fontsize.css}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" th:href="@{/assets/css/plugins/magnific-popup/magnific-popup.css}" />
+  <link rel="stylesheet" th:href="@{/assets/css/admin-product.css}" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml" />
+  <style>
+    /* Modern card shadow and spacing */
+    .modern-card {
+      box-shadow: 0 6px 32px rgba(23, 162, 184, 0.13), 0 1.5px 6px rgba(0, 0, 0, 0.04);
+      border-radius: 1.25rem;
+      margin-bottom: 2.5rem;
+      background: #fff;
+    }
+    .modern-card .card-header {
+      background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border-top-left-radius: 1.25rem;
+      border-top-right-radius: 1.25rem;
+      padding: 1.5rem 2rem 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modern-card .card-header .header-title {
+      flex: 1;
+      text-align: center;
+    }
+    .modern-card .card-header .header-action {
+      flex-shrink: 0;
+    }
+    .modern-card .card-body {
+      padding: 2.5rem 2rem 2rem 2rem;
+    }
+    .modern-table {
+      font-size: 1.5rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 16px rgba(23, 162, 184, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .modern-table th, .modern-table td {
+      padding: 1.25rem 1rem;
+      vertical-align: middle;
+      text-align: center;
+      border-bottom: 1.5px solid #e0e0e0;
+    }
+    .modern-table thead th {
+      background: linear-gradient(90deg, #17a2b8 60%, #138496 100%) !important;
+      color: #fff !important;
+      text-transform: uppercase;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border: none;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(23, 162, 184, 0.1);
+    }
+    .modern-table tbody tr {
+      background: #f8f9fa;
+      transition: background 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .modern-table tbody tr:hover {
+      background: #e0f7fa !important;
+      box-shadow: 0 2px 12px rgba(23, 162, 184, 0.13);
+      z-index: 2;
+    }
+    .modern-table tbody tr.active, .modern-table tbody tr.selected {
+      background: #b2ebf2 !important;
+      font-weight: 600;
+      color: #138496;
+    }
+    .modern-table .table-empty-row {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      background: #f8f9fa;
+      font-size: 1.25rem;
+    }
+    .modern-table .table-empty-row i {
+      color: #b0bec5;
+      margin-bottom: 4px;
+    }
+    .modern-btn {
+      border-radius: 50px !important;
+      font-size: 1.75rem !important;
+      padding: 0.25rem 0.7rem !important;
+      margin: 0 0.12rem !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(23, 162, 184, 0.08);
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .modern-btn:hover {
+      transform: scale(1.13);
+      box-shadow: 0 4px 16px rgba(23, 162, 184, 0.16);
+    }
+    /* Modal UI/UX improvements */
+    .modal-content {
+      border-radius: 1.5rem !important;
+      box-shadow: 0 8px 40px rgba(23, 162, 184, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+      border: none;
+    }
+    .modal-header {
+      padding: 2rem 2.5rem 1.5rem 2.5rem;
+      border-top-left-radius: 1.5rem !important;
+      border-top-right-radius: 1.5rem !important;
+      background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(23, 162, 184, 0.1);
+    }
+    .modal-title {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .modal-body {
+      padding: 2.5rem 2.5rem 2rem 2.5rem !important;
+    }
+    .modal-footer {
+      padding: 1.5rem 2.5rem 1.5rem 2.5rem !important;
+      border-bottom-left-radius: 1.5rem !important;
+      border-bottom-right-radius: 1.5rem !important;
+    }
+    .modal .form-label {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #138496;
+      margin-bottom: 0.5rem;
+    }
+    .modal .form-control, .modal .form-select {
+      font-size: 1.15rem;
+      border-radius: 0.7rem;
+      padding: 0.7rem 1.1rem;
+      margin-bottom: 1.2rem;
+    }
+    .modal .form-check {
+      font-size: 1.4rem;
+      background: #f8f9fa;
+      border-radius: 0.7rem;
+      border: 1.5px solid #e0e0e0;
+      padding: 0.7rem 1.8rem;
+      margin-bottom: 0.7rem;
+      transition: box-shadow 0.15s, border 0.15s;
+      box-shadow: 0 1px 4px rgba(23, 162, 184, 0.06);
+    }
+    .modal .form-check:hover {
+      border: 1.5px solid #17a2b8;
+      box-shadow: 0 2px 8px rgba(23, 162, 184, 0.13);
+      background: #e0f7fa;
+    }
+    .modal .form-check-input:checked {
+      background-color: #17a2b8;
+      border-color: #138496;
+    }
+    .modal .form-check-label {
+      margin-left: 1rem;
+      font-size: 1.4rem;
+      color: #222;
+      font-weight: 500;
+    }
+    .modal .list-group-item {
+      border-radius: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .modal .btn {
+      font-size: 1.15rem;
+      padding: 0.6rem 1.5rem;
+      border-radius: 2rem;
+    }
+    .modal .form-check-input {
+      padding-right: 1.5rem;
+      transform: scale(1.25);
+    }
+    @media (max-width: 768px) {
       .modern-card .card-header {
-        background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        border-top-left-radius: 1.25rem;
-        border-top-right-radius: 1.25rem;
-        padding: 1.5rem 2rem 1.5rem 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .modern-card .card-header .header-title {
-        flex: 1;
-        text-align: center;
-      }
-      .modern-card .card-header .header-action {
-        flex-shrink: 0;
+        font-size: 1.2rem;
+        padding: 1rem 0.5rem;
       }
       .modern-card .card-body {
-        padding: 2.5rem 2rem 2rem 2rem;
+        padding: 1rem 0.2rem;
+      }
+      .modern-table th, .modern-table td {
+        padding: 0.5rem 0.2rem;
+        font-size: 0.98rem;
       }
       .modern-table {
-        font-size: 1.5rem;
-        border-radius: 1rem;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 2px 16px rgba(23, 162, 184, 0.1),
-          0 1px 4px rgba(0, 0, 0, 0.04);
-        border-collapse: separate;
-        border-spacing: 0;
+        font-size: 1.05rem;
       }
-      .modern-table th,
-      .modern-table td {
-        padding: 1.25rem 1rem;
-        vertical-align: middle;
-        text-align: center;
-        border-bottom: 1.5px solid #e0e0e0;
-      }
-      .modern-table thead th {
-        background: linear-gradient(
-          90deg,
-          #17a2b8 60%,
-          #138496 100%
-        ) !important;
-        color: #fff !important;
-        text-transform: uppercase;
-        font-size: 1.25rem;
-        font-weight: 700;
-        border: none;
-        letter-spacing: 1px;
-        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.1);
-      }
-      .modern-table tbody tr {
-        background: #f8f9fa;
-        transition: background 0.18s, box-shadow 0.18s;
-        cursor: pointer;
-      }
-      .modern-table tbody tr:hover {
-        background: #e0f7fa !important;
-        box-shadow: 0 2px 12px rgba(23, 162, 184, 0.13);
-        z-index: 2;
-      }
-      .modern-table tbody tr.active,
-      .modern-table tbody tr.selected {
-        background: #b2ebf2 !important;
-        font-weight: 600;
-        color: #138496;
-      }
-      .modern-table .table-empty-row {
-        color: #888;
-        font-style: italic;
-        text-align: center;
-        background: #f8f9fa;
-        font-size: 1.25rem;
-      }
-      .modern-table .table-empty-row i {
-        color: #b0bec5;
-        margin-bottom: 4px;
-      }
-      .modern-btn {
-        border-radius: 50px !important;
-        font-size: 1.75rem !important;
-        padding: 0.25rem 0.7rem !important;
-        margin: 0 0.12rem !important;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.08);
-        transition: transform 0.12s, box-shadow 0.12s;
-      }
-      .modern-btn:hover {
-        transform: scale(1.13);
-        box-shadow: 0 4px 16px rgba(23, 162, 184, 0.16);
-      }
-      /* Modal UI/UX improvements */
-      .modal-content {
-        border-radius: 1.5rem !important;
-        box-shadow: 0 8px 40px rgba(23, 162, 184, 0.18),
-          0 2px 8px rgba(0, 0, 0, 0.08) !important;
-        border: none;
-      }
-      .modal-header {
-        padding: 2rem 2.5rem 1.5rem 2.5rem;
-        border-top-left-radius: 1.5rem !important;
-        border-top-right-radius: 1.5rem !important;
-        background: linear-gradient(90deg, #17a2b8 60%, #138496 100%);
-        color: #fff;
-        box-shadow: 0 2px 12px rgba(23, 162, 184, 0.1);
+      .modal-header, .modal-body, .modal-footer {
+        padding: 1rem 0.5rem !important;
       }
       .modal-title {
-        font-size: 2.1rem;
-        font-weight: 700;
-        letter-spacing: 1px;
+        font-size: 1.3rem;
       }
-      .modal-body {
-        padding: 2.5rem 2.5rem 2rem 2.5rem !important;
-      }
-      .modal-footer {
-        padding: 1.5rem 2.5rem 1.5rem 2.5rem !important;
-        border-bottom-left-radius: 1.5rem !important;
-        border-bottom-right-radius: 1.5rem !important;
-      }
-      .modal .form-label {
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: #138496;
-        margin-bottom: 0.5rem;
-      }
-      .modal .form-control,
-      .modal .form-select {
-        font-size: 1.15rem;
-        border-radius: 0.7rem;
-        padding: 0.7rem 1.1rem;
-        margin-bottom: 1.2rem;
-      }
-      .modal .form-check {
-        font-size: 1.4rem;
-        background: #f8f9fa;
-        border-radius: 0.7rem;
-        border: 1.5px solid #e0e0e0;
-        padding: 0.7rem 1.8rem;
-        margin-bottom: 0.7rem;
-        transition: box-shadow 0.15s, border 0.15s;
-        box-shadow: 0 1px 4px rgba(23, 162, 184, 0.06);
-      }
-      .modal .form-check:hover {
-        border: 1.5px solid #17a2b8;
-        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.13);
-        background: #e0f7fa;
-      }
-      .modal .form-check-input:checked {
-        background-color: #17a2b8;
-        border-color: #138496;
-      }
-      .modal .form-check-label {
-        margin-left: 1rem;
-        font-size: 1.4rem;
-        color: #222;
-        font-weight: 500;
-      }
-      .modal .list-group-item {
-        border-radius: 0.5rem;
-        margin-bottom: 0.2rem;
-      }
-      .modal .btn {
-        font-size: 1.15rem;
-        padding: 0.6rem 1.5rem;
-        border-radius: 2rem;
-      }
-      .modal .form-check-input {
-        padding-right: 1.5rem;
-        /* margin-left: 0; */
-        transform: scale(1.25);
-      }
-      @media (max-width: 768px) {
-        .modern-card .card-header {
-          font-size: 1.2rem;
-          padding: 1rem 0.5rem;
-        }
-        .modern-card .card-body {
-          padding: 1rem 0.2rem;
-        }
-        .modern-table th,
-        .modern-table td {
-          padding: 0.5rem 0.2rem;
-          font-size: 0.98rem;
-        }
-        .modern-table {
-          font-size: 1.05rem;
-        }
-        .modal-header,
-        .modal-body,
-        .modal-footer {
-          padding: 1rem 0.5rem !important;
-        }
-        .modal-title {
-          font-size: 1.3rem;
-        }
-      }
-      .modal-content,
-      .modal .modal-body,
-      .modal .modal-header,
-      .modal .modal-footer {
-        font-size: 1.25rem;
-      }
-      .modal .form-check-label span.text-muted {
-        font-size: 1.08rem !important;
-      }
-    </style>
-  </head>
-  <body class="bg-light">
-    <div class="container-fluid py-4 main-content">
-      <div class="row min-vh-100">
-        <!-- Sidebar Offcanvas Bootstrap 5 -->
-        <nav
-          id="sidebarMenu"
-          class="d-lg-block bg-white sidebar collapse border-end min-vh-100 position-fixed"
-          style="width: 260px; z-index: 1040"
-        >
-          <div class="position-sticky">
-            <div class="list-group list-group-flush mx-3 mt-4">
-              <a
-                href="/admin/product"
-                class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active"
-              >
-                <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i
-                ><span class="sidebar-link-text">Sản phẩm</span>
-              </a>
-              <a
-                href="/admin/order"
-                class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
-              >
-                <i class="fas fa-receipt me-3 sidebar-link-icon"></i
-                ><span class="sidebar-link-text">Đơn hàng</span>
-              </a>
-              <a
-                href="/admin/user"
-                class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
-              >
-                <i class="fas fa-users me-3 sidebar-link-icon"></i
-                ><span class="sidebar-link-text">Người dùng</span>
-              </a>
-            </div>
-          </div>
-        </nav>
-        <!-- Toggle button for sidebar (visible on mobile) -->
-        <button
-          class="btn btn-primary d-lg-none position-fixed m-3"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#sidebarMenu"
-          aria-controls="sidebarMenu"
-          style="z-index: 1100"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="col-lg-9 col-12">
-          <h2 class="text-primary mb-4 fw-bold display-5 text-center">
-            <i class="fas fa-boxes-stacked me-2"></i>
-            <span class="mx-1"></span>
-            Quản lý Sản phẩm
-          </h2>
+    }
+    .modal-content, .modal .modal-body, .modal .modal-header, .modal .modal-footer {
+      font-size: 1.25rem;
+    }
+    .modal .form-check-label span.text-muted {
+      font-size: 1.08rem !important;
+    }
+  </style>
+</head>
+<body class="bg-light">
+<div class="container-fluid py-4 main-content">
+  <div class="row min-vh-100">
+    <!-- Sidebar Offcanvas Bootstrap 5 -->
+    <nav
+            id="sidebarMenu"
+            class="d-lg-block bg-white sidebar collapse border-end min-vh-100 position-fixed"
+            style="width: 260px; z-index: 1040"
+    >
+      <div class="position-sticky">
+        <div class="list-group list-group-flush mx-3 mt-4">
+          <a
+                  href="/admin/product"
+                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active"
+          >
+            <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Sản phẩm</span>
+          </a>
+          <a
+                  href="/admin/order"
+                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
+          >
+            <i class="fas fa-receipt me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Đơn hàng</span>
+          </a>
+          <a
+                  href="/admin/users"
+                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
+          >
+            <i class="fas fa-users me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Người dùng</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+    <!-- Toggle button for sidebar (visible on mobile) -->
+    <button
+            class="btn btn-primary d-lg-none position-fixed m-3"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu"
+            style="z-index: 1100"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="col-lg-9 col-12">
+      <h2 class="text-primary mb-4 fw-bold display-5 text-center">
+        <i class="fas fa-boxes-stacked me-2"></i>
+        <span class="mx-1"></span>
+        Quản lý Sản phẩm
+      </h2>
 
-          <!-- PC TABLE -->
-          <div class="modern-card">
-            <div class="card-header">
+      <!-- PC TABLE -->
+      <div class="modern-card">
+        <div class="card-header">
               <span class="header-title px-2">
                 <i class="fas fa-desktop me-2"></i>
                 <span class="mx-1"></span>
                 Danh sách PC
               </span>
-              <span class="header-action">
-                <button
-                  type="button"
-                  class="btn btn-success modern-btn"
-                  onclick="openCreateProductModal('pc')"
-                >
-                  <i class="fas fa-plus"></i>
-                  <span class="d-none d-md-inline">Thêm PC</span>
+          <span class="header-action">
+                <button type="button" class="btn btn-success modern-btn" onclick="openCreateProductModal('pc')">
+                  <i class="fas fa-plus"></i><span class="d-none d-md-inline">Thêm PC</span>
                 </button>
               </span>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table
-                  class="table table-bordered table-hover modern-table mb-0"
-                >
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Tên</th>
-                      <th>Giá (VND)</th>
-                      <th
-                        style="width: 1%; white-space: nowrap"
-                        class="text-nowrap"
-                      >
-                        Hành động
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody th:if="${pcs.content.size() == 0}">
-                    <tr>
-                      <td colspan="4" class="table-empty-row">
-                        <i class="fas fa-box-open fa-2x mb-2"></i><br />
-                        Không có dữ liệu
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tbody
-                    th:each="pc : ${pcs.content}"
-                    th:unless="${pcs.content.size() == 0}"
-                  >
-                    <tr>
-                      <td th:text="${pc.id}"></td>
-                      <td th:text="${pc.name}"></td>
-                      <td
-                        th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"
-                      ></td>
-                      <td
-                        style="width: 1%; white-space: nowrap"
-                        class="text-nowrap"
-                      >
-                        <button
-                          class="btn btn-primary modern-btn"
-                          data-bs-toggle="tooltip"
-                          title="Xem chi tiết"
-                          th:attr="data-id=${pc.id}"
-                          data-dismiss="modal"
-                          aria-label="Close"
-                          onclick="viewProductDetailFromList(this, 'pc')"
-                        >
-                          <i class="fas fa-eye"></i
-                          ><span class="d-none d-xl-inline ms-1"> Xem</span>
-                        </button>
-                        <button
-                          class="btn btn-warning modern-btn"
-                          data-bs-toggle="tooltip"
-                          title="Sửa"
-                          th:attr="data-id=${pc.id}"
-                          onclick="openEditModalFromList(this, 'pc')"
-                        >
-                          <i class="fas fa-edit"></i
-                          ><span class="d-none d-xl-inline ms-1"> Sửa</span>
-                        </button>
-                        <form
-                          th:action="@{'/admin/product/pc/delete/' + ${pc.id}}"
-                          method="post"
-                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá pc này không?');"
-                          style="display: inline"
-                        >
-                          <button
-                            type="submit"
-                            class="btn btn-danger modern-btn"
-                            data-bs-toggle="tooltip"
-                            title="Xoá"
-                          >
-                            <i class="fas fa-trash-alt"></i
-                            ><span class="d-none d-xl-inline ms-1"> Xoá</span>
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!-- Pagination PC -->
-              <nav
-                aria-label="Page navigation"
-                th:if="${pcs.totalElements > 0}"
-              >
-                <ul
-                  class="pagination pagination-lg justify-content-center my-3"
-                >
-                  <li
-                    class="page-item"
-                    th:classappend="${!pcs.hasPrevious()} ? 'disabled'"
-                  >
-                    <a
-                      class="page-link page-link-prev px-4 py-2 fs-5"
-                      th:href="@{product(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}"
-                      aria-label="Previous"
-                    >
-                      <span aria-hidden="true"
-                        ><i class="icon-long-arrow-left"></i></span
-                      >Prev
-                    </a>
-                  </li>
-                  <li
-                    class="page-item"
-                    th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}"
-                    th:classappend="${i == pcs.number} ? 'active'"
-                  >
-                    <a
-                      class="page-link px-3 py-2 fs-5"
-                      th:href="@{product(pcPage=${i}, computerItemPage=${computerItems.number})}"
-                      th:text="${i + 1}"
-                      >1</a
-                    >
-                  </li>
-                  <li class="page-item disabled ms-2">
-                    <span class="page-link px-3 py-2 fs-5"
-                      >of <span th:text="${pcs.totalPages}">0</span></span
-                    >
-                  </li>
-                  <li
-                    class="page-item"
-                    th:classappend="${!pcs.hasNext()} ? 'disabled'"
-                  >
-                    <a
-                      class="page-link page-link-next px-4 py-2 fs-5"
-                      th:href="@{product(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}"
-                      aria-label="Next"
-                    >
-                      Next
-                      <span aria-hidden="true"
-                        ><i class="icon-long-arrow-right"></i
-                      ></span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover modern-table mb-0">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Giá (VND)</th>
+                <th style="width: 1%; white-space: nowrap" class="text-nowrap">Hành động</th>
+              </tr>
+              </thead>
+              <tbody th:if="${pcs.content.size() == 0}">
+              <tr>
+                <td colspan="4" class="table-empty-row">
+                  <i class="fas fa-box-open fa-2x mb-2"></i><br />
+                  Không có dữ liệu
+                </td>
+              </tr>
+              </tbody>
+              <tbody th:each="pc : ${pcs.content}" th:unless="${pcs.content.size() == 0}">
+              <tr>
+                <td th:text="${pc.id}"></td>
+                <td th:text="${pc.name}"></td>
+                <td th:text="${#numbers.formatInteger(pc.price, 0, 'POINT')}"></td>
+                <td style="width: 1%; white-space: nowrap" class="text-nowrap">
+                  <button class="btn btn-primary modern-btn" data-bs-toggle="tooltip" title="Xem chi tiết" th:attr="data-id=${pc.id}" onclick="viewProductDetailFromList(this, 'pc')">
+                    <i class="fas fa-eye"></i><span class="d-none d-xl-inline ms-1"> Xem</span>
+                  </button>
+                  <button class="btn btn-warning modern-btn" data-bs-toggle="tooltip" title="Sửa" th:attr="data-id=${pc.id}" onclick="openEditModalFromList(this, 'pc')">
+                    <i class="fas fa-edit"></i><span class="d-none d-xl-inline ms-1"> Sửa</span>
+                  </button>
+                  <form th:action="@{'/admin/product/pc/delete/' + ${pc.id}}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xoá pc này không?');" style="display: inline">
+                    <button type="submit" class="btn btn-danger modern-btn" data-bs-toggle="tooltip" title="Xoá">
+                      <i class="fas fa-trash-alt"></i><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
+          <!-- Pagination PC -->
+          <nav aria-label="Page navigation" th:if="${pcs.totalElements > 0}">
+            <ul class="pagination pagination-lg justify-content-center my-3">
+              <li class="page-item" th:classappend="${!pcs.hasPrevious()} ? 'disabled'">
+                <a class="page-link page-link-prev px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number - 1}, computerItemPage=${computerItems.number})}" aria-label="Previous">
+                  <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, pcs.totalPages - 1)}" th:classappend="${i == pcs.number} ? 'active'">
+                <a class="page-link px-3 py-2 fs-5" th:href="@{product(pcPage=${i}, computerItemPage=${computerItems.number})}" th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item disabled ms-2">
+                <span class="page-link px-3 py-2 fs-5">of <span th:text="${pcs.totalPages}">0</span></span>
+              </li>
+              <li class="page-item" th:classappend="${!pcs.hasNext()} ? 'disabled'">
+                <a class="page-link page-link-next px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number + 1}, computerItemPage=${computerItems.number})}" aria-label="Next">
+                  Next<span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
 
-          <!-- COMPUTER ITEM TABLE -->
-          <div class="modern-card">
-            <div class="card-header mx-2">
-              <span class="header-title"
-                ><i class="fas fa-microchip me-2"></i>
+      <!-- COMPUTER ITEM TABLE -->
+      <div class="modern-card">
+        <div class="card-header">
+              <span class="header-title px-2">
+                <i class="fas fa-microchip me-2"></i>
                 <span class="mx-1"></span>
-                Danh sách Linh kiện</span
-              >
-              <span class="header-action">
-                <button
-                  type="button"
-                  class="btn btn-success modern-btn"
-                  onclick="openCreateProductModal('computerItem')"
-                >
-                  <i class="fas fa-plus"></i>
-                  <span class="d-none d-md-inline">Thêm linh kiện</span>
+                Danh sách Linh kiện
+              </span>
+          <span class="header-action">
+                <button type="button" class="btn btn-success modern-btn" onclick="openCreateProductModal('computerItem')">
+                  <i class="fas fa-plus"></i><span class="d-none d-md-inline">Thêm linh kiện</span>
                 </button>
               </span>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table
-                  class="table table-bordered table-hover modern-table mb-0"
-                >
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Tên</th>
-                      <th>Loại sản phẩm</th>
-                      <th>Giá (VND)</th>
-                      <th
-                        style="width: 1%; white-space: nowrap"
-                        class="text-nowrap"
-                      >
-                        Hành động
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody th:if="${computerItems.content.size() == 0}">
-                    <tr>
-                      <td colspan="5" class="table-empty-row">
-                        <i class="fas fa-box-open fa-2x mb-2"></i><br />
-                        Không có dữ liệu
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tbody
-                    th:each="item : ${computerItems.content}"
-                    th:unless="${computerItems.content.size() == 0}"
-                  >
-                    <tr>
-                      <td th:text="${item.id}"></td>
-                      <td th:text="${item.name}"></td>
-                      <td th:text="${item.category?.name} ?: ''"></td>
-                      <td
-                        th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"
-                      ></td>
-                      <td
-                        style="width: 1%; white-space: nowrap"
-                        class="text-nowrap"
-                      >
-                        <button
-                          class="btn btn-primary modern-btn"
-                          data-bs-toggle="tooltip"
-                          title="Xem chi tiết"
-                          th:attr="data-id=${item.id}"
-                          onclick="viewProductDetailFromList(this, 'computerItem')"
-                        >
-                          <i class="fas fa-eye"></i
-                          ><span class="d-none d-xl-inline ms-1"> Xem</span>
-                        </button>
-                        <button
-                          class="btn btn-warning modern-btn"
-                          data-bs-toggle="tooltip"
-                          title="Sửa"
-                          th:attr="data-id=${item.id}"
-                          onclick="openEditModalFromList(this, 'computerItem')"
-                        >
-                          <i class="fas fa-edit"></i
-                          ><span class="d-none d-xl-inline ms-1"> Sửa</span>
-                        </button>
-                        <form
-                          th:action="@{'/admin/product/item/delete/' + ${item.id}}"
-                          method="post"
-                          onsubmit="return confirm('Bạn có chắc chắn muốn xoá linh kiện này không?');"
-                          style="display: inline"
-                        >
-                          <button
-                            type="submit"
-                            class="btn btn-danger modern-btn"
-                            data-bs-toggle="tooltip"
-                            title="Xoá"
-                          >
-                            <i class="fas fa-trash-alt"></i
-                            ><span class="d-none d-xl-inline ms-1"> Xoá</span>
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!-- Pagination Items -->
-              <nav
-                aria-label="Page navigation"
-                th:if="${computerItems.totalElements > 0}"
-              >
-                <ul
-                  class="pagination pagination-lg justify-content-center my-3"
-                >
-                  <li
-                    class="page-item"
-                    th:classappend="${!computerItems.hasPrevious()} ? 'disabled'"
-                  >
-                    <a
-                      class="page-link page-link-prev px-4 py-2 fs-5"
-                      th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}"
-                      aria-label="Previous"
-                    >
-                      <span aria-hidden="true"
-                        ><i class="icon-long-arrow-left"></i></span
-                      >Prev
-                    </a>
-                  </li>
-                  <li
-                    class="page-item"
-                    th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}"
-                    th:classappend="${i == computerItems.number} ? 'active'"
-                  >
-                    <a
-                      class="page-link px-3 py-2 fs-5"
-                      th:href="@{product(pcPage=${pcs.number}, computerItemPage=${i})}"
-                      th:text="${i + 1}"
-                      >1</a
-                    >
-                  </li>
-                  <li class="page-item disabled ms-2">
-                    <span class="page-link px-3 py-2 fs-5"
-                      >of
-                      <span th:text="${computerItems.totalPages}">0</span></span
-                    >
-                  </li>
-                  <li
-                    class="page-item"
-                    th:classappend="${!computerItems.hasNext()} ? 'disabled'"
-                  >
-                    <a
-                      class="page-link page-link-next px-4 py-2 fs-5"
-                      th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}"
-                      aria-label="Next"
-                    >
-                      Next
-                      <span aria-hidden="true"
-                        ><i class="icon-long-arrow-right"></i
-                      ></span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
-          <!-- Modal for creating new product -->
-          <div
-            class="modal fade"
-            id="modalCreateProduct"
-            tabindex="-1"
-            aria-labelledby="modalCreateProductTitle"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-dialog-centered modal-xxl">
-              <form
-                id="create-product-form"
-                method="post"
-                class="modal-content rounded-4 shadow-lg border-0"
-              >
-                <div class="modal-header bg-primary text-white rounded-top-4">
-                  <h5
-                    class="modal-title fw-bold fs-3"
-                    id="modalCreateProductTitle"
-                  >
-                    Thêm sản phẩm
-                  </h5>
-                  <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-dismiss="modal"
-                    aria-label="Đóng"
-                  ></button>
-                </div>
-                <div class="modal-body p-4 fs-3" id="modalCreateProductBody">
-                  <!-- Nội dung sẽ được JS gán động -->
-                </div>
-                <div class="modal-footer bg-light rounded-bottom-4">
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-lg px-4"
-                    data-dismiss="modal"
-                  >
-                    Huỷ
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover modern-table mb-0">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Loại sản phẩm</th>
+                <th>Giá (VND)</th>
+                <th style="width: 1%; white-space: nowrap" class="text-nowrap">Hành động</th>
+              </tr>
+              </thead>
+              <tbody th:if="${computerItems.content.size() == 0}">
+              <tr>
+                <td colspan="5" class="table-empty-row">
+                  <i class="fas fa-box-open fa-2x mb-2"></i><br />
+                  Không có dữ liệu
+                </td>
+              </tr>
+              </tbody>
+              <tbody th:each="item : ${computerItems.content}" th:unless="${computerItems.content.size() == 0}">
+              <tr>
+                <td th:text="${item.id}"></td>
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.category?.name} ?: ''"></td>
+                <td th:text="${#numbers.formatInteger(item.price, 0, 'POINT')}"></td>
+                <td style="width: 1%; white-space: nowrap" class="text-nowrap">
+                  <button class="btn btn-primary modern-btn" data-bs-toggle="tooltip" title="Xem chi tiết" th:attr="data-id=${item.id}" onclick="viewProductDetailFromList(this, 'computerItem')">
+                    <i class="fas fa-eye"></i><span class="d-none d-xl-inline ms-1"> Xem</span>
                   </button>
-                  <button type="submit" class="btn btn-success btn-lg px-4">
-                    Lưu
+                  <button class="btn btn-warning modern-btn" data-bs-toggle="tooltip" title="Sửa" th:attr="data-id=${item.id}" onclick="openEditModalFromList(this, 'computerItem')">
+                    <i class="fas fa-edit"></i><span class="d-none d-xl-inline ms-1"> Sửa</span>
                   </button>
-                </div>
-              </form>
-            </div>
+                  <form th:action="@{'/admin/product/item/delete/' + ${item.id}}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xoá linh kiện này không?');" style="display: inline">
+                    <button type="submit" class="btn btn-danger modern-btn" data-bs-toggle="tooltip" title="Xoá">
+                      <i class="fas fa-trash-alt"></i><span class="d-none d-xl-inline ms-1"> Xoá</span>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
+          <!-- Pagination Items -->
+          <nav aria-label="Page navigation" th:if="${computerItems.totalElements > 0}">
+            <ul class="pagination pagination-lg justify-content-center my-3">
+              <li class="page-item" th:classappend="${!computerItems.hasPrevious()} ? 'disabled'">
+                <a class="page-link page-link-prev px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number - 1})}" aria-label="Previous">
+                  <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, computerItems.totalPages - 1)}" th:classappend="${i == computerItems.number} ? 'active'">
+                <a class="page-link px-3 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${i})}" th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item disabled ms-2">
+                <span class="page-link px-3 py-2 fs-5">of <span th:text="${computerItems.totalPages}">0</span></span>
+              </li>
+              <li class="page-item" th:classappend="${!computerItems.hasNext()} ? 'disabled'">
+                <a class="page-link page-link-next px-4 py-2 fs-5" th:href="@{product(pcPage=${pcs.number}, computerItemPage=${computerItems.number + 1})}" aria-label="Next">
+                  Next<span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
 
-          <!-- Modal for viewing product details -->
-          <div
-            class="modal fade"
-            id="modalViewProduct"
-            tabindex="-1"
-            aria-labelledby="modalViewTitle"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-dialog-centered modal-xl">
-              <div class="modal-content rounded-4 shadow-lg border-0">
-                <div class="modal-header bg-info text-white rounded-top-4">
-                  <h5 class="modal-title fw-bold" id="modalViewTitle">
-                    Chi tiết sản phẩm
-                  </h5>
-                  <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Đóng"
-                  ></button>
+      <!-- Modal for creating new product -->
+      <div class="modal fade" id="modalCreateProduct" tabindex="-1" aria-labelledby="modalCreateProductTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <form id="create-product-form" method="post" class="modal-content rounded-4 shadow-lg border-0">
+            <div class="modal-header bg-primary text-white rounded-top-4">
+              <h5 class="modal-title fw-bold" id="modalCreateProductTitle">Thêm sản phẩm</h5>
+              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-4" id="modalCreateProductBody">
+              <!-- Nội dung sẽ được JS gán động -->
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Huỷ</button>
+              <button type="submit" class="btn btn-primary btn-lg px-4">Lưu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal for viewing product details -->
+      <div class="modal fade" id="modalViewProduct" tabindex="-1" aria-labelledby="modalViewTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content rounded-4 shadow-lg border-0">
+            <div class="modal-header bg-info text-white rounded-top-4">
+              <h5 class="modal-title fw-bold" id="modalViewTitle">Chi tiết sản phẩm</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-4 px-5">
+              <div class="container-fluid">
+                <!-- ID + Name -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="font-weight-bold">Mã sản phẩm</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-id"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="font-weight-bold">Tên</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-name"></div>
+                  </div>
                 </div>
-                <div class="modal-body p-4 px-5">
-                  <div class="container-fluid">
-                    <!-- ID + Name -->
-                    <div class="row mb-3">
-                      <div class="col-md-6">
-                        <label class="font-weight-bold">Mã sản phẩm</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-id"
-                        ></div>
-                      </div>
-                      <div class="col-md-6">
-                        <label class="font-weight-bold">Tên</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-name"
-                        ></div>
-                      </div>
-                    </div>
-                    <!-- Category + Price -->
-                    <div class="row mb-3" id="row-category-price">
-                      <div class="col-md-6" id="view-category-group">
-                        <label class="font-weight-bold">Loại</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-category"
-                        ></div>
-                      </div>
-                      <div
-                        class="col-md-6"
-                        id="view-computer-items-group"
-                        style="display: none"
-                      >
-                        <label class="font-weight-bold"
-                          >Linh kiện cấu thành</label
-                        >
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-computer-items"
-                        ></div>
-                      </div>
-                      <div class="col-md-6">
-                        <label class="font-weight-bold">Giá (VND)</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-price"
-                        ></div>
-                      </div>
-                    </div>
-                    <!-- Brand + Model (Only ComputerItem) -->
-                    <div class="row mb-3" id="row-brand-model">
-                      <div class="col-md-6">
-                        <label class="font-weight-bold">Brand</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-brand"
-                        ></div>
-                      </div>
-                      <div class="col-md-6">
-                        <label class="font-weight-bold">Model</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-model"
-                        ></div>
-                      </div>
-                    </div>
-                    <!-- Description -->
-                    <div class="row mb-3" id="row-description">
-                      <div class="col-12">
-                        <label class="font-weight-bold">Mô tả</label>
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-description"
-                          style="white-space: pre-wrap"
-                        ></div>
-                      </div>
-                    </div>
-                    <!-- PC: Danh sách linh kiện -->
-                    <div
-                      class="row mb-3"
-                      id="row-computer-items"
-                      style="display: none"
-                    >
-                      <div class="col-12">
-                        <label class="font-weight-bold"
-                          >Danh sách linh kiện</label
-                        >
-                        <div
-                          class="form-control-plaintext border rounded bg-light px-3 py-2"
-                          id="view-computer-items"
-                        ></div>
-                      </div>
-                    </div>
-                    <!-- Image -->
-                    <div class="row mt-4">
-                      <div class="col-12 text-center" id="view-image">
-                        <!-- images inserted here -->
-                      </div>
-                    </div>
+                <!-- Category + Price -->
+                <div class="row mb-3" id="row-category-price">
+                  <div class="col-md-6" id="view-category-group">
+                    <label class="font-weight-bold">Loại</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-category"></div>
+                  </div>
+                  <div class="col-md-6" id="view-computer-items-group" style="display: none">
+                    <label class="font-weight-bold">Linh kiện cấu thành</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-computer-items"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="font-weight-bold">Giá (VND)</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-price"></div>
+                  </div>
+                </div>
+                <!-- Brand + Model (Only ComputerItem) -->
+                <div class="row mb-3" id="row-brand-model">
+                  <div class="col-md-6">
+                    <label class="font-weight-bold">Brand</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-brand"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="font-weight-bold">Model</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-model"></div>
+                  </div>
+                </div>
+                <!-- Description -->
+                <div class="row mb-3" id="row-description">
+                  <div class="col-12">
+                    <label class="font-weight-bold">Mô tả</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-description" style="white-space: pre-wrap"></div>
+                  </div>
+                </div>
+                <!-- PC: Danh sách linh kiện -->
+                <div class="row mb-3" id="row-computer-items" style="display: none">
+                  <div class="col-12">
+                    <label class="font-weight-bold">Danh sách linh kiện</label>
+                    <div class="form-control-plaintext border rounded bg-light px-3 py-2" id="view-computer-items"></div>
+                  </div>
+                </div>
+                <!-- Image -->
+                <div class="row mt-4">
+                  <div class="col-12 text-center" id="view-image">
+                    <!-- images inserted here -->
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Modal for editing product -->
-          <div
-            class="modal fade"
-            id="modalEditProduct"
-            tabindex="-1"
-            aria-labelledby="edit-modal-title"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-              <form
-                id="edit-product-form"
-                method="post"
-                class="modal-content rounded-4 shadow-lg border-0"
-              >
-                <div class="modal-header bg-warning text-white rounded-top-4">
-                  <h5 class="modal-title fw-bold" id="edit-modal-title">
-                    Chỉnh sửa sản phẩm
-                  </h5>
-                  <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-dismiss="modal"
-                    aria-label="Đóng"
-                  ></button>
-                </div>
-                <div class="modal-body p-4" id="modalEditProductBody">
-                  <!-- JS sẽ gán form tùy loại sản phẩm -->
-                </div>
-                <div class="modal-footer bg-light rounded-bottom-4">
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-lg px-4"
-                    data-dismiss="modal"
-                  >
-                    Huỷ
-                  </button>
-                  <button type="submit" class="btn btn-primary btn-lg px-4">
-                    Lưu thay đổi
-                  </button>
-                </div>
-              </form>
+            <div class="modal-footer bg-light rounded-bottom-4">
+              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Đóng</button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Modal for editing product -->
+      <div class="modal fade" id="modalEditProduct" tabindex="-1" aria-labelledby="edit-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <form id="edit-product-form" method="post" class="modal-content rounded-4 shadow-lg border-0">
+            <div class="modal-header bg-warning text-white rounded-top-4">
+              <h5 class="modal-title fw-bold" id="edit-modal-title">Chỉnh sửa sản phẩm</h5>
+              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-4" id="modalEditProductBody">
+              <!-- JS sẽ gán form tùy loại sản phẩm -->
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+              <button type="button" class="btn btn-secondary btn-lg px-4" data-dismiss="modal">Huỷ</button>
+              <button type="submit" class="btn btn-primary btn-lg px-4">Lưu thay đổi</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <script th:inline="javascript">
-      /*<![CDATA[*/
-      window.computerItems = /*[[${computerItems.content}]]*/ [];
-      window.pcs = /*[[${pcs.content}]]*/ [];
-      window.categories = /*[[${categories}]]*/ [];
-      /*]]>*/
-    </script>
-    <script th:src="@{/assets/js/edit-product.js}"></script>
-    <script th:src="@{/assets/js/add-product.js}"></script>
-    <script th:src="@{/assets/js/view-product-detail.js}"></script>
-    <script th:src="@{/assets/js/jquery.min.js}"></script>
-    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
-    <script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>
-    <script th:src="@{/assets/js/superfish.min.js}"></script>
-    <script th:src="@{/assets/js/owl.carousel.min.js}"></script>
-    <script th:src="@{/assets/js/bootstrap-input-spinner.js}"></script>
-    <script th:src="@{/assets/js/jquery.elevateZoom.min.js}"></script>
-    <script th:src="@{/assets/js/jquery.magnific-popup.min.js}"></script>
-    <script th:src="@{/assets/js/main.js}"></script>
-    <script>
-      // Khởi tạo tooltip cho Bootstrap 5
-      document.addEventListener("DOMContentLoaded", function () {
-        var tooltipTriggerList = [].slice.call(
-          document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        );
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-          new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-      });
-    </script>
-  </body>
+  </div>
+</div>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  window.computerItems = /*[[${computerItems.content}]]*/ [];
+  window.pcs = /*[[${pcs.content}]]*/ [];
+  window.categories = /*[[${categories}]]*/ [];
+  /*]]>*/
+</script>
+<script th:src="@{/assets/js/edit-product.js}"></script>
+<script th:src="@{/assets/js/add-product.js}"></script>
+<script th:src="@{/assets/js/view-product-detail.js}"></script>
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
+<script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>
+<script th:src="@{/assets/js/superfish.min.js}"></script>
+<script th:src="@{/assets/js/owl.carousel.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-input-spinner.js}"></script>
+<script th:src="@{/assets/js/jquery.elevateZoom.min.js}"></script>
+<script th:src="@{/assets/js/jquery.magnific-popup.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+<script>
+  // Khởi tạo tooltip cho Bootstrap 5
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+      new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>
+</body>
 </html>
