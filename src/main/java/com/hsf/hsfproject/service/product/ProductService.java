@@ -144,6 +144,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public PC updatePc(PC pc) {
+        PC existingPc = pcRepository.findById(pc.getId())
+                .orElseThrow(() -> new IllegalArgumentException("PC not found"));
+        existingPc.setName(pc.getName());
+        existingPc.setDescription(pc.getDescription());
+        existingPc.setComputerItems(pc.getComputerItems());
+        // Cập nhật lại giá dựa trên linh kiện mới
+        Double price = pc.getComputerItems() != null ? pc.getComputerItems().stream().mapToDouble(ComputerItem::getPrice).sum() : 0.0;
+        existingPc.setPrice(price);
+        pcRepository.save(existingPc);
+        return existingPc;
+    }
+
+    @Override
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }

@@ -1,0 +1,163 @@
+/* admin-simple.css */
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+table {
+    width: 90%;
+    margin: 0 auto 30px auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+}
+table th, table td {
+    border: 1px solid #e1e1e1;
+    padding: 12px 8px;
+    text-align: center;
+}
+table th {
+    background: #2980b9;
+    color: #fff;
+    font-weight: bold;
+}
+table tr:nth-child(even) {
+    background: #f2f6fa;
+}
+table tr:hover {
+    background: #eaf6ff;
+}
+button, .btn {
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 1rem;
+}
+button:hover, .btn:hover {
+    background: #1c5d8c;
+}
+form[style*="display:inline"] {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+}
+form[style*="display:inline"] button {
+    margin-left: 0;
+    padding: 6px 18px;
+    min-width: 60px;
+}
+a, a:visited {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: 500;
+}
+a:hover {
+    text-decoration: underline;
+}
+.pagination {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.pagination a, .pagination span {
+    display: inline-block;
+    margin: 0 4px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    background: #fff;
+    border: 1px solid #2980b9;
+    color: #2980b9;
+    font-weight: 500;
+}
+.pagination a:hover {
+    background: #2980b9;
+    color: #fff;
+}
+label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+input[type="text"], input[type="email"] {
+    padding: 7px 10px;
+    border: 1px solid #bfc9d1;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    width: 250px;
+}
+form {
+    width: 350px;
+    margin: 0 auto 30px auto;
+    background: #fff;
+    padding: 20px 30px 15px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    background: #2c3e50;
+    color: #fff;
+    padding-top: 40px;
+    box-shadow: 2px 0 8px rgba(44,62,80,0.08);
+    z-index: 100;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar li {
+    margin-bottom: 18px;
+}
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 10px 24px;
+    display: block;
+    border-radius: 4px 20px 20px 4px;
+    transition: background 0.18s;
+}
+.sidebar a.active, .sidebar a:hover {
+    background: #2980b9;
+    color: #fff;
+}
+.main-content {
+    margin-left: 220px;
+    padding: 30px 20px 20px 20px;
+}
+@media (max-width: 600px) {
+    table, form {
+        width: 100% !important;
+        font-size: 0.95rem;
+    }
+    input[type="text"], input[type="email"] {
+        width: 100%;
+    }
+}
+@media (max-width: 700px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        padding-top: 10px;
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 10px;
+    }
+} 

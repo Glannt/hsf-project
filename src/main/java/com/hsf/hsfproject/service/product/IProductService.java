@@ -22,4 +22,5 @@ public interface IProductService {
     ComputerItem deleteComputerItem(UUID id);
     List<Category> getAllCategories();
     PC deletePc(UUID id);
+    PC updatePc(PC pc);
 }

@@ -97,6 +97,13 @@ public class AdminController {
         return "redirect:/admin/product";
     }
 
+    @PostMapping("/product/pc/edit/{id}")
+    public String editPC(@ModelAttribute PC item, @PathVariable UUID id, Model model) {
+        item.setId(id);
+        productService.updatePc(item);
+        return "redirect:/admin/product";
+    }
+
     @PostMapping("/product/pc/delete/{id}")
     public String deletePC(@PathVariable UUID id) {
         productService.deletePc(id); // Assuming this method deletes the item

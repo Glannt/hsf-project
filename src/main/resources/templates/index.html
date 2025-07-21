@@ -130,10 +130,10 @@
                   <a th:href="@{/logout}">Logout</a>
                 </li>
                 <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
                 <li th:if="${!isLogin}">
                   <a th:href="@{/register}">Register</a>
                 </li>
+                <li><a th:href="@{/admin}">Admin</a></li>
               </ul>
             </nav>
           </div>
@@ -154,11 +154,14 @@
                     <figure class="product-media">
                       <span class="product-label label-new">New</span>
                       <a th:href="@{/product/{id}(id=${pc.id})}">
-                        <img
-                          src="assets/images/products/product.jpg"
-                          alt="Product image"
-                          class="product-image"
-                        />
+                        <img th:if="${pc.images != null and #lists.size(pc.images) > 0}"
+                             th:src="@{${pc.images[0].imageUrl}}"
+                             th:alt="${pc.name}"
+                             class="product-image" />
+                        <img th:if="${pc.images == null or #lists.size(pc.images) == 0}"
+                             th:src="@{/assets/images/products/product.jpg}"
+                             alt="Product image"
+                             class="product-image" />
                       </a>
 
                       <div class="product-action-vertical">

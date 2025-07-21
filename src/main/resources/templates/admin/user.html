@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Quản lý User</title>
+    <link rel="stylesheet" th:href="@{/assets/css/admin-simple.css}" />
 </head>
 <body>
-
+<div style="text-align:left; margin: 20px 0 10px 30px;">
+    <a href="/admin" class="btn">Về trang chính</a>
+</div>
+<h1>Danh sách User</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user, iterStat : ${users.content}">
+        <td th:text="${iterStat.index + 1}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.phoneNumber}"></td>
+        <td>
+            <a th:href="@{'/admin/user/' + ${user.id}}">Xem/Sửa</a>
+            <form th:action="@{'/admin/user/' + ${user.id} + '/delete'}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa user này?')">Xóa</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="pagination">
+    <span th:if="${users.hasPrevious()}">
+        <a th:href="@{'/admin/user?page=' + ${users.number - 1}}">Trang trước</a>
+    </span>
+    <span>Trang <span th:text="${users.number + 1}"></span> / <span th:text="${users.totalPages}"></span></span>
+    <span th:if="${users.hasNext()}">
+        <a th:href="@{'/admin/user?page=' + ${users.number + 1}}">Trang sau</a>
+    </span>
+</div>
 </body>
 </html>

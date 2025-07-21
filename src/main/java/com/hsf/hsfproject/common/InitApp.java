@@ -4,6 +4,7 @@ import com.hsf.hsfproject.model.Category;
 import com.hsf.hsfproject.model.ComputerItem;
 import com.hsf.hsfproject.model.PC;
 import com.hsf.hsfproject.model.Role;
+import com.hsf.hsfproject.model.Image;
 import com.hsf.hsfproject.repository.CategoryRepository;
 import com.hsf.hsfproject.repository.ComputerItemRepository;
 import com.hsf.hsfproject.repository.PCRepository;
@@ -132,21 +133,34 @@ public class InitApp {
             }
         };
     }
-//    @Bean
-//    CommandLineRunner initPCs(PCRepository pcRepository) {
-//        return args -> {
-//            if (pcRepository.count() == 0) {
-//                PC pc1 = PC.builder()
-//                        .name("Gaming PC")
-//                        .computerItems(1500.0)
-//                        .build();
-//                PC pc2 = PC.builder()
-//                        .name("Office PC")
-//                        .totalPrice(800.0)
-//                        .build();
-//                pcRepository.save(pc1);
-//                pcRepository.save(pc2);
-//            }
-//        };
-//    }
+    @Bean
+    CommandLineRunner initPCs(PCRepository pcRepository, ComputerItemRepository computerItemRepository) {
+        return args -> {
+            if (pcRepository.count() == 0 && computerItemRepository.count() > 0) {
+                // Lấy các linh kiện mẫu
+                List<ComputerItem> allItems = computerItemRepository.findAll();
+                // PC Gaming gồm 4 linh kiện đầu tiên
+                Image img1 = Image.builder()
+                    .imageUrl("https://m.media-amazon.com/images/I/81JlCSDZ3AL._AC_SL1500_.jpg")
+                    .description("Ảnh Gaming PC")
+                    .build();
+                PC pc1 = PC.builder()
+                        .name("Gaming PC")
+                        .description("PC cấu hình cao cho game thủ")
+                        .computerItems(allItems.subList(0, Math.min(4, allItems.size())))
+                        .price(allItems.subList(0, Math.min(4, allItems.size())).stream().mapToDouble(ComputerItem::getPrice).sum())
+                        .images(List.of(img1))
+                        .build();
+                // PC Văn phòng gồm 3 linh kiện tiếp theo
+                PC pc2 = PC.builder()
+                        .name("Office PC")
+                        .description("PC văn phòng tiết kiệm điện")
+                        .computerItems(allItems.subList(Math.min(4, allItems.size()), Math.min(7, allItems.size())))
+                        .price(allItems.subList(Math.min(4, allItems.size()), Math.min(7, allItems.size())).stream().mapToDouble(ComputerItem::getPrice).sum())
+                        .build();
+                pcRepository.save(pc1);
+                pcRepository.save(pc2);
+            }
+        };
+    }
 }

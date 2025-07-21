@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết User</title>
+    <link rel="stylesheet" th:href="@{/assets/css/admin-simple.css}" />
+</head>
+<body>
+<h1>Chi tiết User</h1>
+<form th:action="@{'/admin/user/' + ${userDetail.id} + '/edit'}" method="post">
+    <label>Username:</label>
+    <input type="text" name="username" th:value="${userDetail.username}" required/><br/>
+    <label>Email:</label>
+    <input type="email" name="email" th:value="${userDetail.email}" required/><br/>
+    <label>Phone:</label>
+    <input type="text" name="phoneNumber" th:value="${userDetail.phoneNumber}"/><br/>
+    <button type="submit">Lưu thay đổi</button>
+</form>
+<div style="text-align:center; margin-top:18px;">
+    <a th:href="@{'/admin/user'}">Quay lại danh sách</a>
+</div>
+</body>
+</html> 

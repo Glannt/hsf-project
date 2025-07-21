@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Slf4j(topic = "UserService")
@@ -60,27 +61,39 @@ public class UserService implements IUserService {
         return newUser;
     }
 
-    @Override
-    public void updateUser(Long userId, String username, String password) {
 
+
+    // Triển khai cho admin
+    @Override
+    public User getUserById(UUID id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void deleteUser(Long userId) {
-
+    public void updateUser(UUID id, String username, String email, String phoneNumber) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
+            userRepository.save(user);
+        }
     }
 
     @Override
-    public User getUserByName(String name) {
-        return null;
+    public void deleteUser(UUID id) {
+        userRepository.deleteById(id);
     }
 
     @Override
     public Page<User> getUsers(Pageable pageable) {
-        return null;
+        return userRepository.findAll(pageable);
     }
 
-
+    @Override
+    public User getUserByName(String name) {
+        return userRepository.findByUsername(name);
+    }
 
     @Override
     public User findByUsername(String username) {
