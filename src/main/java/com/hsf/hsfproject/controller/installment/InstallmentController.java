@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.hsf.hsfproject.constants.enums.InstallmentStatus;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -139,5 +141,23 @@ public class InstallmentController {
                 .orElseThrow(() -> new IllegalArgumentException("Installment not found"));
         installmentService.makeInstallmentPayment(installment.getId(), installment.getAmountDue(), "MANUAL");
         return "redirect:/installments/view/" + installment.getInstallmentPlan().getId();
+    }
+
+    @GetMapping("/payment/{id}")
+    public String showPaymentPage(@PathVariable("id") String installmentId, Model model) {
+        Installment installment = installmentRepository.findById(UUID.fromString(installmentId)).orElse(null);
+        model.addAttribute("installment", installment);
+        return "installment/payment";
+    }
+
+    @PostMapping("/payment/place")
+    public String placeOrder(@RequestParam("installmentId") String installmentId) {
+        Installment installment = installmentRepository.findById(UUID.fromString(installmentId)).orElse(null);
+        if (installment != null && installment.getStatus() == InstallmentStatus.PENDING) {
+            installment.setStatus(InstallmentStatus.PAID);
+            installment.setPaidDate(LocalDate.now());
+            installmentRepository.save(installment);
+        }
+        return "redirect:/installments/payments";
     }
 }

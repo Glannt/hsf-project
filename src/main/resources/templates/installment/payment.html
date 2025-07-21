@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Installment Payment</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="container mt-5 mb-5">
+            <h2 class="mb-4">Installment Payment</h2>
+            <div th:if="${installment != null}">
+                <div class="card">
+                    <div class="card-body">
+                        <p><strong>Due Date:</strong> <span th:text="${#temporals.format(installment.dueDate,'dd/MM/yyyy')}"></span></p>
+                        <p><strong>Amount Due:</strong> <span th:text="${#numbers.formatDecimal(installment.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></span></p>
+                        <p><strong>Status:</strong> <span th:text="${installment.status}"></span></p>
+                        <form th:action="@{/installments/payment/place}" method="post">
+                            <input type="hidden" name="installmentId" th:value="${installment.id}" />
+                            <button type="submit" class="btn btn-success" th:if="${installment.status.name() == 'PENDING'}">Place Order</button>
+                            <span th:if="${installment.status.name() != 'PENDING'}" class="text-success">Already Paid</span>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
+

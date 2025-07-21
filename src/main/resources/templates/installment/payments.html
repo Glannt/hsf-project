@@ -38,10 +38,7 @@
                         <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
                         <td th:text="${ins.status}"></td>
                         <td>
-                            <form th:if="${ins.status.name() == 'PENDING'}" th:action="@{/installments/pay}" method="post">
-                                <input type="hidden" name="installmentId" th:value="${ins.id}" />
-                                <button type="submit" class="btn btn-sm btn-primary">Pay</button>
-                            </form>
+                            <a th:if="${ins.status.name() == 'PENDING'}" th:href="@{/installments/payment/{id}(id=${ins.id})}" class="btn btn-sm btn-primary">Pay</a>
                         </td>
                     </tr>
                     </tbody>
