@@ -3,11 +3,9 @@ package com.hsf.hsfproject.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
 import lombok.*;
+import jakarta.persistence.*;
 
 @Table(name = "transactions")
 @Entity
@@ -29,6 +27,8 @@ public class Transaction extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @OneToOne(mappedBy = "transaction")
+    private Installment installment;
     // Additional fields can be added as needed
 }
 

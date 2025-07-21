@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Installment Plan</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="container mt-5 mb-5">
+            <h2 class="mb-4">Select Installment Plan</h2>
+            <form th:action="@{/installments/create}" method="post">
+                <input type="hidden" name="orderId" th:value="${order.id}" />
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Duration</th>
+                        <th>Interest Rate</th>
+                        <th>Monthly Payment</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="type : ${types}">
+                        <td><input type="radio" name="typeId" th:value="${type.id}" /></td>
+                        <td th:text="${type.months} + ' months'"></td>
+                        <td th:text="${type.interestRate != null ? type.interestRate * 100 + '%':'0%'}"></td>
+                        <td th:text="${#numbers.formatDecimal((order.totalPrice + (order.totalPrice * (type.interestRate != null ? type.interestRate : 0))) / type.months,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Create Installment Plan</button>
+            </form>
+        </div>
+    </main>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

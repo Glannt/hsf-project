@@ -200,7 +200,21 @@
                             </tr>
                           </tbody>
                         </table>
-
+                        <div th:if="${order.installmentPlan != null}" class="mt-3">
+                          <h5>Installment Schedule</h5>
+                          <table class="table table-sm">
+                            <thead>
+                            <tr><th>Due Date</th><th>Amount</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="ins : ${order.installmentPlan.installments}">
+                              <td th:text="${#temporals.format(ins.dueDate,'dd/MM/yyyy')}"></td>
+                              <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                              <td th:text="${ins.status}"></td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
                         <!-- Accordion Payment Methods -->
                         <div class="accordion-summary" id="accordion-payment">
                           <!-- Stripe -->

@@ -18,4 +18,9 @@ public class TransactionService implements ITransactionService {
     public Page<Transaction> getAllTransactions(Pageable pageable) {
         return transactionRepository.findAll(pageable);
     }
+
+    @Override
+    public Page<Transaction> getInstallmentTransactions(Pageable pageable) {
+        return transactionRepository.findByInstallmentIsNotNull(pageable);
+    }
 }

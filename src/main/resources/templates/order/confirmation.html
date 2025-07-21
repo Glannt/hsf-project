@@ -9,6 +9,21 @@
 <div class="container" style="text-align:center; margin-top:50px;">
     <h1>Thank you for your purchase!</h1>
     <p>Your order has been placed successfully.</p>
+    <div th:if="${order != null and order.installmentPlan != null}" class="mb-3">
+        <h5>Installment Schedule</h5>
+        <table class="table table-sm">
+            <thead>
+            <tr><th>Due Date</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="ins : ${order.installmentPlan.installments}">
+                <td th:text="${#temporals.format(ins.dueDate,'dd/MM/yyyy')}"></td>
+                <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                <td th:text="${ins.status}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
 </div>
 </body>

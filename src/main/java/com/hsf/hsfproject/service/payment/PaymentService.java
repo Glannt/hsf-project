@@ -10,12 +10,14 @@ import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.hsf.hsfproject.service.installment.InstallmentService;
+import com.hsf.hsfproject.model.Installment;
 
 import com.hsf.hsfproject.configuration.VnPayConfig;
 import com.hsf.hsfproject.dtos.request.VnPayRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import java.util.UUID;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +31,7 @@ public class PaymentService {
     private @Autowired VnPayConfig vnPayConfig;
 
     private final IOrderService orderService;
-
+    private final InstallmentService installmentService;
 
     public String createPaymentUrl(HttpServletRequest req, VnPayRequest order) throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
@@ -152,6 +154,12 @@ public class PaymentService {
                 .build();
 
         return Session.create(params);
+    }
+    /**
+     * Process a payment for a single installment and create the corresponding transaction.
+     */
+    public Installment payInstallment(UUID installmentId, double amount, String paymentMethod) {
+        return installmentService.makeInstallmentPayment(installmentId, amount, paymentMethod);
     }
 }
 

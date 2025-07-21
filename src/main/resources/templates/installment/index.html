@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Installment Plans</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="container mt-5 mb-5">
+            <h2 class="mb-4">My Installment Plans</h2>
+            <div th:if="${plans}">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Monthly Payment</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${plans}">
+                        <td th:text="${p.planName}"></td>
+                        <td th:text="${#dates.format(p.startDate,'dd/MM/yyyy')}"></td>
+                        <td th:text="${#numbers.formatDecimal(p.monthlyPayment,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                        <td><a th:href="@{/installments/view/{id}(id=${p.id})}" class="btn btn-sm btn-primary">View</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

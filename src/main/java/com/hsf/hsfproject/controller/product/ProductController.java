@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.hsf.hsfproject.repository.InstalllmentTypeRepository;
 
 import java.security.Principal;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j(topic = "ProductController")
 public class ProductController {
+    private final InstalllmentTypeRepository installmentTypeRepository;
     private final IProductService productService;
     private final IUserService userService;
     public void addUserToModel(Model model, Principal principal) {
@@ -41,6 +43,8 @@ public class ProductController {
     public String viewProduct(@PathVariable("id") UUID id, Model model, Principal principal) {
         addUserToModel(model, principal);
         Object result = productService.getProduct(id);
+
+        model.addAttribute("installmentTypes", installmentTypeRepository.findAll());
 
         if (result instanceof PC) {
             model.addAttribute("productPC", (PC) result);

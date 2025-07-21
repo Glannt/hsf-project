@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Installment Types</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body class="bg-light">
+<div class="container-fluid py-4">
+    <div class="row">
+        <nav id="sidebarMenu" class="d-lg-block bg-white sidebar collapse border-end" style="width: 260px;">
+            <div class="position-sticky">
+                <div class="list-group list-group-flush mx-3 mt-4">
+                    <a href="/admin/product" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Sản phẩm</span>
+                    </a>
+                    <a href="/admin/order" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-receipt me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Đơn hàng</span>
+                    </a>
+                    <a href="/admin/user" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-users me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Người dùng</span>
+                    </a>
+                    <a href="/admin/installments" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-file-invoice-dollar me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Installments</span>
+                    </a>
+                    <a href="/admin/installment-types" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active">
+                        <i class="fas fa-percent me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Installment Types</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div class="col-lg-9 col-12">
+            <h2 class="text-primary mb-4">Installment Types</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Months</th>
+                        <th>Interest Rate</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="t : ${types}">
+                        <form th:action="@{/admin/installment-type/update}" method="post">
+                            <td th:text="${t.name}"></td>
+                            <td><input type="number" name="months" th:value="${t.months}" class="form-control"/></td>
+                            <td><input type="number" step="0.01" name="rate" th:value="${t.interestRate}" class="form-control"/></td>
+                            <td>
+                                <input type="hidden" name="id" th:value="${t.id}"/>
+                                <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                            </td>
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

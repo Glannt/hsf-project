@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Installment History</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="container mt-5 mb-5">
+            <h2 class="mb-4">Installment History</h2>
+            <div th:if="${plans}">
+                <div th:each="plan : ${plans}" class="mb-4">
+                    <h5 th:text="${plan.planName}"></h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ins : ${plan.installments}">
+                            <td th:text="${#temporals.format(ins.dueDate,'dd/MM/yyyy')}"></td>
+                            <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                            <td th:text="${ins.status}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

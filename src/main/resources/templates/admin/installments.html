@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Installment Plans</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body class="bg-light">
+<div class="container-fluid py-4">
+    <div class="row">
+        <nav id="sidebarMenu" class="d-lg-block bg-white sidebar collapse border-end" style="width: 260px;">
+            <div class="position-sticky">
+                <div class="list-group list-group-flush mx-3 mt-4">
+                    <a href="/admin/product" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Sản phẩm</span>
+                    </a>
+                    <a href="/admin/order" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-receipt me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Đơn hàng</span>
+                    </a>
+                    <a href="/admin/user" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-users me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Người dùng</span>
+                    </a>
+                    <a href="/admin/installments" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active">
+                        <i class="fas fa-file-invoice-dollar me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Installments</span>
+                    </a>
+                    <a href="/admin/installment-types" class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center">
+                        <i class="fas fa-percent me-3 sidebar-link-icon"></i><span class="sidebar-link-text">Installment Types</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div class="col-lg-9 col-12">
+            <h2 class="text-primary mb-4">All Installment Plans</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Order</th>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Monthly</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="plan : ${plans}">
+                        <td th:text="${plan.order.orderNumber}"></td>
+                        <td th:text="${plan.order.user.username}"></td>
+                        <td th:text="${plan.installmentType.name}"></td>
+                        <td th:text="${plan.monthlyPayment}"></td>
+                        <td>
+                            <span th:each="inst : ${plan.installments}" th:text="${inst.status}" th:class="|badge me-1 ${inst.status=='PAID'? 'bg-success':'bg-warning text-dark'}|"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

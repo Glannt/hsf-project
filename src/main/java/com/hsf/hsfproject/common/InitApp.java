@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import com.hsf.hsfproject.model.InstalllmentType;
+import com.hsf.hsfproject.repository.InstalllmentTypeRepository;
 
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class InitApp {
     private final PCRepository pcRepository;
     private final RoleRepository roleRepository;
     private final ComputerItemRepository computerItemRepository;
+    private final InstalllmentTypeRepository installmentTypeRepository;
     @Bean
     CommandLineRunner initRoles(RoleRepository roleRepository) {
         return args -> {
@@ -129,6 +132,21 @@ public class InitApp {
                 categoryRepository.save(motherboard);
                 categoryRepository.save(psu);
                 categoryRepository.save(caseCategory);
+            }
+        };
+    }
+
+    @Bean
+    CommandLineRunner initInstallmentTypes(InstalllmentTypeRepository repo) {
+        return args -> {
+            if (repo.count() == 0) {
+                List<InstalllmentType> types = List.of(
+                        InstalllmentType.builder().name("3 months").months(3).interestRate(0.03).build(),
+                        InstalllmentType.builder().name("6 months").months(6).interestRate(0.05).build(),
+                        InstalllmentType.builder().name("12 months").months(12).interestRate(0.07).build(),
+                        InstalllmentType.builder().name("24 months").months(24).interestRate(0.1).build()
+                );
+                repo.saveAll(types);
             }
         };
     }

@@ -267,7 +267,12 @@
                         >
                           Update Cart
                         </button>
-                        <!--                                        <a th:href="@{/order}" class="btn btn-primary btn-block">Proceed to Checkout</a>-->
+
+                        <!-- Adding Installment Plan button -->
+                        <a th:href="@{/installments/plan}" class="btn btn-outline-primary-2 btn-block" style="margin: 10px 0;">
+                          Pay with Installment Plan
+                        </a>
+
                         <form
                           th:action="@{/orders}"
                           method="post"

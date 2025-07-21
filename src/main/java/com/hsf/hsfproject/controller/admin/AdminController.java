@@ -14,6 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.hsf.hsfproject.model.InstallmentPlan;
+import com.hsf.hsfproject.model.InstalllmentType;
+import com.hsf.hsfproject.repository.InstallmentPlanRepository;
+import com.hsf.hsfproject.repository.InstallmentRepository;
+import com.hsf.hsfproject.repository.InstalllmentTypeRepository;
 
 import java.security.Principal;
 import java.util.List;
@@ -27,6 +32,9 @@ public class AdminController {
     private final IUserService userService;
     private final IProductService productService;
     private final IOrderService orderService;
+    private final InstallmentPlanRepository installmentPlanRepository;
+    private final InstallmentRepository installmentRepository;
+    private final InstalllmentTypeRepository installmentTypeRepository;
     public void addUserToModel(Model model, Principal principal) {
         if (principal != null && !model.containsAttribute("user")) {
             User user = userService.findByUsername(principal.getName());
@@ -121,5 +129,32 @@ public class AdminController {
         orderService.updateOrderStatus(orderId ,status);
         return "redirect:/admin/order";
     }
-    
+
+    @GetMapping("/installments")
+    public String viewInstallments(Model model, Principal principal){
+        addUserToModel(model, principal);
+        List<InstallmentPlan> plans = installmentPlanRepository.findAll();
+        model.addAttribute("plans", plans);
+        return "admin/installments";
+    }
+
+    @GetMapping("/installment-types")
+    public String viewInstallmentTypes(Model model, Principal principal){
+        addUserToModel(model, principal);
+        List<InstalllmentType> types = installmentTypeRepository.findAll();
+        model.addAttribute("types", types);
+        return "admin/installment-type";
+    }
+
+    @PostMapping("/installment-type/update")
+    public String updateInstallmentType(@RequestParam UUID id,
+                                        @RequestParam int months,
+                                        @RequestParam double rate){
+        InstalllmentType type = installmentTypeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Type not found"));
+        type.setMonths(months);
+        type.setInterestRate(rate);
+        installmentTypeRepository.save(type);
+        return "redirect:/admin/installment-types";
+    }
 }

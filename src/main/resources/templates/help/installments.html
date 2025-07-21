@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Installment Help</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <h2 class="text-primary">Installment Payment Guide</h2>
+    <p>This page explains how our installment payments work. Choose one of the available plans and pay over time.</p>
+    <h5>How it works</h5>
+    <ol>
+        <li>Select an installment plan during checkout. The monthly amount depends on the plan duration and interest rate.</li>
+        <li>Each month, pay the amount due before the due date shown in your schedule.</li>
+        <li>You can review all active plans in your account page and track paid or upcoming installments.</li>
+        <li>Late payments may incur penalties and restrict new plans.</li>
+    </ol>
+    <h5>Example Plans</h5>
+    <table class="table table-bordered">
+        <thead><tr><th>Duration</th><th>Interest Rate</th></tr></thead>
+        <tbody>
+        <tr><td>3 months</td><td>3%</td></tr>
+        <tr><td>6 months</td><td>5%</td></tr>
+        <tr><td>12 months</td><td>7%</td></tr>
+        <tr><td>24 months</td><td>10%</td></tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

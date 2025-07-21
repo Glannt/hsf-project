@@ -39,6 +39,20 @@
                 <i class="fas fa-users me-3 sidebar-link-icon"></i
                 ><span class="sidebar-link-text">Người dùng</span>
               </a>
+              <a
+                      href="/admin/installments"
+                      class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
+              >
+                <i class="fas fa-file-invoice-dollar me-3 sidebar-link-icon"></i
+                ><span class="sidebar-link-text">Installments</span>
+              </a>
+              <a
+                      href="/admin/installment-types"
+                      class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
+              >
+                <i class="fas fa-percent me-3 sidebar-link-icon"></i
+                ><span class="sidebar-link-text">Installment Types</span>
+              </a>
             </div>
           </div>
         </nav>
@@ -160,6 +174,7 @@
                         <th>Khách hàng</th>
                         <th>Trạng thái</th>
                         <th>Tổng tiền</th>
+                        <th>Installment</th>
                         <th>Ngày đặt</th>
                         <th>Hành động</th>
                       </tr>
@@ -189,8 +204,11 @@
                         <td class="align-middle fw-bold text-end">
                           <span
                             th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')} + ' VND'"
-                            >1,000,000 VND</span
-                          >
+                          >1,000,000 VND</span>
+                        </td>
+                        <td class="align-middle">
+                          <span th:if="${order.installmentPlan != null}" th:text="${order.installmentPlan.planName}"></span>
+                          <span th:if="${order.installmentPlan == null}">None</span>
                         </td>
                         <td class="align-middle text-center">
                           <span>-</span>
@@ -283,7 +301,7 @@
             </div>
           </div>
           <!-- Update Order Status Modals -->
-          <div th:each="order : ${orders != null ? orders.content : {}}">
+          <div th:each="order : ${orders != null ? orders.content : }">
             <div
               class="modal fade"
               th:id="'updateOrderModal' + ${order.id}"
@@ -483,6 +501,21 @@
                         class="text-muted"
                       >
                         No items in this order.
+                      </div>
+                      <div th:if="${order.installmentPlan != null}" class="mt-3">
+                        <h6>Installment Schedule</h6>
+                        <table class="table table-sm">
+                          <thead>
+                          <tr><th>Due Date</th><th>Amount</th><th>Status</th></tr>
+                          </thead>
+                          <tbody>
+                          <tr th:each="ins : ${order.installmentPlan.installments}">
+                            <td th:text="${#temporals.format(ins.dueDate,'dd/MM/yyyy')}"></td>
+                            <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                            <td th:text="${ins.status}"></td>
+                          </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>

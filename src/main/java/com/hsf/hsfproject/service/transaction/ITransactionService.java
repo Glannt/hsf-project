@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.hsf.hsfproject.model.Transaction;
 
 public interface ITransactionService {
-//    Transaction createTransaction;
-Page<Transaction> getAllTransactions(Pageable pageable);
+    //    Transaction createTransaction;
+    Page<Transaction> getAllTransactions(Pageable pageable);
+
+    Page<Transaction> getInstallmentTransactions(Pageable pageable);
 }

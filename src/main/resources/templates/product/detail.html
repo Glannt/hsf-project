@@ -247,6 +247,10 @@
                                         <button type="submit" class="btn-product btn-cart">
                                             <span>Add to Cart</span>
                                         </button>
+<!--                                    Nút thanh toán trả góp-->
+                                    <button type="button" class="btn-product btn-cart ms-2" data-bs-toggle="modal" data-bs-target="#installmentModal">
+                                        <span>Installment Payment</span>
+                                    </button>
 
                                 </div>
                                 <!-- End .product-details-action -->
@@ -417,6 +421,40 @@
     </footer><!-- End .footer -->
 </div>
 <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+<!-- Installment Modal -->
+<div class="modal fade" id="installmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Available Installment Plans</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Duration</th>
+                        <th>Interest</th>
+                        <th>Monthly Payment</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="type : ${installmentTypes}">
+                        <td><input type="radio" name="planType" th:value="${type.id}"/></td>
+                        <td th:text="${type.months} + ' months'"></td>
+                        <td th:text="${type.interestRate != null ? type.interestRate * 100 + '%':'0%'}"></td>
+                        <td th:text="${#numbers.formatDecimal(((productCI != null ? productCI.price : productPC.price) + (type.interestRate != null ? (productCI != null ? productCI.price : productPC.price) * type.interestRate : 0)) / type.months,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="text-end">
+                    <a class="btn btn-primary" th:href="@{/installments/plans}">Configure Plan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
 <script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>

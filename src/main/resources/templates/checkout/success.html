@@ -107,9 +107,24 @@
                     <div class="row mt-2" th:if="${order.shippingAddress}">
                       <div class="col-12">
                         <strong>Shipping Address:</strong>
-                        <span th:text="${order.shippingAddress}"
-                          >123 Main St, City</span
-                        >
+                        <span th:text="${order.shippingAddress}">123 Main St, City</span>
+                      </div>
+                    </div>
+                    <div class="mt-3" th:if="${order.installmentPlan != null}">
+                      <h6>Installment Plan</h6>
+                      <table class="table table-sm">
+                        <thead>
+                        <tr><th>Due Date</th><th>Amount</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ins : ${order.installmentPlan.installments}">
+                          <td th:text="${#temporals.format(ins.dueDate,'dd/MM/yyyy')}"></td>
+                          <td th:text="${#numbers.formatDecimal(ins.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></td>
+                          <td th:text="${ins.status}"></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
                       </div>
                     </div>
                   </div>

@@ -54,5 +54,23 @@ public class TransactionController {
 
         return "transaction/index";
     }
+    @GetMapping("/installments")
+    public String getInstallmentTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model,
+            Principal principal
+    ) {
+        addUserInfo(model, principal);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
+        Page<Transaction> transactions = transactionService.getInstallmentTransactions(pageable);
+
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("totalElements", transactions.getTotalElements());
+        model.addAttribute("totalPages", transactions.getTotalPages());
+        model.addAttribute("currentPage", page);
+
+        return "transaction/index";
+    }
     
 }
