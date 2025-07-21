@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -85,17 +86,42 @@ public class InstallmentController {
     }
 
     @PostMapping("/create")
-    public String createPlan(@RequestParam("orderId") String orderId,
+    public String createPlan(@RequestParam(value = "orderId", required = false) String orderId,
                              @RequestParam("typeId") String typeId,
+                             @RequestParam(value = "cartId", required = false) String cartId,
                              Principal principal) {
         if (principal == null) return "redirect:/login";
-        Order order = orderRepository.findById(UUID.fromString(orderId))
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        Order order = null;
         InstalllmentType type = installmentTypeRepository.findById(UUID.fromString(typeId))
                 .orElseThrow(() -> new IllegalArgumentException("Type not found"));
+
+        if (orderId != null && !orderId.isEmpty()) {
+            // If order ID is provided, use it
+            order = orderRepository.findById(UUID.fromString(orderId))
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        } else if (cartId != null && !cartId.isEmpty()) {
+            // If cart ID is provided, create an order from the cart
+            User user = userService.findByUsername(principal.getName());
+            Cart cart = cartService.getCartByUserId(user.getId().toString());
+
+            // Create a new order based on the cart
+            order = new Order();
+            order.setUser(user);
+            order.setOrderDate(new Date());
+            order.setStatus("PENDING");
+            order.setTotalPrice(cart.getTotalPrice());
+            // Save the order to generate an ID
+            order = orderRepository.save(order);
+        } else {
+            throw new IllegalArgumentException("Either orderId or cartId must be provided");
+        }
+
+        // Create the installment plan using the order and selected type
         installmentService.createInstallmentPlan(order, type);
         return "redirect:/installments";
     }
+
     @GetMapping("/view/{planId}")
     public String viewPlanPayments(@PathVariable UUID planId, Model model, Principal principal) {
         if (principal == null) return "redirect:/login";

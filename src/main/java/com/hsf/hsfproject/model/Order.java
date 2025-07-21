@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,17 @@ public class Order extends BaseEntity {
     private String status;
     private String shippingAddress;
     private double totalPrice;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private java.util.Date orderDate;
+
+    public java.util.Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(java.util.Date orderDate) {
+        this.orderDate = orderDate;
+    }
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -42,4 +54,3 @@ public class Order extends BaseEntity {
     private User user;
 
 }
-

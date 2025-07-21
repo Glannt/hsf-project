@@ -23,7 +23,8 @@
         <div class="container mt-5 mb-5">
             <h2 class="mb-4">Select Installment Plan</h2>
             <form th:action="@{/installments/create}" method="post">
-                <input type="hidden" name="orderId" th:value="${order.id}" />
+                <!-- Replace orderId with cartId -->
+                <input type="hidden" name="cartId" th:value="${cart.id}" />
                 <table class="table table-bordered">
                     <thead>
                     <tr>
