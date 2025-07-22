@@ -2,52 +2,167 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Installment Plan</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div class="page-wrapper">
     <header class="header">
-        <div class="header-middle sticky-header">
+        <div class="header-middle">
             <div class="container">
-                <div class="header-left">
+                <div class="header-content">
                     <a href="/" class="logo">
                         <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
                     </a>
+                    <div class="header-progress">
+                        <div class="progress-steps">
+                            <div class="step completed">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Cart</span>
+                            </div>
+                            <div class="step active">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Payment Plan</span>
+                            </div>
+                            <div class="step">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Complete</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
+
     <main class="main">
-        <div class="container mt-5 mb-5">
-            <h2 class="mb-4">Select Installment Plan</h2>
-            <form th:action="@{/installments/create}" method="post">
-                <!-- Replace orderId with cartId -->
-                <input type="hidden" name="cartId" th:value="${cart.id}" />
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Duration</th>
-                        <th>Interest Rate</th>
-                        <th>Monthly Payment</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="type : ${types}">
-                        <td><input type="radio" name="typeId" th:value="${type.id}" /></td>
-                        <td th:text="${type.months} + ' months'"></td>
-                        <td th:text="${type.interestRate != null ? type.interestRate * 100 + '%':'0%'}"></td>
-                        <td th:text="${#numbers.formatDecimal((order.totalPrice + (order.totalPrice * (type.interestRate != null ? type.interestRate : 0))) / type.months,0,'COMMA',0,'POINT')} + ' VND'"></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <button type="submit" class="btn btn-primary">Create Installment Plan</button>
-            </form>
+        <div class="container">
+            <div class="installment-section">
+                <div class="section-header">
+                    <h1 class="section-title">Choose Your Payment Plan</h1>
+                    <p class="section-subtitle">Select the installment option that works best for you</p>
+                </div>
+
+                <form th:action="@{/installments/create}" method="post" class="installment-form">
+                    <input type="hidden" name="cartId" th:value="${cart.id}" />
+
+                    <div class="plans-grid">
+                        <div class="plan-card" th:each="type, iterStat : ${types}" th:classappend="${iterStat.index == 1} ? 'featured' : ''">
+                            <div class="plan-header" th:if="${iterStat.index == 1}">
+                                <span class="popular-badge">Most Popular</span>
+                            </div>
+                            <div class="plan-content">
+                                <div class="plan-radio">
+                                    <input type="radio" name="typeId" th:value="${type.id}" th:id="'plan-' + ${type.id}" />
+                                    <label th:for="'plan-' + ${type.id}" class="radio-label"></label>
+                                </div>
+
+                                <div class="plan-info">
+                                    <h3 class="plan-duration" th:text="${type.months} + ' Months'"></h3>
+                                    <div class="plan-interest">
+                                        <span class="interest-label">Interest Rate</span>
+                                        <span class="interest-value" th:text="${type.interestRate != null ? type.interestRate * 100 + '%':'0%'}"></span>
+                                    </div>
+                                    <div class="plan-payment">
+                                        <span class="payment-amount" th:text="${#numbers.formatDecimal((order.totalPrice + (order.totalPrice * (type.interestRate != null ? type.interestRate : 0))) / type.months,0,'COMMA',0,'POINT')} + ' VND'"></span>
+                                        <span class="payment-label">per month</span>
+                                    </div>
+                                </div>
+
+                                <div class="plan-features">
+                                    <div class="feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>No hidden fees</span>
+                                    </div>
+                                    <div class="feature">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>Flexible payment dates</span>
+                                    </div>
+                                    <div class="feature" th:if="${type.interestRate == null or type.interestRate == 0}">
+                                        <i class="fas fa-star"></i>
+                                        <span>0% Interest</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-credit-card"></i>
+                            Create Installment Plan
+                        </button>
+                        <a th:href="@{/cart}" class="btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Cart
+                        </a>
+                    </div>
+                </form>
+
+                <div class="security-info">
+                    <div class="security-badges">
+                        <div class="badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure Payment</span>
+                        </div>
+                        <div class="badge">
+                            <i class="fas fa-lock"></i>
+                            <span>SSL Protected</span>
+                        </div>
+                        <div class="badge">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Privacy Protected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </div>
+
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script>
+    // Add smooth interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        const planCards = document.querySelectorAll('.plan-card');
+        const radioInputs = document.querySelectorAll('input[type="radio"]');
+
+        // Handle card selection
+        planCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                updateSelection();
+            });
+        });
+
+        radioInputs.forEach(radio => {
+            radio.addEventListener('change', updateSelection);
+        });
+
+        function updateSelection() {
+            planCards.forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        // Add loading state to form submission
+        const form = document.querySelector('.installment-form');
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.btn-primary');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
 </body>
 </html>

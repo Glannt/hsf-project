@@ -39,83 +39,7 @@ public class InitApp {
         };
     }
     @Bean
-    CommandLineRunner initComputerItems(ComputerItemRepository computerItemRepository) {
-        return args -> {
-            if(categoryRepository.count() != 0) {
-                if (computerItemRepository.count() == 0) {
-                    List<ComputerItem> items = List.of(
-                            ComputerItem.builder()
-                                    .name("RAM 16GB")
-                                    .price(120.0)
-                                    .description("DDR4 3200MHz suitable for gaming and multitasking")
-                                    .brand("Corsair")
-                                    .model("Vengeance LPX")
-                                    .category(categoryRepository.findByName("RAM"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("SSD 512GB")
-                                    .price(90.0)
-                                    .description("Fast NVMe SSD for quick system boot and application load")
-                                    .brand("Samsung")
-                                    .model("980 PRO")
-                                    .category(categoryRepository.findByName("Storage"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("CPU Intel i7")
-                                    .price(300.0)
-                                    .description("12th Gen Intel Core i7 processor for high performance tasks")
-                                    .brand("Intel")
-                                    .model("i7-12700K")
-                                    .category(categoryRepository.findByName("CPU"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("Mainboard B660")
-                                    .price(150.0)
-                                    .description("Motherboard compatible with Intel 12th Gen CPUs")
-                                    .brand("ASUS")
-                                    .model("TUF Gaming B660")
-                                    .category(categoryRepository.findByName("Motherboard"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("GPU RTX 3060")
-                                    .price(400.0)
-                                    .description("Great for 1080p and 1440p gaming with Ray Tracing support")
-                                    .brand("NVIDIA")
-                                    .model("GeForce RTX 3060")
-                                    .category(categoryRepository.findByName("GPU"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("Power Supply 650W")
-                                    .price(80.0)
-                                    .description("80+ Bronze Certified, enough power for mid-range builds")
-                                    .brand("Cooler Master")
-                                    .model("MWE 650W")
-                                    .category(categoryRepository.findByName("PSU"))
-                                    .build(),
-
-                            ComputerItem.builder()
-                                    .name("Case ATX")
-                                    .price(60.0)
-                                    .description("Spacious ATX tower case with good airflow")
-                                    .brand("NZXT")
-                                    .model("H510")
-                                    .category(categoryRepository.findByName("Case"))
-                                    .build()
-                    );
-
-                    computerItemRepository.saveAll(items);
-                }
-            }
-        };
-    }
-
-    @Bean
-    CommandLineRunner initCategories(CategoryRepository categoryRepository) {
+    CommandLineRunner initCategoriesAndComputerItems(CategoryRepository categoryRepository, ComputerItemRepository computerItemRepository) {
         return args -> {
             if (categoryRepository.count() == 0) {
                 Category cpu = Category.builder().name("CPU").build();
@@ -132,6 +56,25 @@ public class InitApp {
                 categoryRepository.save(motherboard);
                 categoryRepository.save(psu);
                 categoryRepository.save(caseCategory);
+            }
+            if (computerItemRepository.count() == 0) {
+                Category ram = categoryRepository.findByName("RAM");
+                Category storage = categoryRepository.findByName("Storage");
+                Category cpu = categoryRepository.findByName("CPU");
+                Category motherboard = categoryRepository.findByName("Motherboard");
+                Category gpu = categoryRepository.findByName("GPU");
+                Category psu = categoryRepository.findByName("PSU");
+                Category caseCategory = categoryRepository.findByName("Case");
+                List<ComputerItem> items = List.of(
+                        ComputerItem.builder().name("RAM 16GB").price(120.0).description("DDR4 3200MHz suitable for gaming and multitasking").brand("Corsair").model("Vengeance LPX").category(ram).build(),
+                        ComputerItem.builder().name("SSD 512GB").price(90.0).description("Fast NVMe SSD for quick system boot and application load").brand("Samsung").model("980 PRO").category(storage).build(),
+                        ComputerItem.builder().name("CPU Intel i7").price(300.0).description("12th Gen Intel Core i7 processor for high performance tasks").brand("Intel").model("i7-12700K").category(cpu).build(),
+                        ComputerItem.builder().name("Mainboard B660").price(150.0).description("Motherboard compatible with Intel 12th Gen CPUs").brand("ASUS").model("TUF Gaming B660").category(motherboard).build(),
+                        ComputerItem.builder().name("GPU RTX 3060").price(400.0).description("Great for 1080p and 1440p gaming with Ray Tracing support").brand("NVIDIA").model("GeForce RTX 3060").category(gpu).build(),
+                        ComputerItem.builder().name("Power Supply 650W").price(80.0).description("80+ Bronze Certified, enough power for mid-range builds").brand("Cooler Master").model("MWE 650W").category(psu).build(),
+                        ComputerItem.builder().name("Case ATX").price(60.0).description("Spacious ATX tower case with good airflow").brand("NZXT").model("H510").category(caseCategory).build()
+                );
+                computerItemRepository.saveAll(items);
             }
         };
     }
@@ -150,21 +93,4 @@ public class InitApp {
             }
         };
     }
-//    @Bean
-//    CommandLineRunner initPCs(PCRepository pcRepository) {
-//        return args -> {
-//            if (pcRepository.count() == 0) {
-//                PC pc1 = PC.builder()
-//                        .name("Gaming PC")
-//                        .computerItems(1500.0)
-//                        .build();
-//                PC pc2 = PC.builder()
-//                        .name("Office PC")
-//                        .totalPrice(800.0)
-//                        .build();
-//                pcRepository.save(pc1);
-//                pcRepository.save(pc2);
-//            }
-//        };
-//    }
 }

@@ -17,9 +17,7 @@ import com.hsf.hsfproject.constants.enums.InstallmentStatus;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/installments")
@@ -69,7 +67,8 @@ public class InstallmentController {
         tempOrder.setTotalPrice(cart.getTotalPrice());
 
         List<InstalllmentType> types = installmentTypeRepository.findAll();
-
+        Collections.sort(types, Comparator.comparingInt(InstalllmentType::getMonths));
+        Collections.sort(types, Comparator.comparingInt(InstalllmentType::getMonths));
         model.addAttribute("order", tempOrder);
         model.addAttribute("types", types);
         model.addAttribute("cart", cart);
@@ -130,6 +129,9 @@ public class InstallmentController {
         addUserInfo(model, principal);
         InstallmentPlan plan = installmentPlanRepository.findById(planId)
                 .orElseThrow(() -> new IllegalArgumentException("Plan not found"));
+        if (plan.getInstallments() != null) {
+            plan.getInstallments().sort(Comparator.comparing(Installment::getDueDate));
+        }
         model.addAttribute("plan", plan);
         return "installment/payments";
     }
