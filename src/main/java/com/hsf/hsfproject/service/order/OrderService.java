@@ -1,6 +1,5 @@
 package com.hsf.hsfproject.service.order;
 
-import com.hsf.hsfproject.dtos.request.OrderDto;
 import com.hsf.hsfproject.dtos.request.OrderRequest;
 import com.hsf.hsfproject.mapper.Mapper;
 import com.hsf.hsfproject.model.*;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -166,5 +164,11 @@ public class OrderService implements IOrderService {
         order.setStatus(status);
         orderRepository.save(order);
         return order;
+    }
+
+    @Override
+    public Order findById(UUID orderId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        return optionalOrder.orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
     }
 }

@@ -80,11 +80,15 @@ function bindEditPcForm(item) {
   });
 
   // Lưu toàn bộ linh kiện từ các category
-  window.categories.forEach((cat) => {
-    (cat.computerItems || []).forEach((ci) => {
-      allItemsMap.set(String(ci.id), ci);
+  if (Array.isArray(window.categories)) {
+    window.categories.forEach((cat) => {
+      (cat.computerItems || []).forEach((ci) => {
+        allItemsMap.set(String(ci.id), ci);
+      });
     });
-  });
+  } else {
+    console.warn('window.categories is not an array:', window.categories);
+  }
 
   function updateComputerItemsByCategory(categoryId) {
     const category = window.categories.find(
