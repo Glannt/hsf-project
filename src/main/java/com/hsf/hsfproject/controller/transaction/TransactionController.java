@@ -17,11 +17,14 @@ import com.hsf.hsfproject.service.user.IUserService;
 
 import lombok.RequiredArgsConstructor;
 import java.security.Principal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 @RequestMapping("transaction")
 @RequiredArgsConstructor
 public class TransactionController {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
     private final ITransactionService transactionService;
     private final IUserService userService;
     private void addUserInfo(Model model, Principal principal) {
@@ -47,10 +50,41 @@ public class TransactionController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
         Page<Transaction> transactions = transactionService.getAllTransactions(pageable);
 
+        logger.info("Fetched {} transactions, total elements: {}",
+            transactions != null && transactions.getContent() != null ? transactions.getContent().size() : 0,
+            transactions != null ? transactions.getTotalElements() : 0);
+        if (transactions != null && transactions.getContent() != null) {
+            for (Transaction t : transactions.getContent()) {
+                if (t != null) {
+                    logger.info("Transaction ID: {}, Status: {}, Order: {}", 
+                        t.getId(), 
+                        t.getStatus(), 
+                        t.getOrder() != null ? t.getOrder().getId() : null);
+                }
+            }
+        }
+
+        // Calculate counts for each status
+        int successCount = 0;
+        int failedCount = 0;
+        int pendingCount = 0;
+        if (transactions != null && transactions.getContent() != null) {
+            for (Transaction t : transactions.getContent()) {
+                if (t != null && t.getStatus() != null) {
+                    if ("SUCCESS".equalsIgnoreCase(t.getStatus())) successCount++;
+                    else if ("FAILED".equalsIgnoreCase(t.getStatus())) failedCount++;
+                    else if ("PENDING".equalsIgnoreCase(t.getStatus())) pendingCount++;
+                }
+            }
+        }
+
         model.addAttribute("transactions", transactions);
-        model.addAttribute("totalElements", transactions.getTotalElements());
-        model.addAttribute("totalPages", transactions.getTotalPages());
+        model.addAttribute("totalElements", transactions != null ? transactions.getTotalElements() : 0);
+        model.addAttribute("totalPages", transactions != null ? transactions.getTotalPages() : 0);
         model.addAttribute("currentPage", page);
+        model.addAttribute("successCount", successCount);
+        model.addAttribute("failedCount", failedCount);
+        model.addAttribute("pendingCount", pendingCount);
 
         return "transaction/index";
     }

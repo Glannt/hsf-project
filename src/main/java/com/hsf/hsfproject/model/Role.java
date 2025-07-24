@@ -26,4 +26,3 @@ public class Role extends BaseEntity{
 //    @JoinColumn(name = "role_id")
     private Set<User> users;
 }
-

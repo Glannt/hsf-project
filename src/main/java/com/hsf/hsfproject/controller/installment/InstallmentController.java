@@ -146,20 +146,59 @@ public class InstallmentController {
     }
 
     @GetMapping("/payment/{id}")
-    public String showPaymentPage(@PathVariable("id") String installmentId, Model model) {
+    public String showPaymentPage(@PathVariable("id") String installmentId, Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
         Installment installment = installmentRepository.findById(UUID.fromString(installmentId)).orElse(null);
+        if (installment == null) return "redirect:/installments";
+
+        InstallmentPlan plan = installment.getInstallmentPlan();
+        Order order = plan != null ? plan.getOrder() : null;
+        User user = userService.findByUsername(principal.getName());
+
         model.addAttribute("installment", installment);
+        model.addAttribute("plan", plan);
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+
+        // Đảm bảo có thông tin sản phẩm để hiển thị
+        if (order != null) {
+            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                model.addAttribute("cartItems", order.getOrderItems());
+            } else {
+                // Nếu không có orderItems, tạo một item tạm thời để hiển thị
+                List<Object> tempItems = new ArrayList<>();
+                // Bạn có thể tạo một DTO để hiển thị thông tin cơ bản
+                model.addAttribute("cartItems", tempItems);
+            }
+        }
+
+        // Payment methods
+        List<String> paymentMethods = Arrays.asList("MOMO", "VNPay", "Bank Transfer");
+        model.addAttribute("paymentMethods", paymentMethods);
+
+        addUserInfo(model, principal);
         return "installment/payment";
     }
 
     @PostMapping("/payment/place")
-    public String placeOrder(@RequestParam("installmentId") String installmentId) {
+    public String placeOrder(@RequestParam("installmentId") String installmentId,
+                             @RequestParam("paymentMethod") String paymentMethod) {
         Installment installment = installmentRepository.findById(UUID.fromString(installmentId)).orElse(null);
         if (installment != null && installment.getStatus() == InstallmentStatus.PENDING) {
+            // Cập nhật trạng thái installment
             installment.setStatus(InstallmentStatus.PAID);
             installment.setPaidDate(LocalDate.now());
             installmentRepository.save(installment);
+
+            // Có thể thêm logic xử lý thanh toán theo paymentMethod nếu cần
+            // processPayment(installment, paymentMethod);
         }
-        return "redirect:/installments/payments";
+
+        // Redirect về trang view plan thay vì /installments/payments
+        if (installment != null && installment.getInstallmentPlan() != null) {
+            return "redirect:/installments/view/" + installment.getInstallmentPlan().getId();
+        }
+        return "redirect:/installments";
     }
 }

@@ -540,3 +540,378 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   </body>
 </html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Management - Admin Panel</title>
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+  <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet"
+  />
+  <style>
+    .status-badge {
+      font-size: 0.85em;
+      padding: 0.4em 0.8em;
+    }
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .status-accepted {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .table-responsive {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-shopping-cart"></i> Order Management</h2>
+        <div>
+          <a href="/admin" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Admin
+          </a>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+          </button>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-primary">Total Orders</h5>
+              <h3 th:text="${totalElements}">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-warning">Pending</h5>
+              <h3 th:text="${pendingCount}">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-info">Accepted</h5>
+              <h3 th:text="${acceptedCount}">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-success">Completed</h5>
+              <h3 th:text="${completedCount}">0</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${orders == null || orders.isEmpty()}" class="text-center py-5">
+        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No orders found</h4>
+        <p class="text-muted">
+          There are no orders in the system yet.
+        </p>
+      </div>
+
+      <div th:if="${orders != null && !orders.isEmpty()}" class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+          <tr>
+            <th>Order ID</th>
+            <th>Order Number</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="order : ${orders.content}" th:if="${order != null}">
+            <td>
+              <small
+                      class="text-muted"
+                      th:text="${order.id != null ? (#strings.substring(order.id.toString(), 0, 8) + '...') : 'N/A'}"
+              ></small>
+            </td>
+            <td>
+              <span th:text="${order.orderNumber != null ? order.orderNumber : 'N/A'}"></span>
+            </td>
+            <td>
+              <span th:if="${order.user != null}" th:text="${order.user.username}"></span>
+              <span th:unless="${order.user != null}">Unknown</span>
+              <br />
+              <small
+                      class="text-muted"
+                      th:text="${order.user != null && order.user.email != null ? order.user.email : 'N/A'}"
+              ></small>
+            </td>
+            <td>
+              <strong>
+                <span
+                        th:text="${order.totalPrice != null ? #numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT') + ' VND' : 'N/A'}"
+                ></span>
+              </strong>
+            </td>
+            <td>
+              <span
+                      th:if="${order.createdAt != null}"
+                      th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy')}"
+              ></span>
+              <span th:unless="${order.createdAt != null}">N/A</span>
+            </td>
+            <td>
+              <span th:if="${order.orderItems != null}" th:text="${order.orderItems.size()}"></span>
+              <span th:unless="${order.orderItems != null}">0</span>
+            </td>
+            <td>
+              <span
+                      th:if="${order.status != null}"
+                      th:class="'badge status-badge status-' + ${#strings.toLowerCase(order.status)}"
+                      th:text="${order.status}"
+              ></span>
+              <span th:unless="${order.status != null}">Unknown</span>
+            </td>
+            <td>
+              <button
+                      type="button"
+                      class="btn btn-sm btn-outline-info"
+                      data-bs-toggle="modal"
+                      th:data-bs-target="${order.id != null ? '#modal-' + order.id : '#'}"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+              <div class="btn-group">
+                <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                >
+                  <i class="fas fa-cog"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li th:if="${order.status != null && order.status == 'PENDING'}">
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-check text-success"></i> Accept
+                    </a>
+                  </li>
+                  <li th:if="${order.status != null && order.status == 'ACCEPTED'}">
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-truck text-info"></i> Mark as Shipped
+                    </a>
+                  </li>
+                  <li th:if="${order.status != null && (order.status == 'PENDING' || order.status == 'ACCEPTED')}">
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-times text-danger"></i> Cancel
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-print text-primary"></i> Print Invoice
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav th:if="${totalPages > 1}" aria-label="Order pagination">
+        <ul class="pagination justify-content-center">
+          <li
+                  class="page-item"
+                  th:classappend="${currentPage == 0} ? 'disabled'"
+          >
+            <a
+                    class="page-link"
+                    th:href="@{/admin/orders(page=${currentPage - 1})}"
+                    aria-label="Previous"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <li
+                  th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                  class="page-item"
+                  th:classappend="${pageNum == currentPage} ? 'active'"
+          >
+            <a
+                    class="page-link"
+                    th:href="@{/admin/orders(page=${pageNum})}"
+                    th:text="${pageNum + 1}"
+            ></a>
+          </li>
+
+          <li
+                  class="page-item"
+                  th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+          >
+            <a
+                    class="page-link"
+                    th:href="@{/admin/orders(page=${currentPage + 1})}"
+                    aria-label="Next"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modals -->
+<div
+        th:each="order : ${orders != null ? orders.content : null}"
+        th:if="${order != null}"
+        class="modal fade"
+        th:id="${order.id != null ? 'modal-' + order.id : 'modal-unknown'}"
+        tabindex="-1"
+        aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order Details</h5>
+        <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Order ID:</strong><br />
+            <small class="text-muted" th:text="${order.id}"></small>
+          </div>
+          <div class="col-md-6">
+            <strong>Order Number:</strong><br />
+            <small
+                    class="text-muted"
+                    th:text="${order.orderNumber}"
+            ></small>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <strong>Customer:</strong><br />
+            <span th:if="${order.user != null}" th:text="${order.user.username}"></span><br />
+            <small
+                    class="text-muted"
+                    th:if="${order.user != null}"
+                    th:text="${order.user.email}"
+            ></small>
+          </div>
+          <div class="col-md-6">
+            <strong>Total:</strong><br />
+            <span
+                    class="h5"
+                    th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+            ></span>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <strong>Status:</strong><br />
+            <span
+                    th:if="${order.status != null}"
+                    th:class="'badge status-badge status-' + ${#strings.toLowerCase(order.status)}"
+                    th:text="${order.status}"
+            ></span>
+          </div>
+          <div class="col-md-6">
+            <strong>Order Date:</strong><br />
+            <span
+                    th:if="${order.createdAt != null}"
+                    th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm:ss')}"
+            ></span>
+          </div>
+        </div>
+        <div class="row mt-3" th:if="${order.shippingAddress != null}">
+          <div class="col-12">
+            <strong>Shipping Address:</strong><br />
+            <span th:text="${order.shippingAddress}"></span>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6>Order Items</h6>
+            <table class="table table-sm">
+              <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="item : ${order.orderItems}" th:if="${item != null}">
+                <td th:text="${item.productName}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${#numbers.formatDecimal(item.subtotal / item.quantity, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                <td th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+              </tr>
+              </tbody>
+              <tfoot>
+              <tr>
+                <th colspan="3" class="text-end">Total:</th>
+                <th th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></th>
+              </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

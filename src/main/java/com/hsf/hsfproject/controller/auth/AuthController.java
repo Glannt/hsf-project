@@ -3,7 +3,10 @@ package com.hsf.hsfproject.controller.auth;
 import com.hsf.hsfproject.dtos.CreateUserDTO;
 import com.hsf.hsfproject.dtos.request.LoginRequest;
 import com.hsf.hsfproject.dtos.response.LoginResponse;
+import com.hsf.hsfproject.model.Role;
 import com.hsf.hsfproject.model.User;
+import com.hsf.hsfproject.repository.RoleRepository;
+import com.hsf.hsfproject.repository.UserRepository;
 import com.hsf.hsfproject.service.user.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -21,6 +25,8 @@ import java.security.Principal;
 @Slf4j(topic = "AuthController")
 public class AuthController {
     private final IUserService userService;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
 
     @GetMapping("/register")
@@ -30,17 +36,40 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute CreateUserDTO registerRequest, Model model) {
-        if (registerRequest.getUsername() == null || registerRequest.getPassword() == null) {
-            model.addAttribute("registerError", "Username and password are required");
+        try {
+            log.info("Attempting to register user: {}", registerRequest.getUsername());
+
+            if (registerRequest.getUsername() == null || registerRequest.getPassword() == null) {
+                model.addAttribute("registerError", "Username and password are required");
+                return "register";
+            }
+
+            User user = userService.createUser(registerRequest);
+
+            // Kiểm tra và gán role nếu cần
+            if (user.getRole() == null) {
+                log.info("Assigning default role to user: {}", user.getUsername());
+                Role role = roleRepository.findByName("ROLE_USER");
+                if (role == null) {
+                    log.warn("ROLE_USER not found, creating it");
+                    role = Role.builder()
+                            .name("ROLE_USER")
+                            .description("Standard user role")
+                            .build();
+                    roleRepository.save(role);
+                }
+                user.setRole(role);
+                userRepository.save(user);
+            }
+
+            log.info("User registered successfully: {}", user.getUsername());
+            model.addAttribute("registerSuccess", "Registration successful! Please log in.");
+            return "redirect:/login?register=success";
+        } catch (Exception e) {
+            log.error("Error registering user: {}", e.getMessage(), e);
+            model.addAttribute("registerError", "Registration failed: " + e.getMessage());
             return "register";
         }
-        User user = userService.createUser(registerRequest);
-        if (user == null) {
-            model.addAttribute("registerError", "User registration failed");
-            return "register";
-        }
-        model.addAttribute("registerSuccess", "Registration successful! Please log in.");
-        return "login/index";
     }
 
     //Show login form

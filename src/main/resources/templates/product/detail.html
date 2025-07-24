@@ -83,13 +83,6 @@
                                                 th:attr="data-zoom-image=${productCI.images[0].imageUrl}" />
 
                                         <img
-                                                id="product-zoom"
-                                                th:if="${productPC != null and productPC.images != null and #lists.size(productPC.images) > 0}"
-                                                th:src="@{${productPC.images[0].imageUrl}}"
-                                                th:alt="${productPC.name}"
-                                                th:attr="data-zoom-image=${productPC.images[0].imageUrl}" />
-
-                                        <img
                                                 th:if="(${productCI == null or productCI.images == null or #lists.size(productCI.images) == 0}) and (${productPC == null or productPC.images == null or #lists.size(productPC.images) == 0})"
                                                 th:src="@{/assets/images/no-image.png}"
                                                 alt="No image available" />

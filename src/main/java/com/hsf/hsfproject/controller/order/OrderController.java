@@ -76,20 +76,25 @@ public class OrderController {
     }
 
     // Confirm the order and redirect to confirmation page
-//    @PostMapping("/order/confirm")
-//    public String confirmOrder(@RequestParam("shippingAddress") String shippingAddress,
-//                               HttpSession session,
-//                               Model model) {
-//        Order order = (Order) session.getAttribute("pendingOrder");
-//        if (order == null) return "redirect:/cart";
-//        Order confirmedOrder = orderService.acceptOrder(order, shippingAddress);
-//        if (confirmedOrder == null) {
-//            model.addAttribute("error", "Failed to confirm order. Please try again.");
-//            return "order/index";
-//        }
-//        session.removeAttribute("pendingOrder");
-//        // No need to add order to model since redirect
-//        return "redirect:/order/confirmation";
-//    }
+    @PostMapping("/order/confirm")
+    public String confirmOrder(@RequestParam("shippingAddress") String shippingAddress,
+                               @RequestParam("paymentMethod") String paymentMethod,
+                               HttpSession session,
+                               Model model) {
+        Order order = (Order) session.getAttribute("pendingOrder");
+        if (order == null) return "redirect:/cart";
+
+        // Tạo một transaction ID tạm thời cho phương thức thanh toán không trực tuyến
+        String transactionId = "MANUAL-" + System.currentTimeMillis();
+
+        // Với thanh toán trực tuyến, transactionId sẽ được cung cấp từ cổng thanh toán
+        Order confirmedOrder = orderService.acceptOrder(order, shippingAddress, transactionId);
+        if (confirmedOrder == null) {
+            model.addAttribute("error", "Failed to confirm order. Please try again.");
+            return "order/index";
+        }
+        session.removeAttribute("pendingOrder");
+        return "redirect:/confirmation";
+    }
 
 }

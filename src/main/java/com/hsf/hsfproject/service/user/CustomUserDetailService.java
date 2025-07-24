@@ -20,15 +20,31 @@ public class CustomUserDetailService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities(user.getRole().getName()) // Assuming Role has a getName() method
-                .roles(user.getRole().getName().replace("ROLE_", "")) // Remove "ROLE_" prefix for roles
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
+                        // Kiểm tra role có null không
+                        if (user.getRole() == null) {
+                            // Nếu role null, cấp quyền mặc định "USER"
+                            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .authorities("ROLE_USER")
+                    .roles("USER")
+                    .accountExpired(false)
+                    .accountLocked(false)
+                    .credentialsExpired(false)
+                    .disabled(false)
+                    .build();
+                        } else {
+                            // Nếu role không null, lấy quyền từ role
+                            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .authorities(user.getRole().getName())
+                    .roles(user.getRole().getName().replace("ROLE_", ""))
+                    .accountExpired(false)
+                    .accountLocked(false)
+                    .credentialsExpired(false)
+                    .disabled(false)
+                    .build();
+                        }
     }
 }

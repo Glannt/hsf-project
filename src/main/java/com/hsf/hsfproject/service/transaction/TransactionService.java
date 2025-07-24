@@ -15,6 +15,11 @@ public class TransactionService implements ITransactionService {
     private final TransactionRepository transactionRepository;
 
     @Override
+    public Transaction createTransaction(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
+
+    @Override
     public Page<Transaction> getAllTransactions(Pageable pageable) {
         return transactionRepository.findAll(pageable);
     }

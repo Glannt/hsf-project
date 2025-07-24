@@ -2,44 +2,672 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Installment Payment</title>
+    <title>Installment Payment - Molla</title>
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .payment-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .payment-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .payment-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .payment-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.125rem;
+            margin: 0;
+        }
+
+        .payment-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-card {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .payment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header-modern.success {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+        }
+
+        .card-header-modern.info {
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+        }
+
+        .card-body-modern {
+            padding: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition-fast);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item:hover {
+            background: var(--bg-secondary);
+            margin: 0 -2rem;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, var(--warning-color), #F59E0B);
+            color: white;
+        }
+
+        .status-paid {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+            color: white;
+        }
+
+        .payment-form {
+            margin-top: 1.5rem;
+        }
+
+        .form-group-modern {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label-modern {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .form-select-modern {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        .form-select-modern:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-place-order {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-place-order:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .btn-place-order:active {
+            transform: translateY(0);
+        }
+
+        .already-paid-alert {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .already-paid-alert h5 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-summary {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--primary-color);
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .monthly-payment {
+            background: linear-gradient(135deg, var(--primary-light), rgba(79, 70, 229, 0.05));
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .monthly-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .monthly-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .payment-instructions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            color: white;
+            margin-top: 2rem;
+        }
+
+        .instructions-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .instruction-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .instruction-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            font-size: 1.125rem;
+        }
+
+        .no-items-alert {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 145, 178, 0.1));
+            border: 2px solid #06B6D4;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            color: #0891B2;
+        }
+
+        .error-message {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .payment-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .payment-title {
+                font-size: 2rem;
+            }
+
+            .card-body-modern {
+                padding: 1.5rem;
+            }
+
+            .payment-container {
+                padding: 0 1rem;
+            }
+
+            .monthly-amount {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .payment-title {
+                font-size: 1.75rem;
+            }
+
+            .card-header-modern {
+                padding: 1rem 1.5rem;
+                font-size: 1.125rem;
+            }
+
+            .card-body-modern {
+                padding: 1rem;
+            }
+
+            .btn-place-order {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="payment-page">
 <div class="page-wrapper">
+    <!-- Header -->
     <header class="header">
         <div class="header-middle sticky-header">
             <div class="container">
                 <div class="header-left">
                     <a href="/" class="logo">
-                        <img th:src="@{/assets/images/logo.png}" alt="Logo" width="105" height="25" />
+                        <img th:src="@{/assets/images/logo.png}" alt="Molla Logo" width="105" height="25" />
                     </a>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Main Content -->
     <main class="main">
-        <div class="container mt-5 mb-5">
-            <h2 class="mb-4">Installment Payment</h2>
+        <div class="payment-container">
+            <!-- Header Section -->
+            <div class="payment-header">
+                <h1 class="payment-title">
+                    <i class="fas fa-credit-card me-3"></i>
+                    Installment Payment
+                </h1>
+                <p class="payment-subtitle">Complete your monthly installment payment securely</p>
+            </div>
+
+            <!-- Payment Content -->
             <div th:if="${installment != null}">
-                <div class="card">
-                    <div class="card-body">
-                        <p><strong>Due Date:</strong> <span th:text="${#temporals.format(installment.dueDate,'dd/MM/yyyy')}"></span></p>
-                        <p><strong>Amount Due:</strong> <span th:text="${#numbers.formatDecimal(installment.amountDue,0,'COMMA',0,'POINT')} + ' VND'"></span></p>
-                        <p><strong>Status:</strong> <span th:text="${installment.status}"></span></p>
-                        <form th:action="@{/installments/payment/place}" method="post">
-                            <input type="hidden" name="installmentId" th:value="${installment.id}" />
-                            <button type="submit" class="btn btn-success" th:if="${installment.status.name() == 'PENDING'}">Place Order</button>
-                            <span th:if="${installment.status.name() != 'PENDING'}" class="text-success">Already Paid</span>
-                        </form>
+                <div class="payment-content">
+                    <!-- Left Column: Customer Info & Payment Method -->
+                    <div class="left-column">
+                        <!-- Customer Information Card -->
+                        <div class="payment-card">
+                            <div class="card-header-modern">
+                                <i class="fas fa-user-circle"></i>
+                                Customer Information
+                            </div>
+                            <div class="card-body-modern">
+                                <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-user"></i>
+                                            Username
+                                        </span>
+                                    <span class="info-value" th:text="${user != null ? user.username : 'N/A'}">N/A</span>
+                                </div>
+                                <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-receipt"></i>
+                                            Order Number
+                                        </span>
+                                    <span class="info-value" th:text="${order != null ? (order.orderNumber != null ? order.orderNumber : order.id) : 'N/A'}">N/A</span>
+                                </div>
+                                <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-info-circle"></i>
+                                            Status
+                                        </span>
+                                    <span class="status-badge"
+                                          th:classappend="${installment.status.name() == 'PENDING' ? 'status-pending' : 'status-paid'}"
+                                          th:text="${installment.status}">PENDING</span>
+                                </div>
+                                <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            Due Date
+                                        </span>
+                                    <span class="info-value" th:text="${#temporals.format(installment.dueDate,'dd/MM/yyyy')}">23/08/2025</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Card -->
+                        <div class="payment-card">
+                            <div class="card-header-modern info">
+                                <i class="fas fa-credit-card"></i>
+                                Payment Method
+                            </div>
+                            <div class="card-body-modern">
+                                <div th:if="${installment.status.name() == 'PENDING'}">
+                                    <form th:action="@{/installments/payment/place}" method="post" class="payment-form" id="paymentForm">
+                                        <input type="hidden" name="installmentId" th:value="${installment.id}" />
+
+                                        <div class="form-group-modern">
+                                            <label for="paymentMethod" class="form-label-modern">
+                                                <i class="fas fa-wallet me-2"></i>
+                                                Select Payment Method
+                                            </label>
+                                            <select class="form-select-modern" id="paymentMethod" name="paymentMethod" required>
+                                                <option value="">-- Choose Payment Method --</option>
+                                                <option th:each="pm : ${paymentMethods}" th:value="${pm}" th:text="${pm}">MOMO</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn-place-order" id="placeOrderBtn">
+                                            <i class="fas fa-lock"></i>
+                                            Secure Payment
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div th:if="${installment.status.name() != 'PENDING'}" class="already-paid-alert">
+                                    <i class="fas fa-check-circle mb-2" style="font-size: 2rem;"></i>
+                                    <h5>Payment Complete!</h5>
+                                    <p class="mb-0">This installment has been successfully paid</p>
+                                    <div th:if="${installment.paidDate != null}" class="mt-2">
+                                        <small>Paid on: <span th:text="${#temporals.format(installment.paidDate,'dd/MM/yyyy')}"></span></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="right-column">
+                        <!-- Order Summary Card -->
+                        <div class="payment-card">
+                            <div class="card-header-modern success">
+                                <i class="fas fa-shopping-bag"></i>
+                                Order Summary
+                            </div>
+                            <div class="card-body-modern">
+                                <!-- Monthly Payment Highlight -->
+                                <div class="monthly-payment">
+                                    <span class="monthly-amount" th:text="${#numbers.formatDecimal(installment.amountDue,0,'COMMA',0,'POINT')} + ' VND'">74 VND</span>
+                                    <span class="monthly-label">Monthly Payment Due</span>
+                                </div>
+
+                                <!-- Order Items -->
+                                <h6 class="mb-3">
+                                    <i class="fas fa-list me-2"></i>
+                                    Order Items
+                                </h6>
+
+                                <div th:if="${cartItems != null and not #lists.isEmpty(cartItems)}">
+                                    <div class="order-item" th:each="item : ${cartItems}">
+                                        <div class="item-name">
+                                            <span th:text="${item.productName != null ? item.productName : 'Product'}">Product</span>
+                                            <small class="text-muted d-block" th:if="${item.quantity != null}">
+                                                Qty: <span th:text="${item.quantity}">1</span>
+                                            </small>
+                                        </div>
+                                        <div class="item-price" th:text="${item.totalPrice != null ? (#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT') + ' VND') : 'N/A'}">N/A</div>
+                                    </div>
+                                </div>
+
+                                <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="no-items-alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                    Order items information not available
+                                </div>
+
+                                <!-- Payment Details -->
+                                <div class="order-summary mt-3">
+                                    <div class="order-item" th:if="${order != null and order.totalPrice != null}">
+                                        <span>Total Order Value:</span>
+                                        <span th:text="${#numbers.formatDecimal(order.totalPrice,0,'COMMA',0,'POINT')} + ' VND'">420 VND</span>
+                                    </div>
+                                    <div class="order-item" th:if="${plan != null}">
+                                        <span>Installment Plan:</span>
+                                        <span th:text="${plan.installmentType != null ? (plan.installmentType.months + ' months') : 'N/A'}">6 months</span>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>This Month:</span>
+                                        <span th:text="${#numbers.formatDecimal(installment.amountDue,0,'COMMA',0,'POINT')} + ' VND'">74 VND</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Payment Instructions -->
+                <div class="payment-instructions">
+                    <h6 class="instructions-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Payment Security & Instructions
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div>
+                                    <strong>Secure Processing</strong>
+                                    <div class="small">256-bit SSL encryption</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <strong>Quick Confirmation</strong>
+                                    <div class="small">Within 24 hours</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <strong>Email Receipt</strong>
+                                    <div class="small">Sent to your inbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div th:if="${installment == null}" class="error-message">
+                <i class="fas fa-exclamation-triangle mb-3" style="font-size: 3rem;"></i>
+                <h4>Installment Not Found</h4>
+                <p class="mb-4">The requested installment payment could not be found or has been removed.</p>
+                <a href="/installments" class="btn-place-order" style="display: inline-flex; width: auto;">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Installments
+                </a>
             </div>
         </div>
     </main>
 </div>
+
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script>
+    // Enhanced form validation and confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentForm = document.getElementById('paymentForm');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+        if (paymentForm) {
+            // Real-time validation
+            paymentMethodSelect?.addEventListener('change', function() {
+                if (this.value) {
+                    placeOrderBtn.style.background = 'linear-gradient(135deg, var(--secondary-color), #059669)';
+                    placeOrderBtn.disabled = false;
+                } else {
+                    placeOrderBtn.style.background = 'linear-gradient(135deg, #9CA3AF, #6B7280)';
+                    placeOrderBtn.disabled = true;
+                }
+            });
+
+            // Form submission with confirmation
+            paymentForm.addEventListener('submit', function(e) {
+                const paymentMethod = paymentMethodSelect?.value;
+                const amount = `[[${#numbers.formatDecimal(installment.amountDue,0,'COMMA',0,'POINT')}]]`;
+
+                if (!paymentMethod) {
+                    e.preventDefault();
+                    alert('Please select a payment method before proceeding.');
+                    paymentMethodSelect?.focus();
+                    return false;
+                }
+
+                // Confirmation dialog with enhanced styling
+                const confirmMessage = `🔒 Secure Payment Confirmation\n\n` +
+                    `Amount: ${amount} VND\n` +
+                    `Method: ${paymentMethod}\n\n` +
+                    `Do you want to proceed with this payment?`;
+
+                if (!confirm(confirmMessage)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Show loading state
+                placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                placeOrderBtn.disabled = true;
+            });
+
+            // Initialize button state
+            if (paymentMethodSelect && !paymentMethodSelect.value) {
+                placeOrderBtn.style.background = 'linear-gradient(135deg, #9CA3AF, #6B7280)';
+                placeOrderBtn.disabled = true;
+            }
+        }
+    });
+</script>
 </body>
 </html>
-
