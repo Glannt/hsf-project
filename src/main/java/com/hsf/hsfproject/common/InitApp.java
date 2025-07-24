@@ -149,7 +149,8 @@ CommandLineRunner initUsers(RoleRepository roleRepository,
                             UserRepository userRepository,
                             CartRepository cartRepository) {
     return args -> {
-        if (userRepository.count() == 0) {
+        if (userRepository.findByUsername("user1") == null &&
+                userRepository.findByUsername("admin") == null) {
             Role userRole = roleRepository.findByName("ROLE_USER");
             Role adminRole = roleRepository.findByName("ROLE_ADMIN");
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
