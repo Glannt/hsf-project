@@ -38,9 +38,3 @@ vnp:
   return-url: http://localhost:3000/vn-pay/callback
 
 stripe:
-  secret:
-    key:
-  public:
-    key:
-  webhook:
-    key:

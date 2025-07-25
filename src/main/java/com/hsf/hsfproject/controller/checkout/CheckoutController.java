@@ -34,7 +34,9 @@ import java.util.Scanner;
 @RequestMapping("/checkout")
 @RequiredArgsConstructor
 public class CheckoutController {
+
     private static final Logger log = LoggerFactory.getLogger(CheckoutController.class);
+
     private final PaymentService stripeService;
     private final OrderService orderService;
     private final IUserService userService;
@@ -57,27 +59,84 @@ public class CheckoutController {
                                  Principal principal,
                                  HttpSession httpSession,
                                  RedirectAttributes redirectAttributes) throws StripeException {
-        // Kiểm tra thông tin đơn hàngc
+
+        log.info("Processing checkout for payment method: {}", paymentMethod);
+
+        // Get user information
         User user = userService.findByUsername(principal.getName());
         order.setUser(user);
-        System.out.println("Order details: " + order);
+
+        // Validate shipping address
+        if (order.getShippingAddress() == null || order.getShippingAddress().trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Shipping address is required!");
+            return "redirect:/order";
+        }
+
+        // Find the existing order from database
+        Order existingOrder = orderService.findOrderByOrderNumber(order.getOrderNumber());
+        if (existingOrder == null) {
+            log.error("Order not found: {}", order.getOrderNumber());
+            redirectAttributes.addFlashAttribute("error", "Order not found!");
+            return "redirect:/checkout/error";
+        }
+
+        // Update the existing order with shipping address
+        existingOrder.setShippingAddress(order.getShippingAddress());
+        orderService.saveOrder(existingOrder);
+
+        log.info("Processing payment method: {} for order: {}", paymentMethod, order.getOrderNumber());
+
         switch (paymentMethod.toLowerCase()) {
             case "stripe":
-                Session session = stripeService.createCheckoutSession(order);
-                httpSession.setAttribute("orderDto", order);
-                return "redirect:" + session.getUrl();
+                return handleStripePayment(order, httpSession, redirectAttributes);
+
             case "cod":
-            case "bank":
-            case "paypal":
-            case "check":
-//                orderService.save(order); // xử lý đơn hàng nội bộ
-//                orderService.acceptOrder(order, paymentMethod);
-                redirectAttributes.addFlashAttribute("message", "Đơn hàng đã được đặt thành công!");
-                
-                return "redirect:/checkout/success";
+                return handleCODPayment(existingOrder, order, httpSession, redirectAttributes);
+
             default:
-                redirectAttributes.addFlashAttribute("error", "Phương thức thanh toán không hợp lệ!");
+                log.warn("Invalid payment method: {}", paymentMethod);
+                redirectAttributes.addFlashAttribute("error", "Invalid payment method selected!");
                 return "redirect:/checkout/error";
+        }
+    }
+
+    private String handleStripePayment(OrderDto order, HttpSession httpSession, RedirectAttributes redirectAttributes) {
+        try {
+            log.info("Creating Stripe checkout session for order: {}", order.getOrderNumber());
+
+            // Create Stripe session using the existing order
+            Session session = stripeService.createCheckoutSession(order);
+            httpSession.setAttribute("orderDto", order);
+
+            log.info("Stripe session created successfully. Redirecting to: {}", session.getUrl());
+            return "redirect:" + session.getUrl();
+
+        } catch (StripeException e) {
+            log.error("Stripe payment failed for order: {}", order.getOrderNumber(), e);
+            redirectAttributes.addFlashAttribute("error", "Payment processing failed. Please try again.");
+            return "redirect:/checkout/error";
+        }
+    }
+
+    private String handleCODPayment(Order existingOrder, OrderDto orderDto, HttpSession httpSession, RedirectAttributes redirectAttributes) {
+        try {
+            log.info("Processing COD payment for order: {}", existingOrder.getOrderNumber());
+
+            // Accept the order with COD payment method
+            String transactionRef = "COD_" + System.currentTimeMillis();
+            orderService.acceptOrder(existingOrder, existingOrder.getShippingAddress(), transactionRef);
+
+            // Store order info in session for success page
+            httpSession.setAttribute("orderDto", orderDto);
+
+            log.info("COD order processed successfully: {}", existingOrder.getOrderNumber());
+            redirectAttributes.addFlashAttribute("message", "Order placed successfully! You will pay upon delivery.");
+            return "redirect:/checkout/success";
+
+        } catch (Exception e) {
+            log.error("COD payment processing failed for order: {}", existingOrder.getOrderNumber(), e);
+            redirectAttributes.addFlashAttribute("error", "Order processing failed. Please try again.");
+            return "redirect:/checkout/error";
         }
     }
 

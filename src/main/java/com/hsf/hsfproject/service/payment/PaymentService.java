@@ -94,40 +94,15 @@ public class PaymentService {
         return vnPayConfig.getVnpPayUrl() + "?" + query.toString();
     }
 
-    public Session createCheckoutSession(OrderDto order) throws StripeException {
-//        Order newOrder = new Order();
-//        newOrder.setOrderNumber(order.getOrderNumber());
-//        newOrder.setStatus(order.getStatus());
-//        newOrder.setShippingAddress(order.getShippingAddress());
-//        newOrder.setTotalPrice(order.getTotalPrice());
-//        newOrder.setUser(order.getUser());
-//        // Map by product name
-//        Set<OrderDetail> orderItems = order.getOrderItemList().stream()
-//                .map(item -> {
-//                    OrderDetail orderDetail = new OrderDetail();
-//                    orderDetail.setProductName(item.getProductName());
-//                    orderDetail.setQuantity(item.getQuantity());
-//                    orderDetail.setSubtotal(item.getSubtotal());
-//                    return orderDetail;
-//                })
-//                .collect(Collectors.toSet());
-//        newOrder.setOrderItems(orderItems);
-        Order newOrder = Order.builder()
-                .shippingAddress(order.getShippingAddress())
-                .user(order.getUser())
-                .status(order.getStatus())
-                .totalPrice(order.getTotalPrice())
-                .orderNumber(order.getOrderNumber())
-                .orderItems(order.getOrderItems().stream()
-                        .map(item -> OrderDetail.builder()
-                                .productName(item.getProductName())
-                                .quantity(item.getQuantity())
-                                .unitPrice(item.getUnitPrice())
-                                .subtotal(item.getSubtotal())
-                                .build())
-                        .collect(Collectors.toSet()))
-                .build();
-        List<SessionCreateParams.LineItem> lineItems = newOrder.getOrderItems().stream()
+    public Session createCheckoutSession(OrderDto orderDto) throws StripeException {
+        // Get the existing order from database
+        Order existingOrder = orderService.findOrderByOrderNumber(orderDto.getOrderNumber());
+        if (existingOrder == null) {
+            throw new IllegalArgumentException("Order not found with order number: " + orderDto.getOrderNumber());
+        }
+
+        // Create line items from the existing order
+        List<SessionCreateParams.LineItem> lineItems = existingOrder.getOrderItems().stream()
                 .map(item -> SessionCreateParams.LineItem.builder()
                         .setQuantity((long) item.getQuantity())
                         .setPriceData(
@@ -147,8 +122,8 @@ public class PaymentService {
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("http://localhost:8080/checkout/success")
                 .setCancelUrl("http://localhost:8080/checkout/cancel")
-                .putMetadata("orderNumber", newOrder.getOrderNumber())
-                .putMetadata("username", newOrder.getUser().getUsername())
+                .putMetadata("orderNumber", existingOrder.getOrderNumber())
+                .putMetadata("username", existingOrder.getUser().getUsername())
                 .build();
 
         return Session.create(params);

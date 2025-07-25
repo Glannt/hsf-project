@@ -60,12 +60,17 @@ public class OrderController {
                               HttpSession session,
                               Principal principal,
                               Model model) {
+
+        System.out.println("=== DEBUG: Creating order ===");
+        System.out.println("CartId: " + cartId);
+        System.out.println("UserId: " + userId);
         OrderRequest request = OrderRequest.builder()
                 .cartId(cartId)
                 .userId(userId)
                 .build();
         Order order = orderService.createOrder(request);
         if (order == null) {
+            System.out.println("=== DEBUG: Order creation failed ===");
             model.addAttribute("message", "Tạo đơn hàng thất bại. Vui lòng thử lại sau!");
             return "error";
         }

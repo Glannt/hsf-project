@@ -25,8 +25,8 @@
                         <li><a th:href="@{/products}">Products</a></li>
                         <li><a th:href="@{/cart}">Cart</a></li>
                         <li th:if="${user != null}"><a th:href="@{/logout}">Logout</a></li>
-                        <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                        <li th:if="${!isLogin}"><a th:href="@{/register}">Register</a></li>
+                        <li th:if="${isLogin == null or !isLogin}"><a th:href="@{/login}">Login</a></li>
+                        <li th:if="${isLogin == null or !isLogin}"><a th:href="@{/register}">Register</a></li>
                     </ul>
                 </nav>
             </div>

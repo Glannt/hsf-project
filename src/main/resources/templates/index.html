@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  lang="en"
+>
   <head>
     <meta charset="UTF-8" />
     <title>HSF Project - Home</title>
@@ -7,8 +10,14 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/bootstrap.min.css}"
+    />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/style.css}"
+    />
     <link
       rel="stylesheet"
       th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}"
@@ -108,7 +117,9 @@
       <header class="header">
         <div class="header-middle sticky-header">
           <div class="container">
-            <a href="#" class="logo"
+            <a
+              href="#"
+              class="logo"
               ><img
                 th:src="@{/assets/images/logo.png}"
                 alt="Logo"
@@ -129,8 +140,10 @@
                 <li th:if="${user != null}">
                   <a th:href="@{/logout}">Logout</a>
                 </li>
-                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                <li th:if="${!isLogin}">
+                <li th:if="${isLogin == null or !isLogin}">
+                  <a th:href="@{/login}">Login</a>
+                </li>
+                <li th:if="${isLogin == null or !isLogin}">
                   <a th:href="@{/register}">Register</a>
                 </li>
               </ul>
@@ -188,13 +201,21 @@
                           method="post"
                           style="width: 100%"
                         >
-                          <input type="hidden" name="id" th:value="${pc.id}" />
+                          <input
+                            type="hidden"
+                            name="id"
+                            th:value="${pc.id}"
+                          />
                           <input
                             type="hidden"
                             name="cartId"
                             th:value="${user.cart.id}"
                           />
-                          <input type="hidden" name="quantity" value="1" />
+                          <input
+                            type="hidden"
+                            name="quantity"
+                            value="1"
+                          />
                           <button
                             type="submit"
                             class="btn-product btn-cart w-100"
@@ -215,7 +236,10 @@
                       <!-- End .product-action -->
                     </figure>
                     <div class="product-body">
-                      <h3 class="product-title" th:text="${pc.name}">
+                      <h3
+                        class="product-title"
+                        th:text="${pc.name}"
+                      >
                         PC Name
                       </h3>
                       <div class="product-price">
@@ -234,7 +258,10 @@
             </div>
 
             <!-- PC Pagination -->
-            <nav aria-label="PC Pagination" th:if="${pcs.totalElements > 0}">
+            <nav
+              aria-label="PC Pagination"
+              th:if="${pcs.totalElements > 0}"
+            >
               <ul class="pagination justify-content-center">
                 <!-- Prev button -->
                 <li
@@ -350,7 +377,11 @@
                             name="cartId"
                             th:value="${user.cart.id}"
                           />
-                          <input type="hidden" name="quantity" value="1" />
+                          <input
+                            type="hidden"
+                            name="quantity"
+                            value="1"
+                          />
                           <button
                             type="submit"
                             class="btn-product btn-cart w-100"
@@ -369,7 +400,10 @@
                     </figure>
                     <!-- End .product-media -->
                     <div class="product-body">
-                      <h3 class="product-title" th:text="${item.name}">
+                      <h3
+                        class="product-title"
+                        th:text="${item.name}"
+                      >
                         Item Name
                       </h3>
                       <div class="product-price">
@@ -607,7 +641,10 @@
       </footer>
       <!-- End .footer -->
     </div>
-    <button id="scroll-top" title="Back to Top">
+    <button
+      id="scroll-top"
+      title="Back to Top"
+    >
       <i class="icon-arrow-up"></i>
     </button>
 

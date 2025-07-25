@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  lang="en"
+>
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -7,8 +10,14 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <title>Payment Successful - HSF Project</title>
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/bootstrap.min.css}"
+    />
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/style.css}"
+    />
     <link
       rel="stylesheet"
       th:href="@{/assets/css/plugins/owl-carousel/owl.carousel.css}"
@@ -28,7 +37,9 @@
       <header class="header">
         <div class="header-middle sticky-header">
           <div class="container">
-            <a href="#" class="logo"
+            <a
+              href="#"
+              class="logo"
               ><img
                 th:src="@{/assets/images/logo.png}"
                 alt="Logo"
@@ -44,8 +55,10 @@
                 <li th:if="${user != null}">
                   <a th:href="@{/logout}">Logout</a>
                 </li>
-                <li th:if="${!isLogin}"><a th:href="@{/login}">Login</a></li>
-                <li th:if="${!isLogin}">
+                <li th:if="${isLogin == null or !isLogin}">
+                  <a th:href="@{/login}">Login</a>
+                </li>
+                <li th:if="${isLogin == null or !isLogin}">
                   <a th:href="@{/register}">Register</a>
                 </li>
               </ul>
@@ -99,12 +112,17 @@
                       </div>
                       <div class="col-sm-6">
                         <strong>Status:</strong>
-                        <span class="badge bg-success" th:text="${order.status}"
+                        <span
+                          class="badge bg-success"
+                          th:text="${order.status}"
                           >Confirmed</span
                         >
                       </div>
                     </div>
-                    <div class="row mt-2" th:if="${order.shippingAddress}">
+                    <div
+                      class="row mt-2"
+                      th:if="${order.shippingAddress}"
+                    >
                       <div class="col-12">
                         <strong>Shipping Address:</strong>
                         <span th:text="${order.shippingAddress}"
@@ -115,7 +133,10 @@
                   </div>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <a href="/" class="btn btn-primary me-md-2">
+                    <a
+                      href="/"
+                      class="btn btn-primary me-md-2"
+                    >
                       <i class="fas fa-home me-2"></i>Continue Shopping
                     </a>
                     <a
@@ -276,7 +297,10 @@
       </footer>
       <!-- End .footer -->
     </div>
-    <button id="scroll-top" title="Back to Top">
+    <button
+      id="scroll-top"
+      title="Back to Top"
+    >
       <i class="icon-arrow-up"></i>
     </button>
 

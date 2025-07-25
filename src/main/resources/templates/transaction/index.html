@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
     <title>All Transactions - Admin Panel</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -47,10 +53,16 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-chart-line"></i> All Transactions</h2>
             <div>
-              <a href="/admin" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-arrow-left"></i> Back to Admin
+              <a
+                href="/"
+                class="btn btn-outline-secondary me-2"
+              >
+                <i class="fas fa-arrow-left"></i> Back
               </a>
-              <button class="btn btn-primary" onclick="window.print()">
+              <button
+                class="btn btn-primary"
+                onclick="window.print()"
+              >
                 <i class="fas fa-print"></i> Print Report
               </button>
             </div>
@@ -103,7 +115,10 @@
             </div>
           </div>
 
-          <div th:if="${transactions.isEmpty()}" class="text-center py-5">
+          <div
+            th:if="${transactions.isEmpty()}"
+            class="text-center py-5"
+          >
             <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
             <h4 class="text-muted">No transactions found</h4>
             <p class="text-muted">
@@ -111,7 +126,10 @@
             </p>
           </div>
 
-          <div th:if="${!transactions.isEmpty()}" class="table-responsive">
+          <div
+            th:if="${!transactions.isEmpty()}"
+            class="table-responsive"
+          >
             <table class="table table-striped table-hover">
               <thead class="table-dark">
                 <tr>
@@ -206,7 +224,10 @@
           </div>
 
           <!-- Pagination -->
-          <nav th:if="${totalPages > 1}" aria-label="Transaction pagination">
+          <nav
+            th:if="${totalPages > 1}"
+            aria-label="Transaction pagination"
+          >
             <ul class="pagination justify-content-center">
               <li
                 class="page-item"
@@ -274,7 +295,10 @@
             <div class="row">
               <div class="col-md-6">
                 <strong>Transaction ID:</strong><br />
-                <small class="text-muted" th:text="${transaction.id}"></small>
+                <small
+                  class="text-muted"
+                  th:text="${transaction.id}"
+                ></small>
               </div>
               <div class="col-md-6">
                 <strong>Order ID:</strong><br />
@@ -323,7 +347,10 @@
                   th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy HH:mm:ss')}"
                 ></span>
               </div>
-              <div class="col-md-6" th:if="${transaction.transactionRef}">
+              <div
+                class="col-md-6"
+                th:if="${transaction.transactionRef}"
+              >
                 <strong>VNPay Transaction No:</strong><br />
                 <span th:text="${transaction.transactionRef}"></span>
               </div>

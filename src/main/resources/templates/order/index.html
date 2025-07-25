@@ -1,509 +1,920 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Order Management</title>
-  <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
-  <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
-  <link rel="stylesheet" th:href="@{/assets/css/admin-product.css}" />
-</head>
-<body class="bg-light">
-<div class="container-fluid py-4 main-content">
-  <div class="row min-vh-100">
-    <!-- Sidebar Offcanvas Bootstrap 5 (copy from product.html) -->
-    <nav
-            id="sidebarMenu"
-            class="d-lg-block bg-white sidebar collapse border-end min-vh-100 position-fixed"
-            style="width: 260px; z-index: 1040"
-    >
-      <div class="position-sticky">
-        <div class="list-group list-group-flush mx-3 mt-4">
-          <a
-                  href="/admin/product"
-                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
-          >
-            <i class="fas fa-boxes-stacked me-3 sidebar-link-icon"></i
-            ><span class="sidebar-link-text">Sản phẩm</span>
-          </a>
-          <a
-                  href="/admin/order"
-                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center active"
-          >
-            <i class="fas fa-receipt me-3 sidebar-link-icon"></i
-            ><span class="sidebar-link-text">Đơn hàng</span>
-          </a>
-          <a
-                  href="/admin/users"
-                  class="list-group-item list-group-item-action py-3 ripple d-flex align-items-center"
-          >
-            <i class="fas fa-users me-3 sidebar-link-icon"></i
-            ><span class="sidebar-link-text">Người dùng</span>
-          </a>
-        </div>
-      </div>
-    </nav>
-    <!-- Toggle button for sidebar (visible on mobile) -->
-    <button
-            class="btn btn-primary d-lg-none position-fixed m-3"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu"
-            aria-controls="sidebarMenu"
-            style="z-index: 1100"
-    >
-      <i class="fas fa-bars"></i>
-    </button>
-    <div class="col-lg-9 col-12">
-      <div class="d-flex justify-content-end mb-3">
-        <form th:action="@{/logout}" method="post" style="display: inline">
-          <button type="submit" class="btn btn-outline-danger btn-sm">
-            Logout
-          </button>
-        </form>
-      </div>
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Quản lý Đơn hàng</h2>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-            <li class="breadcrumb-item">
-              <a th:href="@{/admin}">Admin</a>
-            </li>
-            <li class="breadcrumb-item active">Orders</li>
-          </ol>
-        </nav>
-      </div>
-      <!-- Order Summary Card -->
-      <div class="row mb-4">
-        <div class="col-lg-12">
-          <div
-                  class="card"
-                  style="
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  color: white;
-                "
-          >
-            <div class="card-body">
-              <h5 class="card-title text-white">Orders Overview</h5>
-              <div class="row">
-                <div class="col-md-3 text-center">
-                  <h6>Total Orders</h6>
-                  <h4
-                          th:text="${orders != null ? orders.totalElements : 0}"
-                  >
-                    0
-                  </h4>
-                </div>
-                <div class="col-md-3 text-center">
-                  <h6>Current Page</h6>
-                  <h4 th:text="${orders != null ? orders.number + 1 : 1}">
-                    1
-                  </h4>
-                </div>
-                <div class="col-md-3 text-center">
-                  <h6>Total Pages</h6>
-                  <h4 th:text="${orders != null ? orders.totalPages : 1}">
-                    1
-                  </h4>
-                </div>
-                <div class="col-md-3 text-center">
-                  <h6>Orders per Page</h6>
-                  <h4 th:text="${orders != null ? orders.size : 10}">10</h4>
-                </div>
-              </div>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Checkout - HSF Project</title>
+
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/images/icons/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/images/icons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/images/icons/favicon-16x16.png"
+    />
+    <link
+      rel="shortcut icon"
+      href="assets/images/icons/favicon.ico"
+    />
+
+    <!-- Plugins CSS File -->
+    <link
+      rel="stylesheet"
+      href="assets/css/bootstrap.min.css"
+    />
+    <!-- Main CSS File -->
+    <link
+      rel="stylesheet"
+      href="assets/css/style.css"
+    />
+  </head>
+
+  <body>
+    <div class="page-wrapper">
+      <header class="header">
+        <div class="header-top">
+          <div class="container">
+            <div class="header-left">
+              <div class="header-dropdown"></div>
+              <div class="header-dropdown"></div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- Success/Error Messages -->
-      <div
-              th:if="${success}"
-              class="alert alert-success alert-dismissible fade show"
-              role="alert"
-      >
-        <span th:text="${success}">Success message</span>
-        <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-        ></button>
-      </div>
-      <div
-              th:if="${error}"
-              class="alert alert-danger alert-dismissible fade show"
-              role="alert"
-      >
-        <span th:text="${error}">Error message</span>
-        <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-        ></button>
-      </div>
-      <!-- Orders Table -->
-      <div class="modern-card">
-        <div class="card-header">
-              <span class="header-title px-2">
-                <i class="fas fa-receipt me-2"></i>
-                Danh sách Đơn hàng
-              </span>
-        </div>
-        <div class="card-body">
-          <div th:if="${orders != null and orders.content.size() > 0}">
-            <div class="table-responsive">
-              <table
-                      class="table table-bordered table-hover modern-table mb-0"
-              >
-                <thead>
-                <tr>
-                  <th>Mã đơn</th>
-                  <th>Khách hàng</th>
-                  <th>Trạng thái</th>
-                  <th>Tổng tiền</th>
-                  <th>Ngày đặt</th>
-                  <th>Hành động</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="order : ${orders.content}">
-                  <td
-                          class="align-middle fw-bold text-primary"
-                          th:text="${order.orderNumber}"
-                  >
-                    ORD-123456
-                  </td>
-                  <td
-                          class="align-middle"
-                          th:text="${order.user.username}"
-                  >
-                    Customer Name
-                  </td>
-                  <td class="align-middle">
-                          <span
-                                  th:class="|badge px-3 py-2 fs-6 ${order.status == 'PENDING' ? 'bg-warning text-dark' : order.status == 'CONFIRMED' ? 'bg-info text-dark' : order.status == 'SHIPPED' ? 'bg-primary' : order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger'}|"
-                                  th:text="${order.status}"
-                          >
-                            Status
-                          </span>
-                  </td>
-                  <td class="align-middle fw-bold text-end">
-                          <span
-                                  th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')} + ' VND'"
-                          >1,000,000 VND</span
-                          >
-                  </td>
-                  <td class="align-middle text-center">
-                    <span>-</span>
-                  </td>
-                  <td class="align-middle">
-                    <div class="d-flex justify-content-center gap-2">
-                      <button
-                              type="button"
-                              class="btn btn-primary modern-btn"
-                              data-bs-toggle="tooltip"
-                              th:data-target="'#orderDetailModal' + ${order.id}"
-                              title="Xem chi tiết"
-                              data-toggle="modal"
+            <div class="header-right">
+              <ul class="top-menu">
+                <li>
+                  <a href="#">Links</a>
+                  <ul>
+                    <li>
+                      <a href="tel:#"
+                        ><i class="icon-phone"></i>Call: +0123 456 789</a
                       >
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button
-                              type="button"
-                              class="btn btn-warning modern-btn"
-                              data-bs-toggle="tooltip"
-                              title="Cập nhật trạng thái"
-                              th:data-target="'#updateOrderModal' + ${order.id}"
-                              data-toggle="modal"
+                    </li>
+                    <li>
+                      <a href="wishlist.html"
+                        ><i class="icon-heart-o"></i>Wishlist
+                        <span>(3)</span></a
                       >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <!-- Pagination -->
-            <nav
-                    aria-label="Orders Pagination"
-                    th:if="${orders.totalPages > 1}"
-            >
-              <ul class="pagination justify-content-center">
-                <li
-                        class="page-item"
-                        th:classappend="${!orders.hasPrevious()} ? 'disabled'"
-                >
-                  <a
-                          class="page-link page-link-prev"
-                          th:href="@{/admin/order(orderPage=${orders.number - 1})}"
-                  >
-                        <span aria-hidden="true"
-                        ><i class="icon-long-arrow-left"></i></span
-                        >Prev
-                  </a>
-                </li>
-                <li
-                        th:each="page : ${#numbers.sequence(0, orders.totalPages - 1)}"
-                        class="page-item"
-                        th:classappend="${page == orders.number} ? 'active'"
-                >
-                  <a
-                          class="page-link"
-                          th:href="@{/admin/order(orderPage=${page})}"
-                          th:text="${page + 1}"
-                  >1</a
-                  >
-                </li>
-                <li
-                        class="page-item"
-                        th:classappend="${!orders.hasNext()} ? 'disabled'"
-                >
-                  <a
-                          class="page-link page-link-next"
-                          th:href="@{/admin/order(orderPage=${orders.number + 1})}"
-                  >
-                    Next<span aria-hidden="true"
-                  ><i class="icon-long-arrow-right"></i
-                  ></span>
-                  </a>
+                    </li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li th:if="${isLogin == null or !isLogin}">
+                      <a
+                        href="#signin-modal"
+                        data-toggle="modal"
+                        ><i class="icon-user"></i>Login</a
+                      >
+                    </li>
+                    <li th:if="${isLogin}">
+                      <a href="/logout"><i class="icon-user"></i>Logout</a>
+                    </li>
+                  </ul>
                 </li>
               </ul>
-            </nav>
-          </div>
-          <!-- No Orders Message -->
-          <div
-                  th:if="${orders == null or orders.content.size() == 0}"
-                  class="text-center py-5"
-          >
-            <div class="alert alert-info modern-table table-empty-row">
-              <i class="fas fa-box-open fa-2x mb-2"></i><br />
-              Không có đơn hàng nào
             </div>
           </div>
         </div>
-      </div>
-      <!-- Update Order Status Modals -->
-      <div th:each="order : ${orders != null ? orders.content : {}}">
-        <div
-                class="modal fade"
-                th:id="'updateOrderModal' + ${order.id}"
-                tabindex="-1"
-                aria-hidden="true"
-        >
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Update Order Status</h5>
-                <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
+
+        <div class="header-middle sticky-header">
+          <div class="container">
+            <div class="header-left">
+              <button class="mobile-menu-toggler">
+                <span class="sr-only">Toggle mobile menu</span>
+                <i class="icon-bars"></i>
+              </button>
+
+              <a
+                href="/"
+                class="logo"
+              >
+                <img
+                  src="assets/images/logo.png"
+                  alt="HSF Logo"
+                  width="105"
+                  height="25"
+                />
+              </a>
+
+              <nav class="main-nav">
+                <ul class="menu sf-arrows">
+                  <li><a href="/">Home</a></li>
+                  <li><a href="/products">Products</a></li>
+                  <li><a href="/cart">Cart</a></li>
+                </ul>
+              </nav>
+            </div>
+
+            <div class="header-right">
+              <div class="dropdown cart-dropdown">
+                <a
+                  href="/cart"
+                  class="dropdown-toggle"
+                  role="button"
                 >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="mb-3">
-                  <p>
-                    <strong>Order Number:</strong>
-                    <span th:text="${order.orderNumber}"></span>
-                  </p>
-                  <p>
-                    <strong>Customer:</strong>
-                    <span th:text="${order.user.username}"></span>
-                  </p>
-                  <p>
-                    <strong>Current Status:</strong>
-                    <span
-                            th:class="|badge ${order.status == 'PENDING' ? 'badge-warning' : order.status == 'CONFIRMED' ? 'badge-info' : order.status == 'SHIPPED' ? 'badge-primary' : order.status == 'DELIVERED' ? 'badge-success' : 'badge-danger'}|"
-                            th:text="${order.status}"
-                    ></span>
-                  </p>
-                </div>
-                <form
-                        th:action="@{/admin/order/{orderId}(orderId=${order.id})}"
-                        method="post"
-                >
-                  <div class="mb-3">
-                    <label
-                            th:for="'status' + ${order.id}"
-                            class="form-label"
-                    >New Status:</label
-                    >
-                    <select
-                            th:name="'status'"
-                            th:id="'status' + ${order.id}"
-                            class="form-select"
-                            required
-                    >
-                      <option
-                              value="PENDING"
-                              th:selected="${order.status == 'PENDING'}"
-                      >
-                        Pending
-                      </option>
-                      <option
-                              value="CONFIRMED"
-                              th:selected="${order.status == 'CONFIRMED'}"
-                      >
-                        Confirmed
-                      </option>
-                      <option
-                              value="SHIPPED"
-                              th:selected="${order.status == 'SHIPPED'}"
-                      >
-                        Shipped
-                      </option>
-                      <option
-                              value="DELIVERED"
-                              th:selected="${order.status == 'DELIVERED'}"
-                      >
-                        Delivered
-                      </option>
-                      <option
-                              value="CANCELLED"
-                              th:selected="${order.status == 'CANCELLED'}"
-                      >
-                        Cancelled
-                      </option>
-                    </select>
-                  </div>
-                  <div class="modal-footer">
-                    <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-dismiss="modal"
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                      Update Status
-                    </button>
-                  </div>
-                </form>
+                  <i class="icon-shopping-cart"></i>
+                  <span class="cart-count">0</span>
+                </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Modal Order detail -->
-      <div th:each="order : ${orders != null ? orders.content : {}}">
+      </header>
+
+      <main class="main">
         <div
-                class="modal fade"
-                th:id="'orderDetailModal' + ${order.id}"
-                tabindex="-1"
-                aria-hidden="true"
+          class="page-header text-center"
+          style="background-image: url('assets/images/page-header-bg.jpg')"
         >
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Order Detail</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
+          <div class="container">
+            <h1 class="page-title">Checkout<span>Shop</span></h1>
+          </div>
+        </div>
+
+        <nav
+          aria-label="breadcrumb"
+          class="breadcrumb-nav"
+        >
+          <div class="container">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/cart">Cart</a></li>
+              <li
+                class="breadcrumb-item active"
+                aria-current="page"
+              >
+                Checkout
+              </li>
+            </ol>
+          </div>
+        </nav>
+
+        <div class="page-content">
+          <div class="checkout">
+            <div class="container">
+              <!-- Success message if order was created -->
+              <div
+                th:if="${order != null}"
+                class="alert alert-success mb-4"
+              >
+                <h5>
+                  <i class="fas fa-check-circle"></i> Order Created
+                  Successfully!
+                </h5>
+                <p>
+                  Your order
+                  <strong th:text="${order.orderNumber}"></strong> has been
+                  created and is pending confirmation.
+                </p>
               </div>
-              <div class="modal-body">
-                <!-- Thông tin đơn hàng -->
-                <div class="mb-3">
-                  <p>
-                    <strong>Order Number:</strong>
-                    <span th:text="${order.orderNumber}"></span>
-                  </p>
-                  <p>
-                    <strong>Customer:</strong>
-                    <span th:text="${order.user.username}"></span>
-                  </p>
-                  <p>
-                    <strong>Status:</strong>
-                    <span
-                            th:class="|badge ${order.status == 'PENDING' ? 'bg-warning text-dark' : order.status == 'CONFIRMED' ? 'bg-info text-dark' : order.status == 'SHIPPED' ? 'bg-primary' : order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger'}|"
-                            th:text="${order.status}"
-                    ></span>
-                  </p>
-                  <p>
-                    <strong>Total Price:</strong>
-                    <span
-                            th:text="${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 2, 'POINT')}"
-                    ></span>
-                    VND
-                  </p>
-                  <p>
-                    <strong>Shipping Address:</strong>
-                    <span th:text="${order.shippingAddress}"></span>
-                  </p>
-                </div>
-                <!-- Danh sách sản phẩm trong đơn -->
-                <div>
-                  <h6 class="fw-bold mb-2">Order Items</h6>
-                  <div
+
+              <form
+                th:action="@{/checkout}"
+                method="post"
+                class="checkout-form"
+              >
+                <div class="row">
+                  <div class="col-lg-9">
+                    <h2 class="checkout-title">Billing Details</h2>
+
+                    <!-- Order Information Section -->
+                    <div
+                      th:if="${order != null}"
+                      class="order-info-section mb-4 p-4 border rounded bg-light"
+                    >
+                      <h4 class="mb-3">
+                        <i class="icon-shopping-bag"></i> Order Information
+                      </h4>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <p>
+                            <strong>Order Number:</strong>
+                            <span
+                              th:text="${order.orderNumber}"
+                              class="text-primary"
+                              >ORD-001</span
+                            >
+                          </p>
+                          <p>
+                            <strong>Status:</strong>
+                            <span
+                              th:class="|badge ${order.status == 'PENDING' ? 'bg-warning text-dark' : order.status == 'CONFIRMED' ? 'bg-info text-dark' : order.status == 'SHIPPED' ? 'bg-primary' : order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger'}|"
+                              th:text="${order.status}"
+                              >PENDING</span
+                            >
+                          </p>
+                          <p>
+                            <strong>Customer:</strong>
+                            <span th:text="${order.user.username}"
+                              >Customer Name</span
+                            >
+                          </p>
+                        </div>
+                        <div class="col-md-6">
+                          <p>
+                            <strong>Total Amount:</strong>
+                            <span
+                              class="h5 text-success"
+                              th:text="${#numbers.formatInteger(order.totalPrice, 0, 'POINT')} + ' VND'"
+                              >0 VND</span
+                            >
+                          </p>
+                          <p>
+                            <strong>Order Date:</strong>
+                            <span
+                              th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"
+                              >-</span
+                            >
+                          </p>
+                          <p>
+                            <strong>Items Count:</strong>
+                            <span th:text="${#lists.size(order.orderItems)}"
+                              >0</span
+                            >
+                            items
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Order Items Details -->
+                      <div class="order-items-section mt-4">
+                        <h5 class="mb-3">
+                          <i class="icon-list"></i> Order Items
+                        </h5>
+                        <div
                           th:if="${order.orderItems != null and #lists.size(order.orderItems) > 0}"
-                  >
-                    <div class="table-responsive">
-                      <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                        <tr>
-                          <th>#</th>
-                          <th>Product</th>
-                          <th>Type</th>
-                          <th>Unit Price</th>
-                          <th>Quantity</th>
-                          <th>Subtotal</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr
-                                th:each="item, iterStat : ${order.orderItems}"
                         >
-                          <td th:text="${iterStat.count}"></td>
-                          <td th:text="${item.productName}"></td>
-                          <td>
-                                  <span th:if="${item.computerItem != null}"
-                                  >Computer Item</span
+                          <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                              <thead class="table-dark">
+                                <tr>
+                                  <th width="5%">#</th>
+                                  <th width="35%">Product Name</th>
+                                  <th width="15%">Type</th>
+                                  <th width="15%">Unit Price</th>
+                                  <th width="10%">Qty</th>
+                                  <th width="20%">Subtotal</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  th:each="item, iterStat : ${order.orderItems}"
+                                >
+                                  <td
+                                    th:text="${iterStat.count}"
+                                    class="fw-bold"
                                   >
-                            <span th:if="${item.pc != null}">PC</span>
-                          </td>
-                          <td
-                                  th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}"
-                          ></td>
-                          <td th:text="${item.quantity}"></td>
-                          <td
-                                  th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}"
-                          ></td>
-                        </tr>
-                        </tbody>
-                      </table>
+                                    1
+                                  </td>
+                                  <td>
+                                    <div>
+                                      <strong
+                                        th:text="${item.productName}"
+                                        class="text-dark"
+                                        >Product Name</strong
+                                      >
+                                    </div>
+                                    <div
+                                      th:if="${item.computerItem != null}"
+                                      class="small text-muted mt-1"
+                                    >
+                                      <i class="icon-tag"></i>
+                                      <span th:text="${item.computerItem.brand}"
+                                        >Brand</span
+                                      >
+                                      -
+                                      <span th:text="${item.computerItem.model}"
+                                        >Model</span
+                                      >
+                                      <div
+                                        th:if="${item.computerItem.category}"
+                                        class="mt-1"
+                                      >
+                                        <span class="badge badge-outline">
+                                          <span
+                                            th:text="${item.computerItem.category.name}"
+                                            >Category</span
+                                          >
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div
+                                      th:if="${item.pc != null}"
+                                      class="small text-muted mt-1"
+                                    >
+                                      <i class="icon-desktop"></i> PC
+                                      Configuration
+                                      <div
+                                        th:if="${item.pc.computerItems != null and #lists.size(item.pc.computerItems) > 0}"
+                                        class="mt-1"
+                                      >
+                                        <small
+                                          >Components:
+                                          <span
+                                            th:each="component, compStat : ${item.pc.computerItems}"
+                                          >
+                                            <span th:text="${component.name}"
+                                              >Component</span
+                                            ><span th:if="${!compStat.last}"
+                                              >,
+                                            </span>
+                                          </span>
+                                        </small>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span
+                                      th:if="${item.computerItem != null}"
+                                      class="badge bg-info text-white"
+                                    >
+                                      <i class="icon-microchip"></i> Computer
+                                      Item
+                                    </span>
+                                    <span
+                                      th:if="${item.pc != null}"
+                                      class="badge bg-success text-white"
+                                    >
+                                      <i class="icon-desktop"></i> PC Build
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span
+                                      th:text="${#numbers.formatInteger(item.unitPrice, 0, 'POINT')} + ' VND'"
+                                      class="fw-bold text-primary"
+                                      >0 VND</span
+                                    >
+                                  </td>
+                                  <td>
+                                    <span
+                                      class="badge bg-secondary fs-6"
+                                      th:text="${item.quantity}"
+                                      >1</span
+                                    >
+                                  </td>
+                                  <td>
+                                    <strong
+                                      th:text="${#numbers.formatInteger(item.subtotal, 0, 'POINT')} + ' VND'"
+                                      class="text-success"
+                                      >0 VND</strong
+                                    >
+                                  </td>
+                                </tr>
+                              </tbody>
+                              <tfoot class="table-light">
+                                <tr>
+                                  <td
+                                    colspan="5"
+                                    class="text-end fw-bold"
+                                  >
+                                    <i class="icon-calculator"></i> Total
+                                    Amount:
+                                  </td>
+                                  <td>
+                                    <strong
+                                      class="h5 text-success"
+                                      th:text="${#numbers.formatInteger(order.totalPrice, 0, 'POINT')} + ' VND'"
+                                      >0 VND</strong
+                                    >
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                        <div
+                          th:if="${order.orderItems == null or #lists.size(order.orderItems) == 0}"
+                          class="alert alert-warning text-center"
+                        >
+                          <i class="icon-exclamation-triangle"></i> No items
+                          found in this order.
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Shipping Address Form -->
+                    <h4 class="checkout-title mt-4">
+                      <i class="icon-map-marker"></i> Shipping Address
+                    </h4>
+
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="shippingAddress">Full Address *</label>
+                        <textarea
+                          id="shippingAddress"
+                          name="shippingAddress"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Enter your complete shipping address including street, city, state, and postal code"
+                          required
+                        ></textarea>
+                        <small class="form-text text-muted">
+                          Please provide a complete address for accurate
+                          delivery
+                        </small>
+                      </div>
                     </div>
                   </div>
-                  <div
-                          th:if="${order.orderItems == null or #lists.size(order.orderItems) == 0}"
-                          class="text-muted"
-                  >
-                    No items in this order.
-                  </div>
+
+                  <aside class="col-lg-3">
+                    <div class="summary">
+                      <h3 class="summary-title">Your Order</h3>
+
+                      <table class="table table-summary">
+                        <thead>
+                          <tr>
+                            <th>Product</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Display order items if order exists -->
+                          <tr
+                            th:if="${order != null}"
+                            th:each="item : ${order.orderItems}"
+                          >
+                            <td>
+                              <span th:text="${item.productName}"
+                                >Product Name</span
+                              >
+                              <span th:if="${item.quantity > 1}">
+                                × <span th:text="${item.quantity}"></span
+                              ></span>
+                            </td>
+                            <td
+                              th:text="${#numbers.formatInteger(item.subtotal, 0, 'POINT')} + ' VND'"
+                            >
+                              $0.00
+                            </td>
+                          </tr>
+
+                          <!-- Fallback if no order items -->
+                          <tr th:if="${order == null}">
+                            <td
+                              colspan="2"
+                              class="text-center text-muted"
+                            >
+                              No items in order
+                            </td>
+                          </tr>
+
+                          <tr class="summary-subtotal">
+                            <td>Subtotal:</td>
+                            <td
+                              th:text="${order != null ? (#numbers.formatInteger(order.totalPrice, 0, 'POINT') + ' VND') : '0 VND'}"
+                            >
+                              $0.00
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Shipping:</td>
+                            <td>Free shipping</td>
+                          </tr>
+                          <tr class="summary-total">
+                            <td>Total:</td>
+                            <td
+                              th:text="${order != null ? (#numbers.formatInteger(order.totalPrice, 0, 'POINT') + ' VND') : '0 VND'}"
+                            >
+                              $0.00
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <div
+                        class="accordion-summary"
+                        id="accordion-payment"
+                      >
+                        <!-- Cash on Delivery Option -->
+                        <div class="card">
+                          <div
+                            class="card-header"
+                            id="heading-cod"
+                          >
+                            <h2 class="card-title">
+                              <a
+                                role="button"
+                                data-toggle="collapse"
+                                href="#collapse-cod"
+                                aria-expanded="true"
+                                aria-controls="collapse-cod"
+                                onclick="selectPaymentMethod('cod')"
+                              >
+                                <input
+                                  type="radio"
+                                  name="paymentMethod"
+                                  value="cod"
+                                  id="payment-cod"
+                                  checked
+                                  onclick="selectPaymentMethod('cod')"
+                                />
+                                <i class="fas fa-money-bill-wave"></i>
+                                Cash on Delivery
+                              </a>
+                            </h2>
+                          </div>
+                          <div
+                            id="collapse-cod"
+                            class="collapse show"
+                            aria-labelledby="heading-cod"
+                            data-parent="#accordion-payment"
+                          >
+                            <div class="card-body">
+                              <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Pay when you receive your order</strong>
+                                <br />
+                                You will pay in cash to our delivery person when
+                                your order arrives. No additional fees apply.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Stripe Credit Card Option -->
+                        <div class="card">
+                          <div
+                            class="card-header"
+                            id="heading-stripe"
+                          >
+                            <h2 class="card-title">
+                              <a
+                                class="collapsed"
+                                role="button"
+                                data-toggle="collapse"
+                                href="#collapse-stripe"
+                                aria-expanded="false"
+                                aria-controls="collapse-stripe"
+                                onclick="selectPaymentMethod('stripe')"
+                              >
+                                <input
+                                  type="radio"
+                                  name="paymentMethod"
+                                  value="stripe"
+                                  id="payment-stripe"
+                                  onclick="selectPaymentMethod('stripe')"
+                                />
+                                <i class="fas fa-credit-card"></i>
+                                Credit Card (Stripe)
+                                <img
+                                  src="assets/images/payments-summary.png"
+                                  alt="payments cards"
+                                  style="height: 20px; margin-left: 10px"
+                                />
+                              </a>
+                            </h2>
+                          </div>
+                          <div
+                            id="collapse-stripe"
+                            class="collapse"
+                            aria-labelledby="heading-stripe"
+                            data-parent="#accordion-payment"
+                          >
+                            <div class="card-body">
+                              <div class="alert alert-success">
+                                <i class="fas fa-shield-alt"></i>
+                                <strong>Secure Online Payment</strong>
+                                <br />
+                                Pay securely with your credit or debit card via
+                                Stripe. Your payment information is encrypted
+                                and secure.
+                                <br /><br />
+                                <small class="text-muted">
+                                  <i class="fas fa-lock"></i>
+                                  SSL encrypted • PCI compliant • 256-bit
+                                  security
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="custom-control custom-checkbox mb-3">
+                        <input
+                          type="checkbox"
+                          class="custom-control-input"
+                          id="terms"
+                          required
+                        />
+                        <label
+                          class="custom-control-label"
+                          for="terms"
+                          >I have read and agree to the website terms and
+                          conditions *</label
+                        >
+                      </div>
+
+                      <input
+                        type="hidden"
+                        name="orderNumber"
+                        th:value="${order != null ? order.orderNumber : ''}"
+                      />
+                      <input
+                        type="hidden"
+                        name="totalPrice"
+                        th:value="${order != null ? order.totalPrice : 0}"
+                      />
+                      <input
+                        type="hidden"
+                        name="userId"
+                        th:value="${order != null ? order.user.id : ''}"
+                      />
+
+                      <button
+                        type="submit"
+                        class="btn btn-outline-primary-2 btn-order btn-block"
+                        th:disabled="${order == null}"
+                      >
+                        <span class="btn-text">Confirm Order</span>
+                        <span class="btn-hover-text">Complete Purchase</span>
+                      </button>
+                    </div>
+                  </aside>
                 </div>
-              </div>
-              <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                >
-                  Close
-                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <div class="footer-middle">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-6 col-lg-3">
+                <div class="widget widget-about">
+                  <img
+                    src="assets/images/logo.png"
+                    class="footer-logo"
+                    alt="Footer Logo"
+                    width="105"
+                    height="25"
+                  />
+                  <p>HSF Project - Your trusted computer store.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div class="footer-bottom">
+          <div class="container">
+            <p class="footer-copyright">
+              Copyright © 2024 HSF Project. All Rights Reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <button
+      id="scroll-top"
+      title="Back to Top"
+    >
+      <i class="icon-arrow-up"></i>
+    </button>
+
+    <!-- Plugins JS File -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="assets/js/jquery.waypoints.min.js"></script>
+    <script src="assets/js/superfish.min.js"></script>
+    <script src="assets/js/owl.carousel.min.js"></script>
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
+
+<!-- Product Detail Modal -->
+<div
+  class="modal fade"
+  id="modalViewProduct"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5
+          class="modal-title"
+          id="modalViewTitle"
+        >
+          Product Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div
+              id="view-image"
+              class="text-center mb-3"
+            >
+              <small class="text-muted">No image available</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="product-details">
+              <p><strong>ID:</strong> <span id="view-id">-</span></p>
+              <h4 id="view-name">Product Name</h4>
+              <p class="h5 text-primary"><span id="view-price">0</span> VND</p>
+
+              <div
+                id="row-brand-model"
+                class="row mb-2"
+                style="display: none"
+              >
+                <div class="col-6">
+                  <strong>Brand:</strong> <span id="view-brand">-</span>
+                </div>
+                <div class="col-6">
+                  <strong>Model:</strong> <span id="view-model">-</span>
+                </div>
+              </div>
+
+              <div
+                id="view-category-group"
+                style="display: none"
+              >
+                <p>
+                  <strong>Category:</strong> <span id="view-category">-</span>
+                </p>
+              </div>
+
+              <div
+                id="view-computer-items-group"
+                style="display: none"
+              >
+                <p><strong>Components:</strong></p>
+                <p
+                  id="view-computer-items"
+                  class="text-muted"
+                >
+                  -
+                </p>
+              </div>
+
+              <div
+                id="row-description"
+                style="display: none"
+              >
+                <p><strong>Description:</strong></p>
+                <p
+                  id="view-description"
+                  class="text-muted"
+                >
+                  -
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
       </div>
     </div>
   </div>
 </div>
-<script th:src="@{/assets/js/jquery.min.js}"></script>
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-</body>
-</html>
+
+<script>
+  function viewProductDetail(id, type) {
+    // Make AJAX call to get product details
+    fetch(`/api/product/${id}?type=${type}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          // Set common fields
+          document.getElementById('view-id').textContent = data.id;
+          document.getElementById('view-name').textContent = data.name;
+          document.getElementById('view-price').textContent = Number(
+            data.price || 0
+          ).toLocaleString('vi-VN');
+
+          // Modal title
+          document.getElementById('modalViewTitle').textContent =
+            type === 'pc' ? 'Chi tiết PC' : 'Chi tiết linh kiện';
+
+          // Brand & Model
+          if (data.brand || data.model) {
+            document.getElementById('row-brand-model').style.display = 'flex';
+            document.getElementById('view-brand').textContent =
+              data.brand || '';
+            document.getElementById('view-model').textContent =
+              data.model || '';
+          } else {
+            document.getElementById('row-brand-model').style.display = 'none';
+          }
+
+          // Description
+          if (data.description) {
+            document.getElementById('row-description').style.display = 'block';
+            document.getElementById('view-description').textContent =
+              data.description;
+          } else {
+            document.getElementById('row-description').style.display = 'none';
+          }
+
+          // Category vs ComputerItems
+          if (type === 'computerItem') {
+            document.getElementById('view-category-group').style.display =
+              'block';
+            document.getElementById('view-computer-items-group').style.display =
+              'none';
+            document.getElementById('view-category').textContent =
+              data.category?.name || '(Không rõ)';
+          } else if (type === 'pc') {
+            document.getElementById('view-category-group').style.display =
+              'none';
+            document.getElementById('view-computer-items-group').style.display =
+              'block';
+            const components =
+              data.computerItems?.map((ci) => ci.name).join(', ') ||
+              '(Không có linh kiện)';
+            document.getElementById('view-computer-items').textContent =
+              components;
+          }
+
+          // Image
+          document.getElementById('view-image').innerHTML = data.imageUrl
+            ? `<img src="${data.imageUrl}" class="img-fluid rounded shadow border" style="max-height: 250px;" />`
+            : `<small class="text-muted">Không có hình ảnh</small>`;
+
+          // Show modal
+          $('#modalViewProduct').modal('show');
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching product details:', error);
+        alert('Failed to load product details');
+      });
+  }
+
+  // Function to handle payment method selection
+  function selectPaymentMethod(method) {
+    // Uncheck all payment method radio buttons
+    document
+      .querySelectorAll('input[name="paymentMethod"]')
+      .forEach(function (radio) {
+        radio.checked = false;
+      });
+
+    // Check the selected payment method
+    const selectedRadio = document.getElementById('payment-' + method);
+    if (selectedRadio) {
+      selectedRadio.checked = true;
+    }
+
+    // Update accordion state
+    if (method === 'cod') {
+      $('#collapse-cod').collapse('show');
+      $('#collapse-stripe').collapse('hide');
+    } else if (method === 'stripe') {
+      $('#collapse-stripe').collapse('show');
+      $('#collapse-cod').collapse('hide');
+    }
+
+    console.log('Payment method selected:', method);
+  }
+
+  // Add event listeners to radio buttons to ensure they work properly
+  document.addEventListener('DOMContentLoaded', function () {
+    document
+      .querySelectorAll('input[name="paymentMethod"]')
+      .forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          console.log('Payment method changed to:', this.value);
+        });
+      });
+  });
+</script>
